@@ -13,28 +13,16 @@ box_factor = 20
 ; Set paths for input files
 path='/users/alexie/Work/Weak_lensing/'
 infile_source  = path+'GG_cat_2006/gglensing_source_v1.7.fits'             ; Using the new catalog (photoz version 1.7)
-;infile_lens    = path+'Group_cat_june_2010/group7.fits'
-;infile_source = '/Users/alexie/Work/GroupCatalogs/lensing15_20101005.fits'
-;infile_lens = '/Users/alexie/Work/GroupCatalogs/cosmos_xgroups_20101005.fits'
-;infile_lens = '/Users/mgeorge/data/cosmos/code/group5_20110114.fits'
-;infile_lens = '/Users/mgeorge/data/cosmos/code/group5_20110201match.fits'
-;infile_lens = '/Users/mgeorge/data/cosmos/code/group5_20101005match.fits'
-;infile_lens = '/Users/mgeorge/data/cosmos/code/group5_20110114matchbox.fits'
-infile_lens = '/Users/mgeorge/data/cosmos/code/group6_20110114.fits'
+infile_lens = '/Users/alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits'
 
 ; Set paths for output files
 dirName='bin_'+string(minRadiusKpc,format='(I0)')+'_'+string(maxRadiusKpc,format='(I0)')+'_'+string(nRadiusBins,format='(I0)')
 if(keyword_set(emp_var)) then dirName += '_emp'
 home=getenv('HOME')
-mgPath=home+'/data/cosmos/lensing/test0201f/'+dirName+'/'
-if(NOT(file_test(mgPath))) then begin
-   file_mkdir,mgPath
-   file_mkdir,mgPath+'/plots'
-endif else begin
-   print, 'Overwrite to '+mgPath+' ?'
-;   stop
-endelse
-dir            = mgPath
+fileDir=home+'/data/cosmos/groups_lensing/outfiles/'+dirName+'/'
+plotDir=home+'/data/cosmos/groups_lensing/plots/'+dirName+'/'
+if(NOT(file_test(fileDir))) then file_mkdir,fileDir
+if(NOT(file_test(plotDir))) then file_mkdir,plotDir
 
 ;-------------------------------------------------------------------------
 ; Fitting parameters
@@ -71,8 +59,8 @@ ptSrcRef=replicate(2,n_elements(cen))
 for i=0, n_elements(allnames)-1 do begin
     print,'---------------------------'
     print,allnames[i]
-    lens_file = strcompress(dir+'center_'+allnames[i]+'.fits',/remove_all)
-    plot_file = strcompress(dir+'Plots/center_'+allnames[i],/remove_all)
+    lens_file = strcompress(fileDir+'center_'+allnames[i]+'.fits',/remove_all)
+    plot_file = strcompress(plotDir+'center_'+allnames[i],/remove_all)
     fit_t[0]=ptSrcAll[i]  ; set to include or exclude point source from fit
 ;    run_gg_offset, infile_source, infile_lens, file, 40, 12344, [35, 50, 0.0, 1.5], box_factor,2, /xgroups,/usespecz,/stackx,center=allnames[i]
 ;    plot_halofit, [0.5,0.9],file, plot,fit_t, this_m200, this_err_m200, /makeplot,/quick_c,/groups,/use_200,/stackx,center=allnames[i]
@@ -91,8 +79,8 @@ for i=0,n_elements(cen)-1 do begin
    ; Start by measuring and modeling the signal around the good center
    print,'---------------------------'
    print,ref[i],' and  ',cen[i]
-   lens_file = strcompress(dir+'center_'+ref[i]+'_'+cen[i]+'.fits',/remove_all)
-   plot_file = strcompress(dir+'plots/center_'+ref[i]+'_'+cen[i],/remove_all)
+   lens_file = strcompress(fileDir+'center_'+ref[i]+'_'+cen[i]+'.fits',/remove_all)
+   plot_file = strcompress(plotDir+'center_'+ref[i]+'_'+cen[i],/remove_all)
    run_gg_offset, infile_source, infile_lens, lens_file, 40, minRadiusKpc, maxRadiusKpc, nRadiusBins, [35, 50, 0.0, 1.5], box_factor,2, /xgroups,/usespecz,center=ref[i],refcen=cen[i],/stackx,emp_var=keyword_set(emp_var)
 
    ; Fit model to the lensing signal around the good center
@@ -106,8 +94,8 @@ for i=0,n_elements(cen)-1 do begin
   ; Now measure the lensing signal around the other center and plot both models
    print,'---------------------------'
    print,cen[i],' and  ',ref[i]
-   lens_file = strcompress(dir+'center_'+cen[i]+'_'+ref[i]+'.fits',/remove_all)
-   plot_file = strcompress(dir+'plots/center_'+cen[i]+'_'+ref[i],/remove_all)
+   lens_file = strcompress(fileDir+'center_'+cen[i]+'_'+ref[i]+'.fits',/remove_all)
+   plot_file = strcompress(plotDir+'center_'+cen[i]+'_'+ref[i],/remove_all)
    run_gg_offset, infile_source, infile_lens, lens_file, 40, minRadiusKpc, maxRadiusKpc, nRadiusBins, [35, 50, 0.0, 1.5], box_factor,2, /xgroups,/usespecz,center=cen[i],refcen=ref[i],/stackx,emp_var=keyword_set(emp_var)
 
    ; Use the results from the good center model fit (rob_p_mean)
