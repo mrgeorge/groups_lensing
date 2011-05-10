@@ -1,0 +1,1249 @@
+IDL Version 7.1.1, Mac OS X (darwin x86_64 m64). (c) 2009, ITT Visual Information Solutions
+Installation number: .
+Licensed for use by: 
+
+% Compiled module: ASTROLIB.
+% ASTROLIB: Astronomy Library system variables have been added
+% Compiled module: PSLAYOUT.
+% Compiled module: SETUPPLOT.
+% Compiled module: SIMPCTABLE.
+Xlib: connection to ":0.0" refused by server
+Xlib: No protocol specified
+
+% TVLCT: Unable to connect to X Windows display: :0.0
+% TVLCT: Unable to open X Windows display.
+         Is your DISPLAY environment variable set correctly?
+% Execution halted at: SIMPCTABLE         82 /Users/mgeorge/idl/simpctable.pro
+%                      SETUPPLOT         126
+   /Users/alexie/idl/umsdss_idl/pro/plotting/setupplot.pro
+%                      $MAIN$          
+% Not a legal system variable: !BLACK.
+% Execution halted at: SIMPCTABLE         82 /Users/mgeorge/idl/simpctable.pro
+%                      SETUPPLOT         126
+   /Users/alexie/idl/umsdss_idl/pro/plotting/setupplot.pro
+%                      $MAIN$          
+% Not a legal system variable: !WHITE.
+% Execution halted at: SIMPCTABLE         82 /Users/mgeorge/idl/simpctable.pro
+%                      SETUPPLOT         126
+   /Users/alexie/idl/umsdss_idl/pro/plotting/setupplot.pro
+%                      $MAIN$          
+
+--- Alexie on Macbeth ---
+
+Xlib: connection to ":0.0" refused by server
+Xlib: No protocol specified
+
+% TVLCT: Unable to connect to X Windows display: :0.0
+% TVLCT: Unable to open X Windows display.
+         Is your DISPLAY environment variable set correctly?
+% Execution halted at: SIMPCTABLE         82 /Users/mgeorge/idl/simpctable.pro
+%                      SETUPPLOT         126
+   /Users/alexie/idl/umsdss_idl/pro/plotting/setupplot.pro
+%                      $MAIN$          
+% Compiled module: DOALL_XGROUPS_MATT_PAPER.
+---------------------------
+mmgg_scale and  xray
+% Compiled module: RUN_GG_OFFSET.
+Run gglensing ...
+% Compiled module: MRDFITS.
+% Compiled module: FXPOSIT.
+% Compiled module: FXMOVE.
+% Compiled module: MRD_HREAD.
+% Compiled module: FXPAR.
+% Compiled module: GETTOK.
+% Compiled module: VALID_NUM.
+% Compiled module: MRD_SKIP.
+% Compiled module: SXPAR.
+% Compiled module: MATCH.
+% Compiled module: MRD_STRUCT.
+Number density before:      46.0539
+Number density after:      35.5368
+COMPARING DIFFERENT CENTERS: stacking on mmgg_scale w/ offset model relative to 
+xray
+% Compiled module: GET_CENTER_COORDS.
+% Compiled module: DISTANCE.
+NUM          88
+
+>> Just zphot cut :           88 objects
+Redshift cut :       0.00000      1.50000
+
+Number of  Lenses :          88
+% Compiled module: SELECT_GG_LENS.
+% Compiled module: DEFINE_P_MEAN.
+
+Number of lenses :          88
+
+Number of sources:      209809  Number of lens:          88
+
+> USING THE STACKX OPTION :
+      0.10000000      0.16938140      0.28690060      0.48595626      0.82311954
+       1.3942114       2.3615349       4.0000010
+% Compiled module: DELVARX.
+
+RUNNING GGLENSING_V6
+% Compiled module: GGLENSING_V6.
+% Compiled module: DEFINE_COSMO.
+% Compiled module: CRITICAL_DENSITY_Z0.
+-----------------------------
+Omega b  :    0.0438000
+Omega m  :     0.258000
+Omega l  :     0.742000
+spectral index     0.963000
+H0 :      72.0000
+Sigma_8  :     0.796000
+Critical density, z=0 :   1.43875e+11
+-----------------------------
+% Compiled module: DEFINE_ASTRO_CST.
+  >> Using speczs when avaliable
+% Compiled module: LUMDIST.
+% Compiled module: COSMO_PARAM.
+% Compiled module: QSIMP.
+% Compiled module: ZPARCHECK.
+% Compiled module: TRAPZD.
+BOX FACTOR      20
+num boxes      400
+   Box number:       0
+   Lenses           1
+% Compiled module: GCIRC.
+% Compiled module: SIGMACRITINV.
+% Compiled module: ANGDIST_LAMBDA.
+   Box number:     100
+   Lenses           1
+   Box number:     200
+   Lenses           1
+   Box number:     300
+   Lenses           1
+% Compiled module: MEAN.
+% Compiled module: MOMENT.
+% Compiled module: JACKKNIFE_COV.
+N r bin            8
+N space bin         400
+% Compiled module: GG_STATS.
+% Compiled module: GG_STATS_WEIGHT.
+Radius      0.10000000      0.16938140      0.28690060      0.48595626
+      0.82311954       1.3942114       2.3615349       4.0000010
+Plot radius     0.078514646      0.13817562      0.23256428      0.39454533
+      0.67226863       1.1307088       1.9178412       3.2448944
+Number       142.00000       369.00000       1083.0000       3069.0000
+       9031.0000       25697.000       71681.000       200689.00
+Delta Sigma       205.51744       100.39350       100.48544       58.699692
+       46.086375       23.977215       14.316610       1.2401924
+ws corr   0.00034863008   0.00036163710   0.00036019019   0.00036950623
+   0.00036750755   0.00036682106   0.00036588673   0.00036575991
+ws corr test   0.00035243787   0.00036572227   0.00036522643   0.00037363173
+   0.00037221007   0.00037155859   0.00037073172   0.00037065674
+mean lz   0.00036593557
+mean_lz_test   0.00037079525
+cata_err_fract      0.00000
+cata_err_fract2    0.0151515
+ds_bias is zero      0.00000      0.00000
+% Compiled module: MWRFITS.
+% Compiled module: FXADDPAR.
+% Compiled module: DETABIFY.
+% Compiled module: FXPARPOS.
+N r bin            8
+N space bin         400
+Number of points for finebin:           61
+The End!
+% Compiled module: RUN_DS_MCMC.
+MRDFITS: Binary table.  40 columns by  1 rows.
+MCMC Nstep        50000
+MCMC burn-in          500
+% Compiled module: DS_MCMC.
+% Compiled module: MCMC__DEFINE.
+% Compiled module: SETUP_4.
+% Compiled module: GET_CONC.
+% Compiled module: GET_ZHAO_CONC.
+
+--------------------------------
+--- SET UP INFORMATION ---------
+
+Stellar Mass       11.262645
+
+-- NFW TERM --
+M nfw      13.5000
+Conc       3.8710020
+M min      12.7000    M max       14.3000
+Conc min      0.97235168Conc max       15.410737
+** Number of free parameters :            1
+GROUPS
+% Compiled module: DS_MODEL.
+% Compiled module: GET_OVERDENSITY.
+% Compiled module: DENSITY_CONTRAST.
+% Compiled module: GET_OMEGAM.
+% Compiled module: EZ.
+% Compiled module: CRITICAL_DENSITY.
+% Compiled module: HUBBLE.
+% Compiled module: NFW_DS.
+% Compiled module: ATANH.
+>> First MCMC run
+MCMC: 00 percentMCMC: 60 percentMCMC: done      
+% Compiled module: COUNT_TRANS.
+Num transitions         7563
+Average Transition length       2.20362  steps
+% Compiled module: MCMC_STATS.
+% Compiled module: SIGMA_CLIP.
+
+Psig ratio1      0.44985176
+
+>> Second MCMC run
+MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
+       34578 transitions
+Average Transition length      0.481983  steps
+
+Psig ratio2       1.0097342
+
+----------
+COMPARE regular versus rob :
+       13.203029
+       13.204208
+      0.18417776
+      0.18169229
+----------
+END OF DS_MCMC ROUTINE
+% Compiled module: PLOT_LENSING_RESULTS.
+MRDFITS: Binary table.  40 columns by  1 rows.
+% Compiled module: PS_OPEN2.
+% Compiled module: TEXTOIDL.
+% Compiled module: TEXTABLE.
+% Compiled module: STRTRANS.
+% Compiled module: STRSPLIT.
+% Compiled module: TRANSLATE_SUB_SUPER.
+% Compiled module: NEXTTOK.
+% Compiled module: STR_TOKEN.
+% Compiled module: MATCHDELIM.
+% Compiled module: STRCNT.
+% Compiled module: SUNSYMBOL.
+% Compiled module: PLOTERROR.
+% Compiled module: LOGLABELS.
+% Compiled module: LEGEND.
+% Compiled module: PS_CLOSE.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_scale_xray.eps closed.
+MRDFITS: Binary table.  40 columns by  1 rows.
+% Compiled module: OPLOTERROR.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_scale_xray_models.eps closed.
+---------------------------
+xray and  mmgg_scale
+Run gglensing ...
+Number density before:      46.0539
+Number density after:      35.5368
+COMPARING DIFFERENT CENTERS: stacking on xray w/ offset model relative to 
+mmgg_scale
+NUM          88
+
+>> Just zphot cut :           88 objects
+Redshift cut :       0.00000      1.50000
+
+Number of  Lenses :          88
+
+Number of lenses :          88
+
+Number of sources:      209809  Number of lens:          88
+
+> USING THE STACKX OPTION :
+      0.10000000      0.16938140      0.28690060      0.48595626      0.82311954
+       1.3942114       2.3615349       4.0000010
+
+RUNNING GGLENSING_V6
+  >> Using speczs when avaliable
+BOX FACTOR      20
+num boxes      400
+   Box number:       0
+   Lenses           1
+   Box number:     100
+   Lenses           1
+   Box number:     200
+   Lenses           1
+   Box number:     300
+   Lenses           1
+N r bin            8
+N space bin         400
+Radius      0.10000000      0.16938140      0.28690060      0.48595626
+      0.82311954       1.3942114       2.3615349       4.0000010
+Plot radius     0.064486389      0.13725657      0.23453766      0.39516069
+      0.66981936       1.1301210       1.9187092       3.2486326
+Number       182.00000       380.00000       1115.0000       3053.0000
+       9054.0000       25958.000       71139.000       200711.00
+Delta Sigma       8.5841184      -38.199424      -22.354621       88.678561
+       23.024307       28.843454       14.764943       1.3739431
+ws corr   0.00034654470   0.00036260565   0.00035608761   0.00037163588
+   0.00036615191   0.00036630665   0.00036654944   0.00036564579
+ws corr test   0.00035161979   0.00036806235   0.00036116466   0.00037486918
+   0.00037135076   0.00037104320   0.00037144253   0.00037050401
+mean lz   0.00036592731
+mean_lz_test   0.00037078289
+cata_err_fract      0.00000
+cata_err_fract2    0.0151515
+ds_bias is zero      0.00000      0.00000
+N r bin            8
+N space bin         400
+Number of points for finebin:           61
+The End!
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_xray_mmgg_scale.eps closed.
+MRDFITS: Binary table.  40 columns by  1 rows.
+% Compiled module: NFW_DS_OFFSET.
+MRDFITS: Binary table.  72 columns by  213 rows.
+% Compiled module: NFW_SIGMA_OFFSET.
+% Compiled module: NFW_SIGMA.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_xray_mmgg_scale_models.eps closed.
+---------------------------
+mmgg_scale and  cm
+Run gglensing ...
+Number density before:      46.0539
+Number density after:      35.5368
+COMPARING DIFFERENT CENTERS: stacking on mmgg_scale w/ offset model relative to 
+cm
+NUM          97
+
+>> Just zphot cut :           97 objects
+Redshift cut :       0.00000      1.50000
+
+Number of  Lenses :          97
+
+Number of lenses :          97
+
+Number of sources:      209809  Number of lens:          97
+
+> USING THE STACKX OPTION :
+      0.10000000      0.16938140      0.28690060      0.48595626      0.82311954
+       1.3942114       2.3615349       4.0000010
+
+RUNNING GGLENSING_V6
+  >> Using speczs when avaliable
+BOX FACTOR      20
+num boxes      400
+   Box number:       0
+   Lenses           1
+   Box number:     100
+   Lenses           1
+   Box number:     200
+   Lenses           1
+   Box number:     300
+   Lenses           1
+N r bin            8
+N space bin         400
+Radius      0.10000000      0.16938140      0.28690060      0.48595626
+      0.82311954       1.3942114       2.3615349       4.0000010
+Plot radius     0.075900748      0.13780312      0.23327976      0.39349540
+      0.67147813       1.1314858       1.9131671       3.2468168
+Number       203.00000       494.00000       1499.0000       3972.0000
+       11145.000       32326.000       89430.000       242364.00
+Delta Sigma       142.20104       147.22896       105.05807       65.103283
+       55.256299       28.173655       14.106398       1.5104269
+ws corr   0.00032293521   0.00035135781   0.00035957157   0.00036319934
+   0.00036363579   0.00036434236   0.00036320907   0.00036488702
+ws corr test   0.00032549236   0.00035546239   0.00036437974   0.00036676143
+   0.00036806655   0.00036902842   0.00036800978   0.00036957551
+mean lz   0.00036434989
+mean_lz_test   0.00036904533
+cata_err_fract      0.00000
+cata_err_fract2    0.0136592
+ds_bias is zero      0.00000      0.00000
+N r bin            8
+N space bin         400
+Number of points for finebin:           61
+The End!
+MRDFITS: Binary table.  40 columns by  1 rows.
+MCMC Nstep        50000
+MCMC burn-in          500
+
+--------------------------------
+--- SET UP INFORMATION ---------
+
+Stellar Mass       11.249319
+
+-- NFW TERM --
+M nfw      13.5000
+Conc       3.8858269
+M min      12.7000    M max       14.3000
+Conc min      0.97607554Conc max       15.469756
+** Number of free parameters :            1
+GROUPS
+>> First MCMC run
+MCMC: 00 percentMCMC: 60 percentMCMC: done      
+Num transitions         6112
+Average Transition length       2.72677  steps
+
+Psig ratio1      0.32849905
+
+>> Second MCMC run
+MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
+       34831 transitions
+Average Transition length      0.478482  steps
+
+Psig ratio2      0.99663298
+
+----------
+COMPARE regular versus rob :
+       13.421193
+       13.421613
+      0.13186427
+      0.13095720
+----------
+END OF DS_MCMC ROUTINE
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_scale_cm.eps closed.
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_scale_cm_models.eps closed.
+---------------------------
+cm and  mmgg_scale
+Run gglensing ...
+Number density before:      46.0539
+Number density after:      35.5368
+COMPARING DIFFERENT CENTERS: stacking on cm w/ offset model relative to 
+mmgg_scale
+NUM          97
+
+>> Just zphot cut :           97 objects
+Redshift cut :       0.00000      1.50000
+
+Number of  Lenses :          97
+
+Number of lenses :          97
+
+Number of sources:      209809  Number of lens:          97
+
+> USING THE STACKX OPTION :
+      0.10000000      0.16938140      0.28690060      0.48595626      0.82311954
+       1.3942114       2.3615349       4.0000010
+
+RUNNING GGLENSING_V6
+  >> Using speczs when avaliable
+BOX FACTOR      20
+num boxes      400
+   Box number:       0
+   Lenses           1
+   Box number:     100
+   Lenses           1
+   Box number:     200
+   Lenses           1
+   Box number:     300
+   Lenses           1
+N r bin            8
+N space bin         400
+Radius      0.10000000      0.16938140      0.28690060      0.48595626
+      0.82311954       1.3942114       2.3615349       4.0000010
+Plot radius     0.069019663      0.13733823      0.23418654      0.39234784
+      0.67046806       1.1325352       1.9163457       3.2483708
+Number       251.00000       447.00000       1428.0000       4078.0000
+       11230.000       32367.000       89867.000       241687.00
+Delta Sigma      -20.017025       1.0545764       49.954735       73.898458
+       40.316358       31.633009       13.937719       1.6081755
+ws corr   0.00035743082   0.00035627468   0.00035902131   0.00036414719
+   0.00036436283   0.00036442155   0.00036269713   0.00036487800
+ws corr test   0.00036194028   0.00035992140   0.00036242994   0.00036778781
+   0.00036908248   0.00036916246   0.00036752351   0.00036955822
+mean lz   0.00036427727
+mean_lz_test   0.00036898267
+cata_err_fract      0.00000
+cata_err_fract2    0.0136592
+ds_bias is zero      0.00000      0.00000
+N r bin            8
+N space bin         400
+Number of points for finebin:           61
+The End!
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_cm_mmgg_scale.eps closed.
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_cm_mmgg_scale_models.eps closed.
+---------------------------
+mmgg_scale and  cm_iter
+Run gglensing ...
+Number density before:      46.0539
+Number density after:      35.5368
+COMPARING DIFFERENT CENTERS: stacking on mmgg_scale w/ offset model relative to 
+cm_iter
+NUM         101
+
+>> Just zphot cut :          101 objects
+Redshift cut :       0.00000      1.50000
+
+Number of  Lenses :         101
+
+Number of lenses :         101
+
+Number of sources:      209809  Number of lens:         101
+
+> USING THE STACKX OPTION :
+      0.10000000      0.16938140      0.28690060      0.48595626      0.82311954
+       1.3942114       2.3615349       4.0000010
+
+RUNNING GGLENSING_V6
+  >> Using speczs when avaliable
+BOX FACTOR      20
+num boxes      400
+   Box number:       0
+   Lenses           1
+   Box number:     100
+   Lenses           1
+   Box number:     200
+   Lenses           1
+   Box number:     300
+   Lenses           1
+N r bin            8
+N space bin         400
+Radius      0.10000000      0.16938140      0.28690060      0.48595626
+      0.82311954       1.3942114       2.3615349       4.0000010
+Plot radius     0.075911510      0.13777257      0.23335234      0.39355055
+      0.67109402       1.1317062       1.9132309       3.2462058
+Number       213.00000       519.00000       1559.0000       4113.0000
+       11490.000       33238.000       91815.000       249702.00
+Delta Sigma       162.16469       164.63698       109.96125       68.840803
+       54.484362       30.501853       15.028856       1.1336301
+ws corr   0.00032068726   0.00035285518   0.00035733647   0.00036172109
+   0.00036206542   0.00036307261   0.00036194236   0.00036376159
+ws corr test   0.00032329893   0.00035653683   0.00036223022   0.00036528786
+   0.00036652134   0.00036776075   0.00036675500   0.00036844378
+mean lz   0.00036316146
+mean_lz_test   0.00036785659
+cata_err_fract      0.00000
+cata_err_fract2    0.0138754
+ds_bias is zero      0.00000      0.00000
+N r bin            8
+N space bin         400
+Number of points for finebin:           61
+The End!
+MRDFITS: Binary table.  40 columns by  1 rows.
+MCMC Nstep        50000
+MCMC burn-in          500
+
+--------------------------------
+--- SET UP INFORMATION ---------
+
+Stellar Mass       11.256073
+
+-- NFW TERM --
+M nfw      13.5000
+Conc       3.8858269
+M min      12.7000    M max       14.3000
+Conc min      0.97607554Conc max       15.469756
+** Number of free parameters :            1
+GROUPS
+>> First MCMC run
+MCMC: 00 percentMCMC: 60 percentMCMC: done      
+Num transitions         5855
+Average Transition length       2.84646  steps
+
+Psig ratio1      0.30749362
+
+>> Second MCMC run
+MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
+       35247 transitions
+Average Transition length      0.472835  steps
+
+Psig ratio2       1.0177685
+
+----------
+COMPARE regular versus rob :
+       13.472151
+       13.472221
+      0.12533805
+      0.12518292
+----------
+END OF DS_MCMC ROUTINE
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_scale_cm_iter.eps closed.
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_scale_cm_iter_models.eps closed.
+---------------------------
+cm_iter and  mmgg_scale
+Run gglensing ...
+Number density before:      46.0539
+Number density after:      35.5368
+COMPARING DIFFERENT CENTERS: stacking on cm_iter w/ offset model relative to 
+mmgg_scale
+NUM         101
+
+>> Just zphot cut :          101 objects
+Redshift cut :       0.00000      1.50000
+
+Number of  Lenses :         101
+
+Number of lenses :         101
+
+Number of sources:      209809  Number of lens:         101
+
+> USING THE STACKX OPTION :
+      0.10000000      0.16938140      0.28690060      0.48595626      0.82311954
+       1.3942114       2.3615349       4.0000010
+
+RUNNING GGLENSING_V6
+  >> Using speczs when avaliable
+BOX FACTOR      20
+num boxes      400
+   Box number:       0
+   Lenses           1
+   Box number:     100
+   Lenses           1
+   Box number:     200
+   Lenses           1
+   Box number:     300
+   Lenses           1
+N r bin            8
+N space bin         400
+Radius      0.10000000      0.16938140      0.28690060      0.48595626
+      0.82311954       1.3942114       2.3615349       4.0000010
+Plot radius     0.070710505      0.13732964      0.23343231      0.39317623
+      0.66901088       1.1321988       1.9155206       3.2472108
+Number       241.00000       504.00000       1493.0000       4159.0000
+       11509.000       33272.000       92240.000       248852.00
+Delta Sigma       21.083744       98.418808       33.384697       54.029594
+       41.370119       33.132780       16.055226       1.1821759
+ws corr   0.00035158339   0.00035597632   0.00035694634   0.00036273964
+   0.00036348222   0.00036337938   0.00036153566   0.00036380929
+ws corr test   0.00035652448   0.00035880196   0.00036063264   0.00036651614
+   0.00036816753   0.00036814875   0.00036635417   0.00036849167
+mean lz   0.00036318448
+mean_lz_test   0.00036789223
+cata_err_fract      0.00000
+cata_err_fract2    0.0138754
+ds_bias is zero      0.00000      0.00000
+N r bin            8
+N space bin         400
+Number of points for finebin:           61
+The End!
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_cm_iter_mmgg_scale.eps closed.
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_cm_iter_mmgg_scale_models.eps closed.
+---------------------------
+mmgg_scale and  cl
+Run gglensing ...
+Number density before:      46.0539
+Number density after:      35.5368
+COMPARING DIFFERENT CENTERS: stacking on mmgg_scale w/ offset model relative to 
+cl
+NUM         103
+
+>> Just zphot cut :          103 objects
+Redshift cut :       0.00000      1.50000
+
+Number of  Lenses :         103
+
+Number of lenses :         103
+
+Number of sources:      209809  Number of lens:         103
+
+> USING THE STACKX OPTION :
+      0.10000000      0.16938140      0.28690060      0.48595626      0.82311954
+       1.3942114       2.3615349       4.0000010
+
+RUNNING GGLENSING_V6
+  >> Using speczs when avaliable
+BOX FACTOR      20
+num boxes      400
+   Box number:       0
+   Lenses           1
+   Box number:     100
+   Lenses           1
+   Box number:     200
+   Lenses           1
+   Box number:     300
+   Lenses           1
+N r bin            8
+N space bin         400
+Radius      0.10000000      0.16938140      0.28690060      0.48595626
+      0.82311954       1.3942114       2.3615349       4.0000010
+Plot radius     0.076039965      0.13813432      0.23320586      0.39323555
+      0.67158885       1.1316040       1.9138514       3.2457931
+Number       214.00000       537.00000       1567.0000       4163.0000
+       11761.000       33914.000       94092.000       257571.00
+Delta Sigma       192.80714       157.96917       96.534810       68.359890
+       57.004210       30.579031       14.861420      0.78338801
+ws corr   0.00032571377   0.00035490262   0.00035653995   0.00036232660
+   0.00036267535   0.00036342392   0.00036272269   0.00036402857
+ws corr test   0.00032881191   0.00035829662   0.00036147511   0.00036597404
+   0.00036708875   0.00036819755   0.00036755132   0.00036878392
+mean lz   0.00036357198
+mean_lz_test   0.00036832354
+cata_err_fract      0.00000
+cata_err_fract2    0.0137848
+ds_bias is zero      0.00000      0.00000
+N r bin            8
+N space bin         400
+Number of points for finebin:           61
+The End!
+MRDFITS: Binary table.  40 columns by  1 rows.
+MCMC Nstep        50000
+MCMC burn-in          500
+
+--------------------------------
+--- SET UP INFORMATION ---------
+
+Stellar Mass       11.255512
+
+-- NFW TERM --
+M nfw      13.5000
+Conc       3.8858269
+M min      12.7000    M max       14.3000
+Conc min      0.97607554Conc max       15.469756
+** Number of free parameters :            1
+GROUPS
+>> First MCMC run
+MCMC: 00 percentMCMC: 60 percentMCMC: done      
+Num transitions         5866
+Average Transition length       2.84112  steps
+
+Psig ratio1      0.31153945
+
+>> Second MCMC run
+MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
+       34948 transitions
+Average Transition length      0.476880  steps
+
+Psig ratio2      0.99624086
+
+----------
+COMPARE regular versus rob :
+       13.458492
+       13.458979
+      0.12516587
+      0.12414733
+----------
+END OF DS_MCMC ROUTINE
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_scale_cl.eps closed.
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_scale_cl_models.eps closed.
+---------------------------
+cl and  mmgg_scale
+Run gglensing ...
+Number density before:      46.0539
+Number density after:      35.5368
+COMPARING DIFFERENT CENTERS: stacking on cl w/ offset model relative to 
+mmgg_scale
+NUM         103
+
+>> Just zphot cut :          103 objects
+Redshift cut :       0.00000      1.50000
+
+Number of  Lenses :         103
+
+Number of lenses :         103
+
+Number of sources:      209809  Number of lens:         103
+
+> USING THE STACKX OPTION :
+      0.10000000      0.16938140      0.28690060      0.48595626      0.82311954
+       1.3942114       2.3615349       4.0000010
+
+RUNNING GGLENSING_V6
+  >> Using speczs when avaliable
+BOX FACTOR      20
+num boxes      400
+   Box number:       0
+   Lenses           1
+   Box number:     100
+   Lenses           1
+   Box number:     200
+   Lenses           1
+   Box number:     300
+   Lenses           1
+N r bin            8
+N space bin         400
+Radius      0.10000000      0.16938140      0.28690060      0.48595626
+      0.82311954       1.3942114       2.3615349       4.0000010
+Plot radius     0.066369265      0.13604945      0.23372208      0.39377410
+      0.66930373       1.1322897       1.9169591       3.2473987
+Number       249.00000       518.00000       1523.0000       4253.0000
+       11844.000       33999.000       94487.000       257029.00
+Delta Sigma       9.9666924      -48.200164       58.627991       63.181309
+       50.696416       32.751178       13.377756       2.0673042
+ws corr   0.00036427087   0.00035315094   0.00035617413   0.00036350681
+   0.00036327111   0.00036361666   0.00036234031   0.00036401253
+ws corr test   0.00036670314   0.00035621263   0.00036075145   0.00036718911
+   0.00036791293   0.00036839826   0.00036719018   0.00036876283
+mean lz   0.00036352895
+mean_lz_test   0.00036828767
+cata_err_fract      0.00000
+cata_err_fract2    0.0137848
+ds_bias is zero      0.00000      0.00000
+N r bin            8
+N space bin         400
+Number of points for finebin:           61
+The End!
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_cl_mmgg_scale.eps closed.
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_cl_mmgg_scale_models.eps closed.
+---------------------------
+mmgg_scale and  mmgg_r200
+Run gglensing ...
+Number density before:      46.0539
+Number density after:      35.5368
+COMPARING DIFFERENT CENTERS: stacking on mmgg_scale w/ offset model relative to 
+mmgg_r200
+NUM          20
+
+>> Just zphot cut :           20 objects
+Redshift cut :       0.00000      1.50000
+
+Number of  Lenses :          20
+
+Number of lenses :          20
+
+Number of sources:      209809  Number of lens:          20
+
+> USING THE STACKX OPTION :
+      0.10000000      0.16938140      0.28690060      0.48595626      0.82311954
+       1.3942114       2.3615349       4.0000010
+
+RUNNING GGLENSING_V6
+  >> Using speczs when avaliable
+BOX FACTOR      20
+num boxes      400
+   Box number:       0
+   Lenses           1
+   Box number:     100
+   Lenses           1
+   Box number:     200
+   Lenses           1
+   Box number:     300
+   Lenses           1
+N r bin            8
+N space bin         400
+Radius      0.10000000      0.16938140      0.28690060      0.48595626
+      0.82311954       1.3942114       2.3615349       4.0000010
+Plot radius     0.075150722      0.13711256      0.23155477      0.39251361
+      0.66930689       1.1312779       1.9019542       3.2454770
+Number       80.000000       200.00000       470.00000       1314.0000
+       3791.0000       10355.000       27735.000       70777.000
+Delta Sigma       51.693594       95.263433       71.489462       29.633834
+       40.780391       37.882385      -2.5805766     -0.22159882
+ws corr   0.00032018225   0.00032562638   0.00032566577   0.00033438238
+   0.00032898094   0.00032878530   0.00032472138   0.00032977207
+ws corr test   0.00032500744   0.00033044068   0.00032873699   0.00033651418
+   0.00033268129   0.00033296132   0.00032917786   0.00033420330
+mean lz   0.00032848582
+mean_lz_test   0.00033284972
+cata_err_fract      0.00000
+cata_err_fract2    0.0114608
+ds_bias is zero      0.00000      0.00000
+N r bin            8
+N space bin         400
+Number of points for finebin:           61
+The End!
+MRDFITS: Binary table.  40 columns by  1 rows.
+MCMC Nstep        50000
+MCMC burn-in          500
+
+--------------------------------
+--- SET UP INFORMATION ---------
+
+Stellar Mass       10.643569
+
+-- NFW TERM --
+M nfw      13.5000
+Conc       3.9175670
+M min      12.7000    M max       14.3000
+Conc min      0.98404829Conc max       15.596116
+** Number of free parameters :            1
+GROUPS
+>> First MCMC run
+MCMC: 00 percentMCMC: 60 percentMCMC: done      
+Num transitions        11840
+Average Transition length       1.40760  steps
+
+Psig ratio1       1.1003679
+
+>> Second MCMC run
+MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
+       34097 transitions
+Average Transition length      0.488782  steps
+
+Psig ratio2      0.98404626
+
+----------
+COMPARE regular versus rob :
+       12.731318
+       12.731388
+      0.43325437
+      0.43312519
+----------
+END OF DS_MCMC ROUTINE
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_scale_mmgg_r200.eps closed.
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_scale_mmgg_r200_models.eps closed.
+---------------------------
+mmgg_r200 and  mmgg_scale
+Run gglensing ...
+Number density before:      46.0539
+Number density after:      35.5368
+COMPARING DIFFERENT CENTERS: stacking on mmgg_r200 w/ offset model relative to 
+mmgg_scale
+NUM          20
+
+>> Just zphot cut :           20 objects
+Redshift cut :       0.00000      1.50000
+
+Number of  Lenses :          20
+
+Number of lenses :          20
+
+Number of sources:      209809  Number of lens:          20
+
+> USING THE STACKX OPTION :
+      0.10000000      0.16938140      0.28690060      0.48595626      0.82311954
+       1.3942114       2.3615349       4.0000010
+
+RUNNING GGLENSING_V6
+  >> Using speczs when avaliable
+BOX FACTOR      20
+num boxes      400
+   Box number:       0
+   Lenses           1
+   Box number:     100
+   Lenses           1
+   Box number:     200
+   Lenses           1
+   Box number:     300
+   Lenses           1
+N r bin            8
+N space bin         400
+Radius      0.10000000      0.16938140      0.28690060      0.48595626
+      0.82311954       1.3942114       2.3615349       4.0000010
+Plot radius     0.072845980      0.13555394      0.23644535      0.39331190
+      0.66908089       1.1345791       1.9117231       3.2468051
+Number       81.000000       141.00000       451.00000       1282.0000
+       3553.0000       10422.000       28395.000       70204.000
+Delta Sigma       7.6582495      -82.843296      -66.188345       67.626176
+       3.7439454       35.851288      -6.5668956       3.9860426
+ws corr   0.00030865371   0.00033347166   0.00033301211   0.00033713738
+   0.00032919941   0.00032488994   0.00032446774   0.00032958208
+ws corr test   0.00030865161   0.00033654792   0.00033617734   0.00033974663
+   0.00033352714   0.00032917351   0.00032878125   0.00033405584
+mean lz   0.00032796566
+mean_lz_test   0.00033234833
+cata_err_fract      0.00000
+cata_err_fract2    0.0114608
+ds_bias is zero      0.00000      0.00000
+N r bin            8
+N space bin         400
+Number of points for finebin:           61
+The End!
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_r200_mmgg_scale.eps closed.
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_r200_mmgg_scale_models.eps closed.
+---------------------------
+mmgg_scale and  2mmgg_r200
+Run gglensing ...
+Number density before:      46.0539
+Number density after:      35.5368
+COMPARING DIFFERENT CENTERS: stacking on mmgg_scale w/ offset model relative to 
+2mmgg_r200
+NUM         101
+
+>> Just zphot cut :          101 objects
+Redshift cut :       0.00000      1.50000
+
+Number of  Lenses :         101
+
+Number of lenses :         101
+
+Number of sources:      209809  Number of lens:         101
+
+> USING THE STACKX OPTION :
+      0.10000000      0.16938140      0.28690060      0.48595626      0.82311954
+       1.3942114       2.3615349       4.0000010
+
+RUNNING GGLENSING_V6
+  >> Using speczs when avaliable
+BOX FACTOR      20
+num boxes      400
+   Box number:       0
+   Lenses           1
+   Box number:     100
+   Lenses           1
+   Box number:     200
+   Lenses           1
+   Box number:     300
+   Lenses           1
+N r bin            8
+N space bin         400
+Radius      0.10000000      0.16938140      0.28690060      0.48595626
+      0.82311954       1.3942114       2.3615349       4.0000010
+Plot radius     0.077632713      0.13810846      0.23458898      0.39494881
+      0.67074933       1.1315249       1.9190479       3.2405671
+Number       176.00000       440.00000       1385.0000       3763.0000
+       10766.000       31245.000       89133.000       244933.00
+Delta Sigma       265.30369       163.63701       93.055733       77.008934
+       57.122494       30.415003       15.769379       3.8500677
+ws corr   0.00032936126   0.00037022159   0.00036836362   0.00037193514
+   0.00037181433   0.00037113833   0.00036925019   0.00036972618
+ws corr test   0.00033156502   0.00037251334   0.00037333892   0.00037593635
+   0.00037652244   0.00037594029   0.00037413339   0.00037453653
+mean lz   0.00036979370
+mean_lz_test   0.00037460840
+cata_err_fract      0.00000
+cata_err_fract2    0.0127005
+ds_bias is zero      0.00000      0.00000
+N r bin            8
+N space bin         400
+Number of points for finebin:           61
+The End!
+MRDFITS: Binary table.  40 columns by  1 rows.
+MCMC Nstep        50000
+MCMC burn-in          500
+
+--------------------------------
+--- SET UP INFORMATION ---------
+
+Stellar Mass       11.320015
+
+-- NFW TERM --
+M nfw      13.5000
+Conc       3.9014371
+M min      12.7000    M max       14.3000
+Conc min      0.97999663Conc max       15.531902
+** Number of free parameters :            1
+GROUPS
+>> First MCMC run
+MCMC: 00 percentMCMC: 60 percentMCMC: done      
+Num transitions         5447
+Average Transition length       3.05967  steps
+
+Psig ratio1      0.28796890
+
+>> Second MCMC run
+MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
+       35131 transitions
+Average Transition length      0.474396  steps
+
+Psig ratio2      0.99508614
+
+----------
+COMPARE regular versus rob :
+       13.590453
+       13.590651
+      0.11501855
+      0.11462155
+----------
+END OF DS_MCMC ROUTINE
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_scale_2mmgg_r200.eps closed.
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_scale_2mmgg_r200_models.eps closed.
+---------------------------
+2mmgg_r200 and  mmgg_scale
+Run gglensing ...
+Number density before:      46.0539
+Number density after:      35.5368
+COMPARING DIFFERENT CENTERS: stacking on 2mmgg_r200 w/ offset model relative to 
+mmgg_scale
+NUM         101
+
+>> Just zphot cut :          101 objects
+Redshift cut :       0.00000      1.50000
+
+Number of  Lenses :         101
+
+Number of lenses :         101
+
+Number of sources:      209809  Number of lens:         101
+
+> USING THE STACKX OPTION :
+      0.10000000      0.16938140      0.28690060      0.48595626      0.82311954
+       1.3942114       2.3615349       4.0000010
+
+RUNNING GGLENSING_V6
+  >> Using speczs when avaliable
+BOX FACTOR      20
+num boxes      400
+   Box number:       0
+   Lenses           1
+   Box number:     100
+   Lenses           1
+   Box number:     200
+   Lenses           1
+   Box number:     300
+   Lenses           1
+N r bin            8
+N space bin         400
+Radius      0.10000000      0.16938140      0.28690060      0.48595626
+      0.82311954       1.3942114       2.3615349       4.0000010
+Plot radius     0.073592624      0.13706902      0.23481020      0.39472725
+      0.66817584       1.1335711       1.9193473       3.2430714
+Number       172.00000       432.00000       1210.0000       3742.0000
+       10825.000       30871.000       89228.000       243609.00
+Delta Sigma       68.263190       57.860209       49.561678       42.451348
+       30.650228       30.242679       12.709118       5.2029184
+ws corr   0.00036031869   0.00037203078   0.00037503954   0.00037305150
+   0.00037252576   0.00037168329   0.00036987035   0.00036976284
+ws corr test   0.00036734615   0.00037615236   0.00037950801   0.00037706281
+   0.00037737202   0.00037660449   0.00037474718   0.00037458913
+mean lz   0.00037007097
+mean_lz_test   0.00037490910
+cata_err_fract      0.00000
+cata_err_fract2    0.0127005
+ds_bias is zero      0.00000      0.00000
+N r bin            8
+N space bin         400
+Number of points for finebin:           61
+The End!
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_2mmgg_r200_mmgg_scale.eps closed.
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_2mmgg_r200_mmgg_scale_models.eps closed.
+---------------------------
+mmgg_scale and  mlgg_r200
+Run gglensing ...
+Number density before:      46.0539
+Number density after:      35.5368
+COMPARING DIFFERENT CENTERS: stacking on mmgg_scale w/ offset model relative to 
+mlgg_r200
+NUM          36
+
+>> Just zphot cut :           36 objects
+Redshift cut :       0.00000      1.50000
+
+Number of  Lenses :          36
+
+Number of lenses :          36
+
+Number of sources:      209809  Number of lens:          36
+
+> USING THE STACKX OPTION :
+      0.10000000      0.16938140      0.28690060      0.48595626      0.82311954
+       1.3942114       2.3615349       4.0000010
+
+RUNNING GGLENSING_V6
+  >> Using speczs when avaliable
+BOX FACTOR      20
+num boxes      400
+   Box number:       0
+   Lenses           1
+   Box number:     100
+   Lenses           1
+   Box number:     200
+   Lenses           1
+   Box number:     300
+   Lenses           1
+N r bin            8
+N space bin         400
+Radius      0.10000000      0.16938140      0.28690060      0.48595626
+      0.82311954       1.3942114       2.3615349       4.0000010
+Plot radius     0.075273528      0.13727809      0.23254834      0.39360161
+      0.67074936       1.1290589       1.9084528       3.2422414
+Number       71.000000       174.00000       441.00000       1238.0000
+       3597.0000       9937.0000       26142.000       72401.000
+Delta Sigma       179.07460       36.072468       34.535903       62.497544
+       19.364398       23.855162       8.7113828       2.9156056
+ws corr   0.00034392924   0.00035349500   0.00036132804   0.00037066165
+   0.00036494551   0.00036475025   0.00036410496   0.00036445347
+ws corr test   0.00034800661   0.00035610636   0.00036559179   0.00037419540
+   0.00036895747   0.00036901898   0.00036832422   0.00036888458
+mean lz   0.00036444098
+mean_lz_test   0.00036878546
+cata_err_fract      0.00000
+cata_err_fract2    0.0179845
+ds_bias is zero      0.00000      0.00000
+N r bin            8
+N space bin         400
+Number of points for finebin:           61
+The End!
+MRDFITS: Binary table.  40 columns by  1 rows.
+MCMC Nstep        50000
+MCMC burn-in          500
+
+--------------------------------
+--- SET UP INFORMATION ---------
+
+Stellar Mass       10.943249
+
+-- NFW TERM --
+M nfw      13.5000
+Conc       3.8435700
+M min      12.7000    M max       14.3000
+Conc min      0.96546109Conc max       15.301529
+** Number of free parameters :            1
+GROUPS
+>> First MCMC run
+MCMC: 00 percentMCMC: 60 percentMCMC: done      
+Num transitions        11430
+Average Transition length       1.45809  steps
+
+Psig ratio1      0.89588053
+
+>> Second MCMC run
+MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
+       35701 transitions
+Average Transition length      0.466822  steps
+
+Psig ratio2      0.99537448
+
+----------
+COMPARE regular versus rob :
+       12.651857
+       12.651857
+      0.35669105
+      0.35669465
+----------
+END OF DS_MCMC ROUTINE
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_scale_mlgg_r200.eps closed.
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mmgg_scale_mlgg_r200_models.eps closed.
+---------------------------
+mlgg_r200 and  mmgg_scale
+Run gglensing ...
+Number density before:      46.0539
+Number density after:      35.5368
+COMPARING DIFFERENT CENTERS: stacking on mlgg_r200 w/ offset model relative to 
+mmgg_scale
+NUM          36
+
+>> Just zphot cut :           36 objects
+Redshift cut :       0.00000      1.50000
+
+Number of  Lenses :          36
+
+Number of lenses :          36
+
+Number of sources:      209809  Number of lens:          36
+
+> USING THE STACKX OPTION :
+      0.10000000      0.16938140      0.28690060      0.48595626      0.82311954
+       1.3942114       2.3615349       4.0000010
+
+RUNNING GGLENSING_V6
+  >> Using speczs when avaliable
+BOX FACTOR      20
+num boxes      400
+   Box number:       0
+   Lenses           1
+   Box number:     100
+   Lenses           1
+   Box number:     200
+   Lenses           1
+   Box number:     300
+   Lenses           1
+N r bin            8
+N space bin         400
+Radius      0.10000000      0.16938140      0.28690060      0.48595626
+      0.82311954       1.3942114       2.3615349       4.0000010
+Plot radius     0.072105491      0.13346049      0.23449872      0.39586987
+      0.66692275       1.1310629       1.9188028       3.2439886
+Number       66.000000       157.00000       420.00000       1293.0000
+       3675.0000       9524.0000       27411.000       72667.000
+Delta Sigma       74.024802       75.369241      -74.960566       69.300868
+       17.249234       29.505548       4.8548193       7.2074076
+ws corr   0.00034751603   0.00037734624   0.00037300012   0.00037105660
+   0.00036217026   0.00036582902   0.00036204679   0.00036329255
+ws corr test   0.00035616560   0.00038288853   0.00037617509   0.00037423203
+   0.00036657185   0.00037009893   0.00036631375   0.00036776944
+mean lz   0.00036328631
+mean_lz_test   0.00036768604
+cata_err_fract      0.00000
+cata_err_fract2    0.0179845
+ds_bias is zero      0.00000      0.00000
+N r bin            8
+N space bin         400
+Number of points for finebin:           61
+The End!
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mlgg_r200_mmgg_scale.eps closed.
+MRDFITS: Binary table.  40 columns by  1 rows.
+/Users/mgeorge/data/cosmos/lensing/bin_50_2000_8/plots/center_mlgg_r200_mmgg_scale_models.eps closed.
