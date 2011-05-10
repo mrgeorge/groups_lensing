@@ -181,26 +181,26 @@ GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
 % Compiled module: COUNT_TRANS.
-Num transitions         5606
-Average Transition length       2.97289  steps
+Num transitions         5632
+Average Transition length       2.95916  steps
 % Compiled module: MCMC_STATS.
 % Compiled module: SIGMA_CLIP.
 
-Psig ratio1      0.29763240
+Psig ratio1      0.30588590
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       35228 transitions
-Average Transition length      0.473090  steps
+       34906 transitions
+Average Transition length      0.477454  steps
 
-Psig ratio2       1.0028292
+Psig ratio2      0.98227147
 
 ----------
 COMPARE regular versus rob :
-       13.366881
-       13.367076
-      0.11977767
-      0.11938978
+       13.367261
+       13.367405
+      0.12047253
+      0.12018520
 ----------
 END OF DS_MCMC ROUTINE
 % Compiled module: PLOT_LENSING_RESULTS.
@@ -220,10 +220,10 @@ MRDFITS: Binary table.  40 columns by  1 rows.
 % Compiled module: LOGLABELS.
 % Compiled module: LEGEND.
 % Compiled module: PS_CLOSE.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_mmgg_scale.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
 % Compiled module: OPLOTERROR.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_mmgg_scale_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale_models.eps closed.
 ---------------------------
 mmgg_r200
 Run gglensing ...
@@ -299,30 +299,30 @@ Conc min      0.97999663Conc max       15.531902
 GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
-Num transitions         5588
-Average Transition length       2.98246  steps
+Num transitions         5616
+Average Transition length       2.96759  steps
 
-Psig ratio1      0.28756285
+Psig ratio1      0.29243050
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       35229 transitions
-Average Transition length      0.473076  steps
+       35000 transitions
+Average Transition length      0.476171  steps
 
-Psig ratio2       1.0079377
+Psig ratio2      0.99318175
 
 ----------
 COMPARE regular versus rob :
-       13.385886
-       13.386153
-      0.11647062
-      0.11593818
+       13.385940
+       13.386231
+      0.11676335
+      0.11617466
 ----------
 END OF DS_MCMC ROUTINE
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_mmgg_r200.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_r200.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_mmgg_r200_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_r200_models.eps closed.
 ---------------------------
 mmgg2_r200
 Run gglensing ...
@@ -398,30 +398,30 @@ Conc min      0.97999663Conc max       15.531902
 GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
-Num transitions         7126
-Average Transition length       2.33876  steps
+Num transitions         7041
+Average Transition length       2.36699  steps
 
-Psig ratio1      0.39266439
+Psig ratio1      0.39778410
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       35121 transitions
-Average Transition length      0.474531  steps
+       35006 transitions
+Average Transition length      0.476090  steps
 
-Psig ratio2       1.0127164
+Psig ratio2       1.0001658
 
 ----------
 COMPARE regular versus rob :
-       12.997657
-       12.997839
-      0.15943957
-      0.15906308
+       13.002582
+       13.002791
+      0.15957096
+      0.15914003
 ----------
 END OF DS_MCMC ROUTINE
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_mmgg2_r200.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg2_r200.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_mmgg2_r200_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg2_r200_models.eps closed.
 ---------------------------
 xray
 Run gglensing ...
@@ -497,30 +497,30 @@ Conc min      0.97999663Conc max       15.531902
 GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
-Num transitions         6368
-Average Transition length       2.61715  steps
+Num transitions         6413
+Average Transition length       2.59878  steps
 
-Psig ratio1      0.33919912
+Psig ratio1      0.33951656
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       35260 transitions
-Average Transition length      0.472660  steps
+       34930 transitions
+Average Transition length      0.477126  steps
 
-Psig ratio2       1.0071713
+Psig ratio2       1.0050308
 
 ----------
 COMPARE regular versus rob :
-       13.140729
-       13.141081
-      0.13738838
-      0.13665264
+       13.140075
+       13.140238
+      0.13681423
+      0.13648985
 ----------
 END OF DS_MCMC ROUTINE
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_xray.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_xray.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_xray_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_xray_models.eps closed.
 ---------------------------
 cm
 Run gglensing ...
@@ -559,18 +559,18 @@ N r bin            8
 N space bin         400
 Radius      0.10000000      0.16938140      0.28690060      0.48595626
       0.82311954       1.3942114       2.3615349       4.0000010
-Plot radius     0.068514239      0.13742771      0.23349633      0.39431004
-      0.66956379       1.1315159       1.9200765       3.2446090
+Plot radius     0.068516340      0.13743296      0.23349568      0.39431212
+      0.66956470       1.1315164       1.9200752       3.2446052
 Number       373.00000       690.00000       2219.0000       6210.0000
-       17651.000       51254.000       144375.00       397617.00
-Delta Sigma       59.464194       93.560933       59.137673       38.397986
-       49.719063       29.678219       12.625225       3.7167549
+       17651.000       51254.000       144375.00       397616.00
+Delta Sigma       59.397303       93.792505       59.152319       38.390435
+       49.716516       29.678890       12.625276       3.7227399
 ws corr   0.00034386573   0.00034616182   0.00034288236   0.00035009627
-   0.00035088438   0.00034988503   0.00034820815   0.00034887980
+   0.00035088438   0.00034988503   0.00034820815   0.00034887891
 ws corr test   0.00035449196   0.00035381820   0.00035267299   0.00035898795
-   0.00036018781   0.00035872118   0.00035750696   0.00035842115
-mean lz   0.00034884528
-mean_lz_test   0.00035826159
+   0.00036018781   0.00035872118   0.00035750696   0.00035842044
+mean lz   0.00034884471
+mean_lz_test   0.00035826114
 cata_err_fract      0.00000
 cata_err_fract2    0.0123558
 ds_bias is zero      0.00000      0.00000
@@ -596,30 +596,30 @@ Conc min      0.97999663Conc max       15.531902
 GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
-Num transitions         5859
-Average Transition length       2.84451  steps
+Num transitions         5992
+Average Transition length       2.78138  steps
 
-Psig ratio1      0.31428397
+Psig ratio1      0.30590384
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       35214 transitions
-Average Transition length      0.473278  steps
+       35202 transitions
+Average Transition length      0.473439  steps
 
-Psig ratio2       1.0043159
+Psig ratio2       1.0283514
 
 ----------
 COMPARE regular versus rob :
-       13.249432
-       13.249678
-      0.12676766
-      0.12625615
+       13.253799
+       13.253989
+      0.12625650
+      0.12583066
 ----------
 END OF DS_MCMC ROUTINE
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_cm.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_cm.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_cm_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_cm_models.eps closed.
 ---------------------------
 cm_iter
 Run gglensing ...
@@ -658,18 +658,18 @@ N r bin            8
 N space bin         400
 Radius      0.10000000      0.16938140      0.28690060      0.48595626
       0.82311954       1.3942114       2.3615349       4.0000010
-Plot radius     0.069353831      0.13701130      0.23341013      0.39388644
-      0.66986090       1.1321758       1.9203237       3.2440471
-Number       346.00000       723.00000       2186.0000       6235.0000
-       17615.000       51059.000       143516.00       395968.00
-Delta Sigma       97.973406       94.180223       53.625136       46.619837
-       45.526122       34.843642       12.737949       3.1527260
-ws corr   0.00034565825   0.00034268384   0.00034397889   0.00034941042
-   0.00035089399   0.00034958588   0.00034782079   0.00034848042
-ws corr test   0.00035569567   0.00035080242   0.00035351531   0.00035842674
-   0.00036011609   0.00035851250   0.00035704076   0.00035801970
-mean lz   0.00034846858
-mean_lz_test   0.00035787029
+Plot radius     0.069356949      0.13701048      0.23338585      0.39387138
+      0.66986255       1.1321747       1.9203196       3.2440427
+Number       346.00000       723.00000       2185.0000       6236.0000
+       17615.000       51059.000       143515.00       395968.00
+Delta Sigma       98.151420       94.225251       53.848366       46.551120
+       45.526699       34.844773       12.739731       3.1514418
+ws corr   0.00034565825   0.00034268384   0.00034393854   0.00034942320
+   0.00035089399   0.00034958588   0.00034782024   0.00034848072
+ws corr test   0.00035569567   0.00035080242   0.00035346119   0.00035844380
+   0.00036011609   0.00035851250   0.00035704004   0.00035802011
+mean lz   0.00034846864
+mean_lz_test   0.00035787038
 cata_err_fract      0.00000
 cata_err_fract2    0.0124352
 ds_bias is zero      0.00000      0.00000
@@ -695,30 +695,30 @@ Conc min      0.97999663Conc max       15.531902
 GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
-Num transitions         5689
-Average Transition length       2.92951  steps
+Num transitions         5782
+Average Transition length       2.88239  steps
 
-Psig ratio1      0.30063352
+Psig ratio1      0.29330921
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       35032 transitions
-Average Transition length      0.475736  steps
+       35494 transitions
+Average Transition length      0.469544  steps
 
-Psig ratio2      0.98865133
+Psig ratio2       1.0071408
 
 ----------
 COMPARE regular versus rob :
-       13.313294
-       13.313632
-      0.11957080
-      0.11888869
+       13.315047
+       13.315149
+      0.11836837
+      0.11816147
 ----------
 END OF DS_MCMC ROUTINE
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_cm_iter.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_cm_iter.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_cm_iter_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_cm_iter_models.eps closed.
 ---------------------------
 cl
 Run gglensing ...
@@ -757,18 +757,18 @@ N r bin            8
 N space bin         400
 Radius      0.10000000      0.16938140      0.28690060      0.48595626
       0.82311954       1.3942114       2.3615349       4.0000010
-Plot radius     0.067751127      0.13782699      0.23293652      0.39454684
-      0.66956424       1.1315668       1.9202547       3.2448017
-Number       368.00000       737.00000       2175.0000       6241.0000
-       17666.000       51271.000       144563.00       397828.00
-Delta Sigma       100.69503      -21.438089       75.606503       39.331224
-       49.682691       28.788670       12.665277       3.9454498
-ws corr   0.00034201989   0.00034490972   0.00034397003   0.00034911504
-   0.00035143865   0.00034985314   0.00034809041   0.00034891734
-ws corr test   0.00035197642   0.00035336742   0.00035382837   0.00035814447
-   0.00036053766   0.00035876605   0.00035736937   0.00035845334
-mean lz   0.00034884756
-mean_lz_test   0.00035825787
+Plot radius     0.067634265      0.13794818      0.23297993      0.39453391
+      0.66959376       1.1315748       1.9202393       3.2447963
+Number       369.00000       738.00000       2172.0000       6241.0000
+       17668.000       51269.000       144569.00       397833.00
+Delta Sigma       98.016506      -22.660337       76.376090       39.416628
+       49.544627       28.874878       12.660518       3.9285178
+ws corr   0.00034195159   0.00034476456   0.00034395345   0.00034912834
+   0.00035145373   0.00034984518   0.00034809353   0.00034891730
+ws corr test   0.00035191331   0.00035322893   0.00035382002   0.00035815120
+   0.00036055532   0.00035875466   0.00035737328   0.00035845330
+mean lz   0.00034884795
+mean_lz_test   0.00035825821
 cata_err_fract      0.00000
 cata_err_fract2    0.0123558
 ds_bias is zero      0.00000      0.00000
@@ -794,30 +794,30 @@ Conc min      0.97999663Conc max       15.531902
 GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
-Num transitions         6073
-Average Transition length       2.74428  steps
+Num transitions         5994
+Average Transition length       2.78045  steps
 
-Psig ratio1      0.31969502
+Psig ratio1      0.31830028
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       35336 transitions
-Average Transition length      0.471644  steps
+       35323 transitions
+Average Transition length      0.471817  steps
 
-Psig ratio2       1.0167181
+Psig ratio2       1.0011668
 
 ----------
 COMPARE regular versus rob :
-       13.212415
-       13.212697
-      0.13069139
-      0.13001589
+       13.213922
+       13.214075
+      0.12779977
+      0.12746867
 ----------
 END OF DS_MCMC ROUTINE
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_cl.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_cl.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_cl_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_cl_models.eps closed.
 ---------------------------
 mlgg_scale
 Run gglensing ...
@@ -893,30 +893,30 @@ Conc min      0.97999663Conc max       15.531902
 GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
-Num transitions         5801
-Average Transition length       2.87295  steps
+Num transitions         5780
+Average Transition length       2.88339  steps
 
-Psig ratio1      0.29730314
+Psig ratio1      0.30091093
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       35185 transitions
-Average Transition length      0.473668  steps
+       34863 transitions
+Average Transition length      0.478043  steps
 
-Psig ratio2       1.0216552
+Psig ratio2      0.99358804
 
 ----------
 COMPARE regular versus rob :
-       13.355480
-       13.355607
-      0.12175771
-      0.12149653
+       13.354569
+       13.354687
+      0.11984022
+      0.11959260
 ----------
 END OF DS_MCMC ROUTINE
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_mlgg_scale.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mlgg_scale.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_mlgg_scale_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mlgg_scale_models.eps closed.
 ---------------------------
 mlgg_r200
 Run gglensing ...
@@ -992,30 +992,30 @@ Conc min      0.97999663Conc max       15.531902
 GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
-Num transitions         5640
-Average Transition length       2.95496  steps
+Num transitions         5570
+Average Transition length       2.99210  steps
 
-Psig ratio1      0.29189068
+Psig ratio1      0.29465878
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       34708 transitions
-Average Transition length      0.480177  steps
+       34590 transitions
+Average Transition length      0.481816  steps
 
-Psig ratio2      0.99352463
+Psig ratio2      0.97489507
 
 ----------
 COMPARE regular versus rob :
-       13.384036
-       13.384313
-      0.11662839
-      0.11600023
+       13.384431
+       13.384569
+      0.11518069
+      0.11490456
 ----------
 END OF DS_MCMC ROUTINE
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_mlgg_r200.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mlgg_r200.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/Plots/center_mlgg_r200_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mlgg_r200_models.eps closed.
 ---------------------------
 mmgg_scale and  mmgg_r200
 Run gglensing ...
@@ -1093,30 +1093,30 @@ Conc min      0.98404829Conc max       15.596116
 GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
-Num transitions        12499
-Average Transition length       1.33339  steps
+Num transitions        12414
+Average Transition length       1.34252  steps
 
-Psig ratio1       1.1010009
+Psig ratio1       1.1127881
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       36300 transitions
-Average Transition length      0.459118  steps
+       36025 transitions
+Average Transition length      0.462623  steps
 
-Psig ratio2       1.0102227
+Psig ratio2       1.0085615
 
 ----------
 COMPARE regular versus rob :
-       12.434212
-       12.434212
-      0.44489796
-      0.44490246
+       12.436352
+       12.436352
+      0.44892154
+      0.44892607
 ----------
 END OF DS_MCMC ROUTINE
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_scale_mmgg_r200.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale_mmgg_r200.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_scale_mmgg_r200_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale_mmgg_r200_models.eps closed.
 ---------------------------
 mmgg_r200 and  mmgg_scale
 Run gglensing ...
@@ -1176,13 +1176,13 @@ N space bin         400
 Number of points for finebin:           61
 The End!
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_r200_mmgg_scale.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_r200_mmgg_scale.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
 % Compiled module: NFW_DS_OFFSET.
 MRDFITS: Binary table.  96 columns by  211 rows.
 % Compiled module: NFW_SIGMA_OFFSET.
 % Compiled module: NFW_SIGMA.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_r200_mmgg_scale_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_r200_mmgg_scale_models.eps closed.
 ---------------------------
 mmgg_scale and  mmgg2_r200
 Run gglensing ...
@@ -1259,30 +1259,30 @@ Conc min      0.97999663Conc max       15.531902
 GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
-Num transitions         5859
-Average Transition length       2.84451  steps
+Num transitions         6063
+Average Transition length       2.74880  steps
 
-Psig ratio1      0.32041810
+Psig ratio1      0.32721198
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       35109 transitions
-Average Transition length      0.474693  steps
+       34978 transitions
+Average Transition length      0.476471  steps
 
-Psig ratio2       1.0000130
+Psig ratio2       1.0110229
 
 ----------
 COMPARE regular versus rob :
-       13.435763
-       13.435913
-      0.12848386
-      0.12816890
+       13.432697
+       13.433068
+      0.13311975
+      0.13232752
 ----------
 END OF DS_MCMC ROUTINE
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_scale_mmgg2_r200.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale_mmgg2_r200.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_scale_mmgg2_r200_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale_mmgg2_r200_models.eps closed.
 ---------------------------
 mmgg2_r200 and  mmgg_scale
 Run gglensing ...
@@ -1342,9 +1342,9 @@ N space bin         400
 Number of points for finebin:           61
 The End!
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg2_r200_mmgg_scale.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg2_r200_mmgg_scale.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg2_r200_mmgg_scale_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg2_r200_mmgg_scale_models.eps closed.
 ---------------------------
 mmgg_scale and  xray
 Run gglensing ...
@@ -1421,30 +1421,30 @@ Conc min      0.97235168Conc max       15.410737
 GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
-Num transitions         7898
-Average Transition length       2.11015  steps
+Num transitions         7874
+Average Transition length       2.11659  steps
 
-Psig ratio1      0.47212983
+Psig ratio1      0.47312696
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       34677 transitions
-Average Transition length      0.480607  steps
+       34641 transitions
+Average Transition length      0.481106  steps
 
-Psig ratio2      0.97744398
+Psig ratio2      0.98285596
 
 ----------
 COMPARE regular versus rob :
-       13.145328
-       13.146028
-      0.18603411
-      0.18459219
+       13.147186
+       13.148116
+      0.18795116
+      0.18600626
 ----------
 END OF DS_MCMC ROUTINE
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_scale_xray.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale_xray.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_scale_xray_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale_xray_models.eps closed.
 ---------------------------
 xray and  mmgg_scale
 Run gglensing ...
@@ -1504,9 +1504,9 @@ N space bin         400
 Number of points for finebin:           61
 The End!
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_xray_mmgg_scale.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_xray_mmgg_scale.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_xray_mmgg_scale_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_xray_mmgg_scale_models.eps closed.
 ---------------------------
 mmgg_scale and  cm
 Run gglensing ...
@@ -1583,30 +1583,30 @@ Conc min      0.97607554Conc max       15.469756
 GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
-Num transitions         6900
-Average Transition length       2.41536  steps
+Num transitions         6977
+Average Transition length       2.38871  steps
 
-Psig ratio1      0.38968005
+Psig ratio1      0.39391290
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       34843 transitions
-Average Transition length      0.478317  steps
+       34789 transitions
+Average Transition length      0.479059  steps
 
-Psig ratio2      0.99102692
+Psig ratio2      0.99358680
 
 ----------
 COMPARE regular versus rob :
-       13.266563
-       13.266896
-      0.15514463
-      0.15447337
+       13.269203
+       13.269360
+      0.15688819
+      0.15655466
 ----------
 END OF DS_MCMC ROUTINE
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_scale_cm.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale_cm.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_scale_cm_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale_cm_models.eps closed.
 ---------------------------
 cm and  mmgg_scale
 Run gglensing ...
@@ -1646,18 +1646,18 @@ N r bin            8
 N space bin         400
 Radius      0.10000000      0.16938140      0.28690060      0.48595626
       0.82311954       1.3942114       2.3615349       4.0000010
-Plot radius     0.068093020      0.13712887      0.23361390      0.39359555
-      0.66981825       1.1299717       1.9189605       3.2472049
+Plot radius     0.068095799      0.13713641      0.23361298      0.39359852
+      0.66981957       1.1299724       1.9189587       3.2471994
 Number       282.00000       480.00000       1575.0000       4352.0000
-       12143.000       34873.000       97382.000       271174.00
-Delta Sigma       18.690815       31.821146       23.406343       25.266499
-       46.781501       32.506051       11.749994       3.2434680
+       12143.000       34873.000       97382.000       271173.00
+Delta Sigma       18.602477       32.157643       23.427291       25.255572
+       46.777782       32.507039       11.750068       3.2522329
 ws corr   0.00035004376   0.00034898066   0.00034559401   0.00035094046
-   0.00035237956   0.00035209355   0.00035009914   0.00035041720
+   0.00035237956   0.00035209355   0.00035009914   0.00035041592
 ws corr test   0.00035858744   0.00035663751   0.00035385486   0.00035942110
-   0.00036178108   0.00036088901   0.00035955227   0.00036018436
-mean lz   0.00035052037
-mean_lz_test   0.00036010721
+   0.00036178108   0.00036088901   0.00035955227   0.00036018335
+mean lz   0.00035051954
+mean_lz_test   0.00036010656
 cata_err_fract      0.00000
 cata_err_fract2    0.0140538
 ds_bias is zero      0.00000      0.00000
@@ -1666,9 +1666,9 @@ N space bin         400
 Number of points for finebin:           61
 The End!
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_cm_mmgg_scale.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_cm_mmgg_scale.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_cm_mmgg_scale_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_cm_mmgg_scale_models.eps closed.
 ---------------------------
 mmgg_scale and  cm_iter
 Run gglensing ...
@@ -1745,30 +1745,30 @@ Conc min      0.97235168Conc max       15.410737
 GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
-Num transitions         6861
-Average Transition length       2.42909  steps
+Num transitions         7007
+Average Transition length       2.37848  steps
 
-Psig ratio1      0.38993734
+Psig ratio1      0.38606961
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       34869 transitions
-Average Transition length      0.477960  steps
+       34973 transitions
+Average Transition length      0.476539  steps
 
-Psig ratio2      0.99356324
+Psig ratio2      0.99005321
 
 ----------
 COMPARE regular versus rob :
-       13.247677
-       13.248129
-      0.15603639
-      0.15497096
+       13.248306
+       13.248479
+      0.15324231
+      0.15289178
 ----------
 END OF DS_MCMC ROUTINE
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_scale_cm_iter.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale_cm_iter.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_scale_cm_iter_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale_cm_iter_models.eps closed.
 ---------------------------
 cm_iter and  mmgg_scale
 Run gglensing ...
@@ -1808,18 +1808,18 @@ N r bin            8
 N space bin         400
 Radius      0.10000000      0.16938140      0.28690060      0.48595626
       0.82311954       1.3942114       2.3615349       4.0000010
-Plot radius     0.069344901      0.13652994      0.23371464      0.39322302
-      0.67021572       1.1309445       1.9192809       3.2465270
-Number       263.00000       530.00000       1603.0000       4532.0000
-       12503.000       35901.000       100014.00       279088.00
-Delta Sigma       75.433822       39.346899       26.381656       40.323082
-       40.831358       38.258560       13.029319       1.6326589
-ws corr   0.00035184526   0.00034375240   0.00034874151   0.00035225566
-   0.00035398408   0.00035373300   0.00035120140   0.00035165097
-ws corr test   0.00036070812   0.00035241611   0.00035718045   0.00036078484
-   0.00036319499   0.00036251589   0.00036053218   0.00036141512
-mean lz   0.00035176396
-mean_lz_test   0.00036131878
+Plot radius     0.069344829      0.13652939      0.23368026      0.39320112
+      0.67021771       1.1309446       1.9192805       3.2465242
+Number       263.00000       530.00000       1602.0000       4533.0000
+       12503.000       35901.000       100014.00       279087.00
+Delta Sigma       75.422571       39.348416       26.667486       40.232977
+       40.830731       38.259306       13.029448       1.6317481
+ws corr   0.00035184526   0.00034375240   0.00034868998   0.00035227258
+   0.00035398408   0.00035373300   0.00035120140   0.00035165113
+ws corr test   0.00036070812   0.00035241611   0.00035711184   0.00036080725
+   0.00036319499   0.00036251589   0.00036053218   0.00036141535
+mean lz   0.00035176406
+mean_lz_test   0.00036131892
 cata_err_fract      0.00000
 cata_err_fract2    0.0147169
 ds_bias is zero      0.00000      0.00000
@@ -1828,9 +1828,9 @@ N space bin         400
 Number of points for finebin:           61
 The End!
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_cm_iter_mmgg_scale.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_cm_iter_mmgg_scale.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_cm_iter_mmgg_scale_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_cm_iter_mmgg_scale_models.eps closed.
 ---------------------------
 mmgg_scale and  cl
 Run gglensing ...
@@ -1907,30 +1907,30 @@ Conc min      0.97607554Conc max       15.469756
 GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
-Num transitions         6812
-Average Transition length       2.44656  steps
+Num transitions         6791
+Average Transition length       2.45413  steps
 
-Psig ratio1      0.38219824
+Psig ratio1      0.37615484
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       34886 transitions
-Average Transition length      0.477727  steps
+       35147 transitions
+Average Transition length      0.474180  steps
 
-Psig ratio2       1.0016693
+Psig ratio2       1.0307589
 
 ----------
 COMPARE regular versus rob :
-       13.273735
-       13.275527
-      0.15737537
-      0.15313449
+       13.278213
+       13.278827
+      0.15639466
+      0.15508998
 ----------
 END OF DS_MCMC ROUTINE
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_scale_cl.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale_cl.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_scale_cl_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale_cl_models.eps closed.
 ---------------------------
 cl and  mmgg_scale
 Run gglensing ...
@@ -1970,18 +1970,18 @@ N r bin            8
 N space bin         400
 Radius      0.10000000      0.16938140      0.28690060      0.48595626
       0.82311954       1.3942114       2.3615349       4.0000010
-Plot radius     0.067353556      0.13784466      0.23326319      0.39434752
-      0.66962995       1.1303331       1.9187269       3.2471326
-Number       289.00000       540.00000       1543.0000       4482.0000
-       12483.000       35730.000       100239.00       279355.00
-Delta Sigma       118.79377      -60.273060       49.006559       26.861735
-       49.201554       30.529732       11.091233       3.2906979
-ws corr   0.00034467319   0.00034595834   0.00034818856   0.00035203945
-   0.00035414430   0.00035394748   0.00035155328   0.00035193303
-ws corr test   0.00035327939   0.00035547193   0.00035678321   0.00036043123
-   0.00036324799   0.00036279599   0.00036099917   0.00036171725
-mean lz   0.00035204516
-mean_lz_test   0.00036164215
+Plot radius     0.067206230      0.13800994      0.23332505      0.39432951
+      0.66967170       1.1303445       1.9187048       3.2471249
+Number       290.00000       541.00000       1540.0000       4482.0000
+       12485.000       35728.000       100245.00       279360.00
+Delta Sigma       115.30403      -61.903279       50.052347       26.981343
+       49.006784       30.652561       11.084508       3.2668184
+ws corr   0.00034458343   0.00034575535   0.00034817190   0.00035205783
+   0.00035416483   0.00035393664   0.00035155754   0.00035193291
+ws corr test   0.00035319927   0.00035528222   0.00035677566   0.00036044079
+   0.00036327164   0.00036278053   0.00036100449   0.00036171711
+mean lz   0.00035204560
+mean_lz_test   0.00036164254
 cata_err_fract      0.00000
 cata_err_fract2    0.0136986
 ds_bias is zero      0.00000      0.00000
@@ -1990,9 +1990,9 @@ N space bin         400
 Number of points for finebin:           61
 The End!
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_cl_mmgg_scale.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_cl_mmgg_scale.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_cl_mmgg_scale_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_cl_mmgg_scale_models.eps closed.
 ---------------------------
 mmgg_scale and  mlgg_r200
 Run gglensing ...
@@ -2069,30 +2069,30 @@ Conc min      0.96546109Conc max       15.301529
 GROUPS
 >> First MCMC run
 MCMC: 00 percentMCMC: 60 percentMCMC: done      
-Num transitions        11692
-Average Transition length       1.42542  steps
+Num transitions        11803
+Average Transition length       1.41201  steps
 
-Psig ratio1      0.91424376
+Psig ratio1      0.91023898
 
 >> Second MCMC run
 MCMC: 00 percentMCMC: 20 percentMCMC: 40 percentMCMC: 60 percentMCMC: 80 percentMCMC: done      
-       36405 transitions
-Average Transition length      0.457794  steps
+       36312 transitions
+Average Transition length      0.458967  steps
 
-Psig ratio2      0.98763236
+Psig ratio2      0.99661281
 
 ----------
 COMPARE regular versus rob :
-       12.360823
-       12.360823
-      0.36117104
-      0.36117469
+       12.358509
+       12.358509
+      0.36285867
+      0.36286233
 ----------
 END OF DS_MCMC ROUTINE
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_scale_mlgg_r200.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale_mlgg_r200.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mmgg_scale_mlgg_r200_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mmgg_scale_mlgg_r200_models.eps closed.
 ---------------------------
 mlgg_r200 and  mmgg_scale
 Run gglensing ...
@@ -2152,7 +2152,6 @@ N space bin         400
 Number of points for finebin:           61
 The End!
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mlgg_r200_mmgg_scale.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mlgg_r200_mmgg_scale.eps closed.
 MRDFITS: Binary table.  40 columns by  1 rows.
-/Users/mgeorge/data/cosmos/lensing/test0201f/bin_50_2000_8_emp/plots/center_mlgg_r200_mmgg_scale_models.eps closed.
-st0201d/bin_50_2000_8_emp/plots/center_mlgg_r200_mmgg_scale_models.eps closed.
+/Users/mgeorge/data/cosmos/groups_lensing/plots/bin_50_2000_8_emp/center_mlgg_r200_mmgg_scale_models.eps closed.
