@@ -16,6 +16,8 @@ if(NOT(keyword_set(refcen))) then refcen='mmgg_scale'
 
 common xgroup_cat, group
 if(NOT(keyword_set(group))) then begin
+   print,'Group catalog not defined - this code reads in an old version'
+   stop
    groupfile="~alexie/Work/Weak_lensing/Group_cat_june_2010/group6.fits"
    group=mrdfits(groupfile,1)
 endif
