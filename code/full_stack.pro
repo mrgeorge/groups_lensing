@@ -44,10 +44,10 @@ fit_t = [$
 ;----------------------------------------------------------------------
 zscheme=2 ; from ALs code
 box_factor=20 ; from ALs code
-type=40 ; from ALs code
-minz=0.0 ; from ALs code
-maxz=1.5 ; from ALs code
-array=[35, 50, minz, maxz] ; from ALs code
+minLensZ=0.0
+maxLensZ=1.0
+minLensMass=12.
+maxLensMass=15.
 
 cenNames=['mmgg_scale','mmgg_r200','mmgg2_r200','xray','cm','cm_iter','cl','mlgg_scale','mlgg_r200']
 ptSrc=[2,2,2,0,0,0,0,2,2] ; for fit_t
@@ -68,7 +68,7 @@ for i=0, n_elements(cenNames)-1 do begin
     print,'---------------------------'
     print,cenNames[i]
 
-    run_gg_offset, infile_source, infile_lens, lensOutFileArr[i], type, minRadiusKpc, maxRadiusKpc, nRadiusBins, array, box_factor, zscheme, /xgroups,/usespecz,center=cenNames[i],/stackx,emp_var=keyword_set(emp_var)
+    run_gg_offset, infile_source, infile_lens, lensOutFileArr[i], minRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=cenNames[i],/stackx,emp_var=keyword_set(emp_var)
 
    ; Fit model to the lensing signal
    run_ds_mcmc, lensOutFileArr[i], fitTypeAll[*,i], rob_p_mean, rob_p_sigma
