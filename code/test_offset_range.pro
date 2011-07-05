@@ -28,7 +28,7 @@ yerr=str.we1_error
 !p.charsize=1.2
 !p.charthick=1.2
 set_plot,'ps'
-device,filename='test_offset_range.eps',/encapsul,/color
+device,filename='~/data/cosmos/groups_lensing/plots/test_offset_range.eps',/encapsul,/color
 
 xst=1
 yst=1
