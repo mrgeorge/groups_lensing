@@ -1,8 +1,8 @@
-function nfw_ds_offset, r, p, zl, $
+function nfw_ds_offset, r, p, zl, groupFile, $
                         r200 = r200, $
                         r180 = r180, $
                         center=center, $
-                        refcen=refcen 
+                        refcen=refcen, $
 
 ; center is the string name of the center under consideration
 ; refcen is the best halo center, default 'mmgg_scale'
@@ -14,13 +14,8 @@ function nfw_ds_offset, r, p, zl, $
 
 if(NOT(keyword_set(refcen))) then refcen='mmgg_scale'
 
-common xgroup_cat, group
-if(NOT(keyword_set(group))) then begin
-   print,'Group catalog not defined - this code reads in an old version'
-   stop
-   groupfile="~alexie/Work/Weak_lensing/Group_cat_june_2010/group6.fits"
-   group=mrdfits(groupfile,1)
-endif
+; read in group file to get offsets
+group=mrdfits(groupFile,1)
 
 ; get array of offset lengths
 groupsel=group[where(group.flag_include EQ 1)]

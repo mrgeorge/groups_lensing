@@ -1,6 +1,7 @@
 pro plot_lensing_results, lensing_infile, ps_file, p_mean, fit_type,$
                           center=center,$
                           refcen=refcen,$
+                          groupFile=groupFile,$
                           stackx=stackx,$
                           use_m200=use_m200,$
                           use_maccio=use_maccio, $
@@ -188,7 +189,7 @@ if(keyword_set(models)) then begin
 
    ; Offset NFW term
    if(keyword_set(center) AND keyword_set(refcen)) then begin
-      nfw_off = nfw_ds_offset(x_mpc,[rnfw,conc],zl,r200=keyword_set(use_m200),center=center,refcen=refcen)
+      nfw_off = nfw_ds_offset(x_mpc,[rnfw,conc],zl,groupFile,r200=keyword_set(use_m200),center=center,refcen=refcen)
       oplot,x_mpc,nfw_off,color=!orange,linestyle=3
    endif
 
@@ -211,7 +212,7 @@ if(keyword_set(models)) then begin
 
    ; calculate expected model values at locations of data points
    if(keyword_set(center) AND keyword_set(refcen)) then $
-      model_nfw = nfw_ds_offset(x,[rnfw,conc],zl,r200=keyword_set(use_m200),center=center,refcen=refcen) $
+      model_nfw = nfw_ds_offset(x,[rnfw,conc],zl,groupFile,r200=keyword_set(use_m200),center=center,refcen=refcen) $
    else model_nfw = nfw_ds(x,[rnfw,conc],zl,r200=keyword_set(use_m200))
 
    if(fit_type[0] NE 0) then begin
