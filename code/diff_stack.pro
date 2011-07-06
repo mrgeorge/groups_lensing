@@ -103,8 +103,8 @@ for i=0,n_elements(cenNames)-1 do begin
    ;  rather than rerunning run_ds_mcmc
 
    ; Plot the results with and without models
-   plot_lensing_results,lensOutFileArrCen[i],plotFileArrCen[i],rob_p_mean,fitTypeAllCen[*,i],/stackx,/use_m200,center=cenNames[i],refcen=refNames[i]
-   plot_lensing_results,lensOutFileArrCen[i],plotFileArrCen[i]+'_models',rob_p_mean,fitTypeAllCen[*,i],/stackx,/use_m200,center=cenNames[i],refcen=refNames[i],/models
+   plot_lensing_results,lensOutFileArrCen[i],plotFileArrCen[i],rob_p_mean,fitTypeAllCen[*,i],/stackx,/use_m200,center=cenNames[i],refcen=refNames[i],groupFile=infile_lens
+   plot_lensing_results,lensOutFileArrCen[i],plotFileArrCen[i]+'_models',rob_p_mean,fitTypeAllCen[*,i],/stackx,/use_m200,center=cenNames[i],refcen=refNames[i],groupFile=infile_lens,/models
 
 endfor
 
