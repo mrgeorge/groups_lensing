@@ -8,6 +8,7 @@ pro full_stack,minRadiusKpc,maxRadiusKpc,nRadiusBins,emp_var=emp_var
 ; diff_stack.pro to measuring lensing signal comparing two different
 ; centers
 
+; sample call: full_stack,50,2000,8,/emp_var
 
 ; Set paths for input files
 infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7.fits' ; Using the new catalog (photoz version 1.7)
@@ -50,10 +51,12 @@ minLensMass=12.
 maxLensMass=15.
 
 cenNames=['mmgg_scale','mmgg_r200','mmgg2_r200','xray','cm','cm_iter','cl','mlgg_scale','mlgg_r200']
+cenTitles=textoidl(['MMGG_{scale}','MMGG_{R200}','2nd MMGG_{R200}','X-ray','CM','CM_{iter}','CL','MLGG_{scale}','MLGG_{R200}'])
 ptSrc=[2,2,2,0,0,0,0,2,2] ; for fit_t
 
 lensOutFileArr=strcompress(fileDir+'center_'+cenNames+'.fits',/remove_all)
 plotFileArr=strcompress(plotDir+'center_'+cenNames,/remove_all)
+fullPlotFile=plotDir+'full_stacks.eps'
 
 ; create 2d array to save fit types, 1 row for each center
 fitTypeAll=rebin(fit_t,n_elements(fit_t),n_elements(cenNames))
@@ -103,5 +106,7 @@ printf,u,'# Center  Mass  MassErr'
 for ii=0,n_elements(cenNames)-1 do printf,u,cenNames[ii],massMean[ii],massErr[ii]
 close,u
 free_lun,u
+
+plot_full_stacks,cenTitles,lensOutFileArr,fullPlotFile,massMean,fitTypeAll,/stackx,/use_m200
 
 end
