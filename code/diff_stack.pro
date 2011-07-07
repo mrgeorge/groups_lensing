@@ -7,6 +7,7 @@ pro diff_stack,minRadiusKpc,maxRadiusKpc,nRadiusBins,emp_var=emp_var
 ; split into this script for comparing stacks and a separate script
 ; full_stack.pro for single full stacks
 
+; sample call: diff_stack,50,2000,8,/emp_var
 
 ; Set paths for input files
 infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7.fits' ; Using the new catalog (photoz version 1.7)
@@ -48,9 +49,11 @@ maxLensZ=1.0
 minLensMass=12.
 maxLensMass=15.
 
-cenNames=['mmgg_r200','mmgg2_r200','xray','cm','cm_iter','cl','mlgg_scale','mlgg_r200'] ; the "bad centers" to be compared with ref center
-ptSrcCen=[2,2,0,0,0,0,2,2] ; for fit_t
+cenNames=['mmgg_r200','mmgg2_r200','xray','cm','cl','mlgg_scale','mlgg_r200'] ; the "bad centers" to be compared with ref center
+cenTitles=textoidl(['MMGG_{R200}','2nd MMGG_{R200}','X-ray','CM','CL','MLGG_{scale}','MLGG_{R200}'])
+ptSrcCen=[2,2,0,0,0,2,2] ; for fit_t
 refNames=replicate('mmgg_scale',n_elements(cenNames)) ; the "good center" to compare with the ones above
+refTitles=replicate(textoidl('MMGG_{scale}'),n_elements(cenNames))
 ptSrcRef=replicate(2,n_elements(cenNames))
 
 ; filenames convention - first name is the center used for lensing,
@@ -60,7 +63,7 @@ lensOutFileArrCen=strcompress(fileDir+'center_'+cenNames+'_'+refNames+'.fits',/r
 plotFileArrCen=strcompress(plotDir+'center_'+cenNames+'_'+refNames,/remove_all)
 lensOutFileArrRef=strcompress(fileDir+'center_'+refNames+'_'+cenNames+'.fits',/remove_all)
 plotFileArrRef=strcompress(plotDir+'center_'+refNames+'_'+cenNames,/remove_all)
-
+diffPlotFile=plotDir+'diff_stacks.eps'
 
 ; create 2d array to save fit types, 1 row for each center
 fitTypeAllCen=rebin(fit_t,n_elements(fit_t),n_elements(cenNames))
@@ -133,5 +136,6 @@ for ii=0,n_elements(cenNames)-1 do printf,u,refNames[ii],cenNames[ii],massMean[i
 close,u
 free_lun,u
 
+plot_diff_stacks,cenText,refText,lensOutFileArrCen,lensOutFileArrRef,diffPlotFile,infile_lens,massMeanRef,fitTypeAllCen,fitTypeAllRef,stackx=keyword_set(stackx),use_m200=keyword_set(use_m200)
 
 end
