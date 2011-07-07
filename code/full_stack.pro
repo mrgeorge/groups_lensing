@@ -57,6 +57,8 @@ ptSrc=[2,2,2,0,0,0,2,2] ; for fit_t
 lensOutFileArr=strcompress(fileDir+'center_'+cenNames+'.fits',/remove_all)
 plotFileArr=strcompress(plotDir+'center_'+cenNames,/remove_all)
 fullPlotFile=plotDir+'full_stacks.eps'
+massComparisonPlotFile='mass_comparison_full.eps'
+massComparisonTextFile='mass_comparison_full.txt'
 
 ; create 2d array to save fit types, 1 row for each center
 fitTypeAll=rebin(fit_t,n_elements(fit_t),n_elements(cenNames))
@@ -92,7 +94,7 @@ simpctable
 !y.thick=3
 !p.charthick=1.2
 !p.charsize=1.2
-device,filename=plotDir+'mass_comparison_full.eps',/encapsul,/color,/helvetica,xsize=10,ysize=4,/inches
+device,filename=plotDir+massComparisonPlotFile,/encapsul,/color,/helvetica,xsize=10,ysize=4,/inches
 
 plot,massMean,psym=4,xticks=n_elements(cenNames)-1,xtickn=cenNames,xminor=1,xstyle=2,yrange=[min(massMean-massErr),max(massMean+massErr)]
 oploterror,massMean,massErr,psym=4,errthick=3
@@ -100,7 +102,7 @@ oploterror,massMean,massErr,psym=4,errthick=3
 device,/close
 
 ; record the masses and errors to a text file
-openw,u,plotDir+'mass_comparison_full.txt',/get_lun
+openw,u,plotDir+massComparisonTextFile,/get_lun
 printf,u,'# Masses and errors from ds_mcmc. M200c, h=0.72'
 printf,u,'# Center  Mass  MassErr'
 for ii=0,n_elements(cenNames)-1 do printf,u,cenNames[ii],massMean[ii],massErr[ii]
