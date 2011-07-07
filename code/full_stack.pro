@@ -50,9 +50,9 @@ maxLensZ=1.0
 minLensMass=12.
 maxLensMass=15.
 
-cenNames=['mmgg_scale','mmgg_r200','mmgg2_r200','xray','cm','cm_iter','cl','mlgg_scale','mlgg_r200']
-cenTitles=textoidl(['MMGG_{scale}','MMGG_{R200}','2nd MMGG_{R200}','X-ray','CM','CM_{iter}','CL','MLGG_{scale}','MLGG_{R200}'])
-ptSrc=[2,2,2,0,0,0,0,2,2] ; for fit_t
+cenNames=['mmgg_scale','mmgg_r200','mmgg2_r200','xray','cm','cl','mlgg_scale','mlgg_r200']
+cenTitles=textoidl(['MMGG_{scale}','MMGG_{R200}','2nd MMGG_{R200}','X-ray','CM','CL','MLGG_{scale}','MLGG_{R200}'])
+ptSrc=[2,2,2,0,0,0,2,2] ; for fit_t
 
 lensOutFileArr=strcompress(fileDir+'center_'+cenNames+'.fits',/remove_all)
 plotFileArr=strcompress(plotDir+'center_'+cenNames,/remove_all)
