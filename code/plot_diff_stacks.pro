@@ -1,4 +1,4 @@
-pro plot_diff_stacks,cenText,refText,lensFileArrCen,lensFileArrRef,plotFile,groupFile,massMeanRef,fitTypeAllCen,fitTypeAllRef,stackx=stackx,use_m200=use_m200,test=test
+pro plot_diff_stacks,cenNames,refNames,cenText,refText,lensFileArrCen,lensFileArrRef,plotFile,groupFile,massMeanRef,fitTypeAllCen,fitTypeAllRef,stackx=stackx,use_m200=use_m200,test=test
 
 ; plot the lensing stacks on different centers vs. mmgg_scale with model fits
 ; in separate panels, along with histogram of offsets
@@ -149,8 +149,8 @@ for ii=0,nCen-1 do begin
    plot,/nodata,xr,yr,position=[x1,y1,x2,y2],xlog=xlog,ylog=ylog,xst=xst,yst=yst,xtitle=xtit,ytitle=ytit,xtickname=xtickname,ytickname=ytickname,xcharsize=tickCharSize,ycharsize=tickCharSize,ytickv=ytickv,yticks=n_elements(ytickv)-1,yminor=4
    if(ii EQ 0) then begin
       xyouts,xstart+0.5*(nCols*dx+ddx),0.25*ystart,xtitle,alignment=0.5,/normal
-      xyouts,0.3*xstart,ystart+0.5*(nRows*dy),ytitle,alignment=0.5,orientation=90,/normal
-      xyouts,1.7*xstart+nCols*dx+ddx,ystart+0.5*(nRows*dy),ytitleHist,alignment=0.5,orientation=90,/normal
+      xyouts,0.33*xstart,ystart+0.5*(nRows*dy),ytitle,alignment=0.5,orientation=90,/normal
+      xyouts,1.73*xstart+nCols*dx+ddx,ystart+0.5*(nRows*dy),ytitleHist,alignment=0.5,orientation=90,/normal
    endif
 
    ; PLOT THE MODEL
@@ -260,7 +260,7 @@ for ii=0,nCen-1 do begin
    ytickname=blank
 
    ; PLOT BLANK PANEL AND AXIS LABELS
-   plot,/nodata,xr,yr,position=[x1,y1,x2,y2],xlog=xlog,ylog=ylog,xst=xst,yst=yst,xtitle=xtit,ytitle=ytit,xtickname=xtickname,ytickname=ytickname,xcharsize=tickCharSize,ycharsize=tickCharSize
+   plot,/nodata,xr,yr,position=[x1,y1,x2,y2],xlog=xlog,ylog=ylog,xst=xst,yst=yst,xtitle=xtit,ytitle=ytit,xtickname=xtickname,ytickname=ytickname,xcharsize=tickCharSize,ycharsize=tickCharSize,ytickv=ytickv,yticks=n_elements(ytickv)-1,yminor=4
 
    ; PLOT THE MODEL
    nxMpc = 50
