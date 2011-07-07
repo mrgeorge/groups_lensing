@@ -2,7 +2,7 @@ function nfw_ds_offset, r, p, zl, groupFile, $
                         r200 = r200, $
                         r180 = r180, $
                         center=center, $
-                        refcen=refcen, $
+                        refcen=refcen
 
 ; center is the string name of the center under consideration
 ; refcen is the best halo center, default 'mmgg_scale'
