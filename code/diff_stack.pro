@@ -50,10 +50,10 @@ minLensMass=12.
 maxLensMass=15.
 
 cenNames=['mmgg_r200','mmgg2_r200','xray','cm','cl','mlgg_scale','mlgg_r200'] ; the "bad centers" to be compared with ref center
-cenTitles=textoidl(['MMGG_{R200}','2nd MMGG_{R200}','X-ray','CM','CL','MLGG_{scale}','MLGG_{R200}'])
+cenText=textoidl(['MMGG_{R200}','2nd MMGG_{R200}','X-ray','CM','CL','MLGG_{scale}','MLGG_{R200}'])
 ptSrcCen=[2,2,0,0,0,2,2] ; for fit_t
 refNames=replicate('mmgg_scale',n_elements(cenNames)) ; the "good center" to compare with the ones above
-refTitles=replicate(textoidl('MMGG_{scale}'),n_elements(cenNames))
+refText=replicate(textoidl('MMGG_{scale}'),n_elements(cenNames))
 ptSrcRef=replicate(2,n_elements(cenNames))
 
 ; filenames convention - first name is the center used for lensing,
@@ -132,10 +132,10 @@ openw,u,plotDir+'mass_comparison_diff.txt',/get_lun
 printf,u,'# Masses for stacks centered on Center1 when they disagree with Center2'
 printf,u,'# Masses and errors from ds_mcmc. M200c, h=0.72'
 printf,u,'# Center1  Center2  Mass  MassErr'
-for ii=0,n_elements(cenNames)-1 do printf,u,refNames[ii],cenNames[ii],massMean[ii],massErr[ii]
+for ii=0,n_elements(cenNames)-1 do printf,u,refNames[ii],cenNames[ii],massMeanRef[ii],massErrRef[ii]
 close,u
 free_lun,u
 
-plot_diff_stacks,cenText,refText,lensOutFileArrCen,lensOutFileArrRef,diffPlotFile,infile_lens,massMeanRef,fitTypeAllCen,fitTypeAllRef,stackx=keyword_set(stackx),use_m200=keyword_set(use_m200)
+plot_diff_stacks,cenNames,refNames,cenText,refText,lensOutFileArrCen,lensOutFileArrRef,diffPlotFile,infile_lens,massMeanRef,fitTypeAllCen,fitTypeAllRef,/stackx,/use_m200
 
 end
