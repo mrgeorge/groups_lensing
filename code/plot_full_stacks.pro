@@ -50,14 +50,14 @@ nRows=4
 !y.thick=3
 set_plot,'ps'
 simpctable
-plotcircle,1.
+plotcircle,0.7
 sun=sunsymbol()
 star=starsymbol()
 blank=replicate(' ',60)
 
 ;margins and plot dimensions
-xstart=0.1
-ystart=0.05
+xstart=0.12
+ystart=0.07
 dx=(1.-1.2*xstart)/nCols
 dy=(1.-1.4*ystart)/nRows
 
@@ -114,7 +114,7 @@ for ii=0,nCen-1 do begin
 ;   plot,x,y,xr=xr,yr=yr,position=[x1,y1,x2,y2]
    if(ii EQ 0) then begin
       xyouts,xstart+0.5*(nCols*dx),0.25*ystart,xtitle,alignment=0.5,/normal
-      xyouts,0.25*xstart,ystart+0.5*(nRows*dy),ytitle,alignment=0.5,orientation=90,/normal
+      xyouts,0.3*xstart,ystart+0.5*(nRows*dy),ytitle,alignment=0.5,orientation=90,/normal
    endif
 
    ; PLOT THE MODEL
@@ -132,7 +132,7 @@ for ii=0,nCen-1 do begin
 
    ; NFW term
    nfw=nfw_ds(x_mpc,[rnfw,conc],str.z_lens,r200=keyword_set(use_m200))
-   oplot,x_mpc,nfw,color=!green,linestyle=2
+   oplot,x_mpc,nfw,color=!darkgreen,linestyle=2
 
    ; Sum of terms (currently just NFW + point source if point source is included in model)
    if(fitTypeAll[0,ii] NE 0) then begin
@@ -141,7 +141,7 @@ for ii=0,nCen-1 do begin
    endif
 
    ; PLOT DATA POINTS
-   oploterror,x,y,yerr,psym=8,symsize=1.0,color=!black
+   oploterror,x,y,yerr,psym=8,color=!black
    
 
    ; CALCULATE CHI^2
@@ -159,29 +159,33 @@ for ii=0,nCen-1 do begin
    dof = n_elements(x)-n_elements(where(fitTypeAll[*,ii] EQ 1))
 
    ; LEGEND
-   nlens=textoidl('N_{Lens}:')+string(str.lens,format="(I)")
-   z='Redshift:'+string(str.z_lens,format="(f6.2)")
+   nlens=textoidl('N_{Lens}:')
+   zstr='Redshift:'
    if keyword_set(use_m200) then begin
-      m=textoidl('log(M_{200c}/M'+sun+'):')+string(massMean[ii],format="(f6.2)")
-      r=textoidl('R_{200c} (Mpc):')+string(rnfw,format="(f6.2)")
+      mstr=textoidl('log(M_{200c}/M'+sun+'):')
+      rstr=textoidl('R_{200c} (Mpc):')
    endif else begin
-      m=textoidl('log(M_{vir}):')+string(massMean[ii],format="(f6.2)")
-      r=textoidl('R_{vir}:')+string(rnfw,format="(f6.2)")
+      mstr=textoidl('log(M_{vir}):')
+      rstr=textoidl('R_{vir}:')
    endelse
-   c='Concentration:'+string(conc,format="(f6.2)")
-   chisq_str=textoidl('\chi^2:')+string(chisq,format="(f6.2)")
-   dof_str='d.o.f.:'+string(dof,format='(I)')
+   cstr='Concentration:'
+   chisqstr=textoidl('\chi^2:')
+   dof_str='d.o.f.:'
    if(fitTypeAll[0,ii] NE 0) then begin
-      sm=textoidl('log(M')+star+'/M'+sun+'):'+string(str.msun_lens,format="(f6.2)")
+      smstr=textoidl('log(M')+star+'/M'+sun+'):'
    endif else sm=textoidl('log(M')+star+'/M'+sun+'):'+string(0.0,format="(f6.2)")
-   items=[m,sm,chisq_str]
-;   legend,items,/right,pos=[xr[1],yr[1]],box=0,spacing=1.5,charsize=1
+
    yLine=0.1*(yr[1]-yr[0])
-   xRight=0.9*xr[1]
-   for ll=0,n_elements(items)-1 do begin
-      xyouts,xRight,yr[1]-(ll+1)*yLine,items[ll],alignment=1.0,charsize=1.
-   endfor
-   
+   xRight=0.8*xr[1]
+   xStrRight=0.33*xr[1]
+   fmt="(F6.2)"
+   xyouts,xStrRight,yr[1]-1.*yLine,mstr,alignment=0.99,charsize=0.9
+   xyouts,xStrRight,yr[1]-2.*yLine,smstr,alignment=0.88,charsize=0.9
+   xyouts,xStrRight,yr[1]-3.*yLine,chisqstr,alignment=1.0,charsize=0.9
+   xyouts,xRight,yr[1]-1.*yLine,string(massMean[ii],format=fmt),alignment=1,charsize=0.9
+   xyouts,xRight,yr[1]-2.*yLine,string(str.msun_lens,format=fmt),alignment=1,charsize=0.9
+   xyouts,xRight,yr[1]-3.*yLine,string(chisq,format=fmt),alignment=1,charsize=0.9
+
    xyouts,1.1*xr[0],yr[0]+0.5*yLine,cenText[ii],alignment=0
 
 endfor
