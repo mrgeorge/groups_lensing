@@ -37,6 +37,10 @@ case name of
       ra=group.alpha_mlgg_r200
       dec=group.delta_mlgg_r200
    end
+   'bcg1': begin ; AL's old center
+      ra=group.alpha_bcg1
+      dec=group.delta_bcg1
+   end
    'e1': begin
       ra=group.alpha_e1
       dec=group.delta_e1

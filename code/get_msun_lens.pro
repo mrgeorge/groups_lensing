@@ -12,6 +12,7 @@ case center of
    'mmgg2_r200': mass=group.mmgg2_r200_mstar
    'mlgg_scale': mass=group.mlgg_scale_mstar
    'mlgg_r200': mass=group.mlgg_r200_mstar
+   'bcg1': mass=group.bcg_sm ; AL's old center
    else: mass[*]=0.              ; center is not a galaxy
 endcase
 
