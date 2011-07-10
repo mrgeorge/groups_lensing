@@ -14,7 +14,7 @@ gOld=mrdfits("~alexie/Work/Weak_lensing/Group_cat_2008/group11.fits",1)
 infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7.fits' ; Using the new catalog (photoz version 1.7)
 
 fileExt=''
-if(keyword_set(nostackx) AND keyword_set(noempvar)) then $
+if(keyword_set(nostackx) AND keyword_set(noemp)) then $
    fileExt='_nostackx_noemp' $
 else if (keyword_set(nostackx)) then $
    fileExt='_nostackx' $
@@ -32,40 +32,44 @@ printf,u,'#  #       #    x10^42       x10^13         '
 
 ;AL's bins
 ; cf. get_group_paper_boxes()
-lxBins=[[43.30,43.70],$ ;A0
-        [43.01,43.41],$ ;A1
-        [42.61,43.01],$ ;A2
-        [42.21,42.61],$ ;A3
-        [41.71,42.11],$ ;A4
-        [41.81,42.21],$ ;A5
-        [42.30,42.90],$ ;A6
-        [42.37,42.97],$ ;A7
-        [42.75,43.35],$ ;A8
-        [43.30,43.70],$ ;A9 ; repeat the first bin, we can use this to test the repeatability of the lensing code when a different number of identical groups are used
-        [43.30,43.70],$ ;A10
-        [43.30,43.70],$ ;A11
-        [43.30,43.70],$ ;A12
-        [43.30,43.70],$ ;A13
-        [43.30,43.70],$ ;A14
-        [43.30,43.70],$ ;A15
-        [43.30,43.70]] ;A16
-zBins=[[0.17,0.27],$ ;A0
-       [0.3,0.4],$ ;A1
-       [0.3,0.4],$ ;A2
-       [0.3,0.4],$ ;A3
-       [0.18,0.28],$ ;A4
-       [0.3,0.4],$ ;A5
-       [0.43,0.58],$ ;A6
-       [0.595,0.745],$ ;A7
-       [0.816,0.966],$ ;A8
-       [0.17,0.27],$ ;A9
-       [0.17,0.27],$ ;A10
-       [0.17,0.27],$ ;A11
-       [0.17,0.27],$ ;A12
-       [0.17,0.27],$ ;A13
-       [0.17,0.27],$ ;A14
-       [0.17,0.27],$ ;A15
-       [0.17,0.27]] ;A16
+lxBins=[ $
+       [43.30,43.70],$          ;A0
+       [43.01,43.41],$          ;A1
+       [42.61,43.01],$          ;A2
+       [42.21,42.61],$          ;A3
+       [41.71,42.11],$          ;A4
+       [41.81,42.21],$          ;A5
+       [42.30,42.90],$          ;A6
+       [42.37,42.97],$          ;A7
+       [42.75,43.35],$          ;A8
+       [43.30,43.70],$ ;A9 ; repeat the first bin, we can use this to test the repeatability of the lensing code when a different number of identical groups are used
+       [43.30,43.70],$ ;A10
+       [43.30,43.70],$ ;A11
+       [43.30,43.70],$ ;A12
+       [43.30,43.70],$ ;A13
+       [43.30,43.70],$ ;A14
+       [43.30,43.70],$ ;A15
+       [43.30,43.70] $ ;A16
+       ]
+zBins=[ $
+      [0.17,0.27],$                            ;A0
+      [0.3,0.4],$                              ;A1
+      [0.3,0.4],$                              ;A2
+      [0.3,0.4],$                              ;A3
+      [0.18,0.28],$                            ;A4
+      [0.3,0.4],$                              ;A5
+      [0.43,0.58],$                            ;A6
+      [0.595,0.745],$                          ;A7
+      [0.816,0.966],$                          ;A8
+      [0.17,0.27],$                            ;A9
+      [0.17,0.27],$                            ;A10
+      [0.17,0.27],$                            ;A11
+      [0.17,0.27],$                            ;A12
+      [0.17,0.27],$                            ;A13
+      [0.17,0.27],$                            ;A14
+      [0.17,0.27],$                            ;A15
+      [0.17,0.27] $                            ;A16
+      ]
 nRep=[2,1,1,1,1,1,1,1,1,2,2,2,10,20,30,50,100] ; number of times to repeat single group for bins A0,A9+
 nBins=(size(lxBins,/dim))[1]
 
@@ -113,7 +117,7 @@ for ii=0,nBins-1 do begin
              AND gOld.zphot LE zBins[1,ii] $
              AND gOld.lx_scale GE lxBins[0,ii] $
              AND gOld.lx_scale LE lxBins[1,ii] $
-             AND gOld.bcg_flag LE 2 $
+             AND gOld.bcg_flag GE 2 $ ; AL used BCG_FLAG=2 or 3 in her table 1
              ,nSel)
    if(nSel EQ 1) then begin
       sel=replicate(sel,nRep[ii])      ; duplicate entry to avoid scalar/array bugs
@@ -145,7 +149,7 @@ for ii=0,nBins-1 do begin
    run_gg_offset, infile_source, groupFile, lensOutFile, minRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=cenName,stackx=~(keyword_set(nostackx)),emp_var=~(keyword_set(noemp))
 
    ; Fit model to the lensing signal
-   run_ds_mcmc, lensOutFile, fit_t, rob_p_mean, rob_p_sigma
+   run_ds_mcmc, lensOutFile, fit_t, rob_p_mean, rob_p_sigma, stackx=~(keyword_set(nostackx))
    massMean[ii]=rob_p_mean
    massErr[ii]=rob_p_sigma
 
