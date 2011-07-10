@@ -2,7 +2,8 @@ pro run_ds_mcmc, lens_infile, $
                  fit_t, $
                  rob_p_mean, $
                  rob_p_sigma, $
-                 fast=fast
+                 fast=fast, $
+                 stackx=stackx
 
 ; Partial replacement of plot_halofit - only does the modeling, plotting is done elsewhere
 
@@ -44,7 +45,8 @@ use_group = 1                   ; /groups
 use_m200 = 1                    ; /use_200
 ws_corr = 0                     ; /weak_shear_corr
 use_maccio = 0                  ; /use_maccio
-sx = 1                          ; /stackx
+
+sx = keyword_set(stackx)        ; /stackx
 
 ;-------------------------------------------------------------------------
 ; MCMC METHOD
