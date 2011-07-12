@@ -1,4 +1,4 @@
-pro full_stack,minRadiusKpc,maxRadiusKpc,nRadiusBins,emp_var=emp_var
+pro full_stack,minRadiusKpc,maxRadiusKpc,nRadiusBins,stackx=stackx,emp_var=emp_var
 
 ; measure lensing signal for the full stack of groups around different centers
 ; plot results in one big figure for paper
@@ -8,7 +8,7 @@ pro full_stack,minRadiusKpc,maxRadiusKpc,nRadiusBins,emp_var=emp_var
 ; diff_stack.pro to measuring lensing signal comparing two different
 ; centers
 
-; sample call: full_stack,50,2000,8,/emp_var
+; sample call: full_stack,50,2000,8,/stackx,/emp_var
 
 ; Set paths for input files
 infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7.fits' ; Using the new catalog (photoz version 1.7)
@@ -16,6 +16,7 @@ infile_lens = '/Users/alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits' ; 
 
 ; Set paths for output files
 dirName='bin_'+string(minRadiusKpc,format='(I0)')+'_'+string(maxRadiusKpc,format='(I0)')+'_'+string(nRadiusBins,format='(I0)')
+if(keyword_set(stackx)) then dirName += '_sx'
 if(keyword_set(emp_var)) then dirName += '_emp'
 fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'/'
 plotDir='~/data/cosmos/groups_lensing/plots/'+dirName+'/'
@@ -73,7 +74,7 @@ for i=0, n_elements(cenNames)-1 do begin
     print,'---------------------------'
     print,cenNames[i]
 
-    run_gg_offset, infile_source, infile_lens, lensOutFileArr[i], minRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=cenNames[i],/stackx,emp_var=keyword_set(emp_var)
+    run_gg_offset, infile_source, infile_lens, lensOutFileArr[i], minRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=cenNames[i],stackx=keyword_set(stackx),emp_var=keyword_set(emp_var)
 
    ; Fit model to the lensing signal
    run_ds_mcmc, lensOutFileArr[i], fitTypeAll[*,i], rob_p_mean, rob_p_sigma
@@ -81,8 +82,8 @@ for i=0, n_elements(cenNames)-1 do begin
    massErr[i]=rob_p_sigma
 
    ; Plot the results, with and without the models
-   plot_lensing_results,lensOutFileArr[i],plotFileArr[i],rob_p_mean,fitTypeAll[*,i],/stackx,/use_m200
-   plot_lensing_results,lensOutFileArr[i],plotFileArr[i]+'_models',rob_p_mean,fitTypeAll[*,i],/stackx,/use_m200,/models
+   plot_lensing_results,lensOutFileArr[i],plotFileArr[i],rob_p_mean,fitTypeAll[*,i],stackx=keyword_set(stackx),/use_m200
+   plot_lensing_results,lensOutFileArr[i],plotFileArr[i]+'_models',rob_p_mean,fitTypeAll[*,i],stackx=keyword_set(stackx),/use_m200,/models
 endfor
 
 ; plot halo masses and uncertainties from different centers for comparison
@@ -109,6 +110,6 @@ for ii=0,n_elements(cenNames)-1 do printf,u,cenNames[ii],massMean[ii],massErr[ii
 close,u
 free_lun,u
 
-plot_full_stacks,cenTitles,lensOutFileArr,fullPlotFile,massMean,fitTypeAll,/stackx,/use_m200
+plot_full_stacks,cenTitles,lensOutFileArr,fullPlotFile,massMean,fitTypeAll,stackx=keyword_set(stackx),/use_m200
 
 end
