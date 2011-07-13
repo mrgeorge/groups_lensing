@@ -50,9 +50,12 @@ maxLensZ=1.0
 minLensMass=12.
 maxLensMass=15.
 
-cenNames=['mmgg_r200','mmgg2_r200','xray','cm','cl','mlgg_scale','mlgg_r200'] ; the "bad centers" to be compared with ref center
-cenText=textoidl(['MMGG_{R200}','2nd MMGG_{R200}','X-ray','CM','CL','MLGG_{scale}','MLGG_{R200}'])
-ptSrcCen=[2,2,0,0,0,2,2] ; for fit_t
+;cenNames=['mmgg_r200','mmgg2_r200','xray','cm','cl','mlgg_scale','mlgg_r200'] ; the "bad centers" to be compared with ref center
+;cenText=textoidl(['MMGG_{R200}','2nd MMGG_{R200}','X-ray','CM','CL','MLGG_{scale}','MLGG_{R200}'])
+;ptSrcCen=[2,2,0,0,0,2,2] ; for fit_t
+cenNames=['mmgg_r200','cn','cn_red','cm','cm_red','cl','cl_red'] ; the "bad centers" to be compared with ref center
+cenText=textoidl(['MMGG_{R200}','CN','CN_{red}','CM','CM_{red}','CL','CL_{red}'])
+ptSrcCen=[2,0,0,0,0,0,0] ; for fit_t
 refNames=replicate('mmgg_scale',n_elements(cenNames)) ; the "good center" to compare with the ones above
 refText=replicate(textoidl('MMGG_{scale}'),n_elements(cenNames))
 ptSrcRef=replicate(2,n_elements(cenNames))

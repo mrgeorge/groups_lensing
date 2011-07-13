@@ -5,17 +5,33 @@ case name of
       ra=group.alpha_ellipse
       dec=group.delta_ellipse
    end
+   'cn': begin
+      ra=group.alpha_cn
+      dec=group.delta_cn
+   end
    'cm': begin
       ra=group.alpha_cm
       dec=group.delta_cm
    end
-   'cm_iter': begin
-      ra=group.alpha_cm_iter
-      dec=group.delta_cm_iter
-   end
    'cl': begin
       ra=group.alpha_cl
       dec=group.delta_cl
+   end
+   'cn_red': begin
+      ra=group.alpha_cn_red
+      dec=group.delta_cn_red
+   end
+   'cm_red': begin
+      ra=group.alpha_cm_red
+      dec=group.delta_cm_red
+   end
+   'cl_red': begin
+      ra=group.alpha_cl_red
+      dec=group.delta_cl_red
+   end
+   'cm_iter': begin
+      ra=group.alpha_cm_iter
+      dec=group.delta_cm_iter
    end
    'mmgg_scale': begin
       ra=group.alpha_mmgg_scale
