@@ -27,9 +27,11 @@ nDiffSamp=intarr(nSamples) ; number of groups where centers disagree
 minRadiusKpc=50.
 maxRadiusKpc=2000.
 nRadiusBins=8
-emp_var=1
+stackx=0
+emp_var=0
 cenName='mmgg_scale'
 dirName='bin_'+string(minRadiusKpc,format='(I0)')+'_'+string(maxRadiusKpc,format='(I0)')+'_'+string(nRadiusBins,format='(I0)')
+if(keyword_set(stackx)) then dirName += '_sx'
 if(keyword_set(emp_var)) then dirName += '_emp'
 fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'/'
 lensOutFile=strcompress(fileDir+'center_'+cenName+'+_jackknife.fits',/remove_all)
@@ -69,7 +71,7 @@ for ii=0,nSamples-1 do begin
    zSamp[ii]=median(group[sel].zphot)
    nDiffSamp[ii]=n_elements(where(group[sel].id_mmgg_scale NE group[sel].id_mmgg_r200))
 
-   run_gg_offset, infile_source, sampGroupFile, lensOutFile, minRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=cenName,/stackx,emp_var=keyword_set(emp_var)
+   run_gg_offset, infile_source, sampGroupFile, lensOutFile, minRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=cenName,stackx=keyword_set(stackx),emp_var=keyword_set(emp_var)
 
    ; Fit model to the lensing signal
    run_ds_mcmc, lensOutFile, fitType, rob_p_mean, rob_p_sigma
