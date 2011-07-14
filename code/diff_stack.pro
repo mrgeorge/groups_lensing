@@ -12,6 +12,7 @@ pro diff_stack,minRadiusKpc,maxRadiusKpc,nRadiusBins,stackx=stackx,emp_var=emp_v
 ; Set paths for input files
 infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7.fits' ; Using the new catalog (photoz version 1.7)
 infile_lens = '/Users/alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits' ; group catalog with centers
+;infile_lens = '/Users/mgeorge/data/cosmos/code/group6_20110712.fits' ; group catalog with red centers
 
 ; Set paths for output files
 dirName='bin_'+string(minRadiusKpc,format='(I0)')+'_'+string(maxRadiusKpc,format='(I0)')+'_'+string(nRadiusBins,format='(I0)')
@@ -50,12 +51,10 @@ maxLensZ=1.0
 minLensMass=12.
 maxLensMass=15.
 
-;cenNames=['mmgg_r200','mmgg2_r200','xray','cm','cl','mlgg_scale','mlgg_r200'] ; the "bad centers" to be compared with ref center
-;cenText=textoidl(['MMGG_{R200}','2nd MMGG_{R200}','X-ray','CM','CL','MLGG_{scale}','MLGG_{R200}'])
-;ptSrcCen=[2,2,0,0,0,2,2] ; for fit_t
-cenNames=['mmgg_r200','cn','cn_red','cm','cm_red','cl','cl_red'] ; the "bad centers" to be compared with ref center
-cenText=textoidl(['MMGG_{R200}','CN','CN_{red}','CM','CM_{red}','CL','CL_{red}'])
-ptSrcCen=[2,0,0,0,0,0,0] ; for fit_t
+; ordered bottom left to top on plot
+cenNames=['mlgg_scale','mlgg_r200','mmgg_r200','cl','cm','cn','xray']
+cenText=textoidl(['MLGG_{scale}','MLGG_{R200}','MMGG_{R200}','CL','CM','CN','X-ray'])
+ptSrcCen=[2,2,2,0,0,0,0] ; for fit_t
 refNames=replicate('mmgg_scale',n_elements(cenNames)) ; the "good center" to compare with the ones above
 refText=replicate(textoidl('MMGG_{scale}'),n_elements(cenNames))
 ptSrcRef=replicate(2,n_elements(cenNames))
