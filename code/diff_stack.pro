@@ -51,9 +51,9 @@ maxLensZ=1.0
 minLensMass=12.
 maxLensMass=15.
 
-; ordered bottom left to top on plot
-cenNames=['mlgg_scale','mlgg_r200','mmgg_r200','cl','cm','cn','xray']
-cenText=textoidl(['MLGG_{scale}','MLGG_{R200}','MMGG_{R200}','CL','CM','CN','X-ray'])
+; ordered bottom to top on plot
+cenNames=['mmgg_r200','mlgg_r200','mlgg_scale','cm','cl','cn','xray']
+cenText=textoidl(['MMGG_{R200}','MLGG_{R200}','MLGG_{scale}','CM','CL','CN','X-ray'])
 ptSrcCen=[2,2,2,0,0,0,0] ; for fit_t
 refNames=replicate('mmgg_scale',n_elements(cenNames)) ; the "good center" to compare with the ones above
 refText=replicate(textoidl('MMGG_{scale}'),n_elements(cenNames))
@@ -90,7 +90,7 @@ for i=0,n_elements(cenNames)-1 do begin
    run_gg_offset, infile_source, infile_lens, lensOutFileArrRef[i], minRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=refNames[i],refcen=cenNames[i],stackx=keyword_set(stackx),emp_var=keyword_set(emp_var)
 
    ; Fit model to the lensing signal around the good center
-   run_ds_mcmc, lensOutFileArrRef[i], fitTypeAllRef[*,i], rob_p_mean, rob_p_sigma
+   run_ds_mcmc, lensOutFileArrRef[i], fitTypeAllRef[*,i], rob_p_mean, rob_p_sigma, stackx=keyword_set(stackx)
    massMeanRef[i]=rob_p_mean
    massErrRef[i]=rob_p_sigma
 

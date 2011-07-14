@@ -54,8 +54,8 @@ minLensMass=12.
 maxLensMass=15.
 
 ; ordered bottom left to top right on plot
-cenNames=['mlgg_scale','mlgg_r200','mmgg_scale','mmgg_r200','cl','cm','cn','xray']
-cenTitles=textoidl(['MLGG_{scale}','MLGG_{R200}','MMGG_{scale}','MMGG_{R200}','CL','CM','CN','X-ray'])
+cenNames=['mmgg_scale','mmgg_r200','mlgg_scale','mlgg_r200','cl','cm','xray','cn']
+cenTitles=textoidl(['MMGG_{scale}','MMGG_{R200}','MLGG_{scale}','MLGG_{R200}','CL','CM','X-ray','CN'])
 ptSrc=[2,2,2,2,0,0,0,0] ; for fit_t
 
 lensOutFileArr=strcompress(fileDir+'center_'+cenNames+'.fits',/remove_all)
@@ -80,7 +80,7 @@ for i=0, n_elements(cenNames)-1 do begin
     run_gg_offset, infile_source, infile_lens, lensOutFileArr[i], minRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=cenNames[i],stackx=keyword_set(stackx),emp_var=keyword_set(emp_var)
 
    ; Fit model to the lensing signal
-   run_ds_mcmc, lensOutFileArr[i], fitTypeAll[*,i], rob_p_mean, rob_p_sigma
+   run_ds_mcmc, lensOutFileArr[i], fitTypeAll[*,i], rob_p_mean, rob_p_sigma, stackx=keyword_set(stackx)
    massMean[i]=rob_p_mean
    massErr[i]=rob_p_sigma
 
