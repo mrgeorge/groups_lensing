@@ -12,13 +12,13 @@ pro plot_full_stacks,cenText,lensFileArr,plotFile,massMean,fitTypeAll,stackx=sta
 
 if(keyword_set(test)) then begin
    ; Set paths for output files
-   dirName='bin_50_2000_8_emp'
+   dirName='bin_50_1500_7_emp'
    fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'/'
    plotDir='~/data/cosmos/groups_lensing/plots/'+dirName+'/'
 
-   cenNames=['mmgg_scale','mmgg_r200','mmgg2_r200','xray','cm','cl','mlgg_scale','mlgg_r200']
-   cenText=textoidl(['MMGG_{scale}','MMGG_{R200}','2nd MMGG_{R200}','X-ray','CM','CL','MLGG_{scale}','MLGG_{R200}'])
-   ptSrc=[2,2,2,0,0,0,2,2]    ; for fit_t
+   cenNames=['mmgg_scale','mmgg_r200','mlgg_scale','mlgg_r200','cl','cm','xray','cn']
+   cenText=textoidl(['MMGG_{scale}','MMGG_{R200}','MLGG_{scale}','MLGG_{R200}','CL','CM','X-ray','CN'])
+   ptSrc=[2,2,2,2,0,0,0,0]      ; for fit_t
 
    lensFileArr=strcompress(fileDir+'center_'+cenNames+'.fits',/remove_all)
    plotFile=plotDir+'full_stacks.eps'
@@ -67,7 +67,7 @@ yst=1
 xlog=1
 ylog=0
 if(keyword_set(xlog)) then xr = [0.02,2] else xr=[0,1.5]
-if(keyword_set(ylog)) then yr = [0.5,3000] else yr = [-99,300]
+if(keyword_set(ylog)) then yr = [0.5,3000] else yr = [-99,200]
 ;if(keyword_set(ylog)) then ytickf='loglabels' else ytickf=''
 ;if(keyword_set(xlog)) then xtickf='loglabels' else xtickf=''
 xtitle=textoidl('Physical transverse distance,  R (h_{72}^{-1} Mpc)')
@@ -124,26 +124,23 @@ for ii=0,nCen-1 do begin
       x_mpc=10.^(findgen(nxMpc)/(nxMpc-1)*alog10((xr[1]*xbuffer)/(xr[0]/xbuffer)))*xr[0]/xbuffer
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
    
+   ; NFW term
+   nfw=nfw_ds(x_mpc,[rnfw,conc],str.z_lens,r200=keyword_set(use_m200))
+
    ; Baryonic point source term
    if(fitTypeAll[0,ii] NE 0) then begin
       ps_term=10^(str.msun_lens)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
-      oplot,x_mpc,ps_term,color=!red,linestyle=1
-   endif
-
-   ; NFW term
-   nfw=nfw_ds(x_mpc,[rnfw,conc],str.z_lens,r200=keyword_set(use_m200))
-   oplot,x_mpc,nfw,color=!darkgreen,linestyle=2
-
-   ; Sum of terms (currently just NFW + point source if point source is included in model)
-   if(fitTypeAll[0,ii] NE 0) then begin
       tot=ps_term + nfw
-      oplot,x_mpc,tot,color=!blue
-   endif
+   endif else tot=nfw
+
+   oplot,x_mpc,tot,color=!blue,thick=3
+   oplot,x_mpc,nfw,color=!darkgreen,linestyle=2,thick=8
+   if(fitTypeAll[0,ii] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=4
+
 
    ; PLOT DATA POINTS
    oploterror,x,y,yerr,psym=8,color=!black
    
-
    ; CALCULATE CHI^2
    ; currently just NFW + point source if point source is included in model
 
@@ -186,7 +183,7 @@ for ii=0,nCen-1 do begin
    xyouts,xRight,yr[1]-2.*yLine,string(str.msun_lens,format=fmt),alignment=1,charsize=0.9
    xyouts,xRight,yr[1]-3.*yLine,string(chisq,format=fmt),alignment=1,charsize=0.9
 
-   xyouts,1.1*xr[0],yr[0]+0.5*yLine,cenText[ii],alignment=0
+   xyouts,xRight,yr[0]+0.5*yLine,cenText[ii],alignment=1
 
 endfor
 device,/close

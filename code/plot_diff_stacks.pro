@@ -12,13 +12,13 @@ pro plot_diff_stacks,cenNames,refNames,cenText,refText,lensFileArrCen,lensFileAr
 
 if(keyword_set(test)) then begin
    ; Set paths for output files
-   dirName='bin_50_2000_8_emp'
+   dirName='bin_50_1500_7_emp'
    fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'/'
    plotDir='~/data/cosmos/groups_lensing/plots/'+dirName+'/'
 
-   cenNames=['mmgg_r200','mmgg2_r200','xray','cm','cl','mlgg_scale','mlgg_r200']
-   cenText=textoidl(['MMGG_{R200}','2nd MMGG_{R200}','X-ray','CM','CL','MLGG_{scale}','MLGG_{R200}'])
-   ptSrcCen=[2,2,0,0,0,2,2]    ; for fitType
+   cenNames=['mmgg_r200','mlgg_r200','mlgg_scale','cm','cl','cn','xray']
+   cenText=textoidl(['MMGG_{R200}','MLGG_{R200}','MLGG_{scale}','CM','CL','CN','X-ray'])
+   ptSrcCen=[2,2,2,0,0,0,0]     ; for fit_t
    refNames=replicate('mmgg_scale',n_elements(cenNames)) ; the "good center" to compare with the ones above
    refText=textoidl(replicate('MMGG_{scale}',n_elements(cenNames)))
    ptSrcRef=replicate(2,n_elements(cenNames))
@@ -82,7 +82,7 @@ if(keyword_set(xlog)) then xr=[0.02,2] else xr=[0,1.5]
 if(keyword_set(ylog)) then begin
    yr=[0.5,3000] 
 endif else begin 
-   yr=[-199,400]
+   yr=[-120,400]
    ytickv=[0,200,400]
 endelse
 if(keyword_set(yloghist)) then yrhist=[0.5,150] else yrhist=[0,110]
@@ -160,25 +160,22 @@ for ii=0,nCen-1 do begin
       x_mpc=10.^(findgen(nxMpc)/(nxMpc-1)*alog10((xr[1]*xbuffer)/(xr[0]/xbuffer)))*xr[0]/xbuffer
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
    
+   ; NFW term
+   nfw=nfw_ds(x_mpc,[rnfw,conc],str.z_lens,r200=keyword_set(use_m200))
+
    ; Baryonic point source term
    if(fitTypeAllRef[0,ii] NE 0) then begin
       ps_term=10^(str.msun_lens)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
-      oplot,x_mpc,ps_term,color=!red,linestyle=1
-   endif
-
-   ; NFW term
-   nfw=nfw_ds(x_mpc,[rnfw,conc],str.z_lens,r200=keyword_set(use_m200))
-   oplot,x_mpc,nfw,color=!darkgreen,linestyle=2
-
-   ; Sum of terms (currently just NFW + point source if point source is included in model)
-   if(fitTypeAllRef[0,ii] NE 0) then begin
       tot=ps_term + nfw
-      oplot,x_mpc,tot,color=!blue
-   endif
+   endif else tot=nfw
+
+   oplot,x_mpc,tot,color=!blue,thick=3
+   oplot,x_mpc,nfw,color=!darkgreen,linestyle=2,thick=8
+   if(fitTypeAllRef[0,ii] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=6
+
 
    ; PLOT DATA POINTS
    oploterror,x,y,yerr,psym=8,color=!black
-   
 
    ; CALCULATE CHI^2
    ; currently just NFW + point source if point source is included in model
@@ -218,7 +215,7 @@ for ii=0,nCen-1 do begin
    xyouts,xRight,yr[1]-2.*yLine,string(str.msun_lens,format=fmt),alignment=1,charsize=lCharSize
    xyouts,xRight,yr[1]-3.*yLine,string(chisq,format=fmt),alignment=1,charsize=lCharSize
 
-   xyouts,1.1*xr[0],yr[0]+0.5*yLine,refText[ii],alignment=0,charsize=1.2*lCharSize
+   xyouts,xRight,yr[0]+0.5*yLine,refText[ii],alignment=1,charsize=1.2*lCharSize
 
 
    ; MIDDLE COLUMN - OFFSET CENTERS
@@ -269,29 +266,26 @@ for ii=0,nCen-1 do begin
       x_mpc=10.^(findgen(nxMpc)/(nxMpc-1)*alog10((xr[1]*xbuffer)/(xr[0]/xbuffer)))*xr[0]/xbuffer
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
    
-   ; Baryonic point source term
-   if(fitTypeAllCen[0,ii] NE 0) then begin
-      ps_term=10^(str.msun_lens)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
-      oplot,x_mpc,ps_term,color=!red,linestyle=1
-   endif
-
    ; Offset NFW term
    if(keyword_set(test)) then begin
       nfwOff=x_mpc
    endif else begin
       nfwOff=nfw_ds_offset(x_mpc,[rnfw,conc],str.z_lens,groupFile,r200=keyword_set(use_m200),center=cenNames[ii],refcen=refNames[ii])
-      oplot,x_mpc,nfwOff,color=!orange,linestyle=3
    endelse
 
-   ; Sum of terms (currently just offset NFW + point source if point source is included in model)
+   ; Baryonic point source term
    if(fitTypeAllCen[0,ii] NE 0) then begin
+      ps_term=10^(str.msun_lens)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
       tot=ps_term + nfwOff
-      oplot,x_mpc,tot,color=!blue
-   endif
+   endif else tot=nfwOff
+
+   oplot,x_mpc,tot,color=!blue,thick=3
+   oplot,x_mpc,nfwOff,color=!orange,linestyle=3,thick=8
+   if(fitTypeAllCen[0,ii] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=6
+
 
    ; PLOT DATA POINTS
    oploterror,x,y,yerr,psym=8,color=!black
-   
 
    ; CALCULATE CHI^2
    ; currently just NFW + point source if point source is included in model
@@ -333,7 +327,7 @@ for ii=0,nCen-1 do begin
    xyouts,xRight,yr[1]-1.*yLine,string(str.msun_lens,format=fmt),alignment=1,charsize=lCharSize
    xyouts,xRight,yr[1]-2.*yLine,string(chisq,format=fmt),alignment=1,charsize=lCharSize
 
-   xyouts,1.1*xr[0],yr[0]+0.5*yLine,cenText[ii],alignment=0,charsize=1.2*lCharSize
+   xyouts,xRight,yr[0]+0.5*yLine,cenText[ii],alignment=1,charsize=1.2*lCharSize
 
 
    ; RIGHT COLUMN - HISTOGRAM OF OFFSETS
