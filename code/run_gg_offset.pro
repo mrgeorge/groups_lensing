@@ -1,4 +1,4 @@
-pro run_gg_offset, infile_source, infile_lens, outfile, minRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor,zscheme,$
+pro run_gg_offset, infile_source, infile_lens, outfile, innerRadiusKpc, secondRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor,zscheme,$
             xgroups=xgroups,$
             zgroups=zgroups,$
             usespecz=usespecz,$
@@ -180,10 +180,12 @@ source_good_specz = struct_source.good_specz
 
 ; Build radius array - radius_kpc[i] is the outer radius of the ith bin
 ;                      (zero is assumed for the inner radius of bin 0)
-logFactor=(maxRadiusKpc/minRadiusKpc)^(1./(nRadiusBins-1))
+logFactor=(maxRadiusKpc/secondRadiusKpc)^(1./(nRadiusBins-2))
 radius_kpc=dblarr(nRadiusBins)
-radius_kpc[0]=minRadiusKpc
-for i=1,nRadiusBins-1 do begin
+radius_kpc[0]=innerRadiusKpc
+radius_kpc[1]=secondRadiusKpc
+radius_kpc[2:nRadiusBins-1]=radius_kpc[1]*logFactor^(indgen(nRadiusBins-2)+1)
+for i=2,nRadiusBins-1 do begin
    radius_kpc[i]=radius_kpc[i-1]*logFactor
 endfor
 

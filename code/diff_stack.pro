@@ -1,4 +1,4 @@
-pro diff_stack,minRadiusKpc,maxRadiusKpc,nRadiusBins,stackx=stackx,emp_var=emp_var
+pro diff_stack,innerRadiusKpc,secondRadiusKpc,maxRadiusKpc,nRadiusBins,stackx=stackx,emp_var=emp_var,loz=loz,hiz=hiz,loM=loM,hiM=hiM
 
 ; measure lensing signal for two stacks of groups where centers disagree
 ; plot results in one big figure for paper
@@ -9,15 +9,42 @@ pro diff_stack,minRadiusKpc,maxRadiusKpc,nRadiusBins,stackx=stackx,emp_var=emp_v
 
 ; sample call: diff_stack,50,2000,8,/stackx,/emp_var
 
+if(keyword_set(loz)) then begin
+   minLensZ=0.0
+   maxLensZ=0.5
+   zExt='_loz'
+endif else if(keyword_set(hiz)) then begin
+   minLensZ=0.5
+   maxLensZ=1.0
+   zExt='_hiz'
+endif else begin
+   minLensZ=0.0
+   maxLensZ=1.0
+   zExt=''
+endelse
+if(keyword_set(loM)) then begin
+   minLensMass=12.0
+   maxLensMass=13.5
+   mExt='_loM'
+endif else if(keyword_set(hiM)) then begin
+   minLensMass=13.5
+   maxLensMass=15.0
+   mExt='_hiM'
+endif else begin
+   minLensMass=12.0
+   maxLensMass=15.0
+   mExt=''
+endelse
+if(keyword_set(stackx)) then sxExt='_sx' else sxExt=''
+if(keyword_set(emp_var)) then empExt='_emp' else empExt=''
+
 ; Set paths for input files
 infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7.fits' ; Using the new catalog (photoz version 1.7)
 infile_lens = '/Users/alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits' ; group catalog with centers
 ;infile_lens = '/Users/mgeorge/data/cosmos/code/group6_20110712.fits' ; group catalog with red centers
 
 ; Set paths for output files
-dirName='bin_'+string(minRadiusKpc,format='(I0)')+'_'+string(maxRadiusKpc,format='(I0)')+'_'+string(nRadiusBins,format='(I0)')
-if(keyword_set(stackx)) then dirName += '_sx'
-if(keyword_set(emp_var)) then dirName += '_emp'
+dirName='bin_'+string(innerRadiusKpc,format='(I0)')+'_'+string(secondRadiusKpc,format='(I0)')+'_'+string(maxRadiusKpc,format='(I0)')+'_'+string(nRadiusBins,format='(I0)')+sxExt+empExt+zExt+mExt
 fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'/'
 plotDir='~/data/cosmos/groups_lensing/plots/'+dirName+'/'
 if(NOT(file_test(fileDir))) then file_mkdir,fileDir
@@ -46,10 +73,6 @@ fit_t = [$
 ;----------------------------------------------------------------------
 zscheme=2 ; from ALs code
 box_factor=20 ; from ALs code
-minLensZ=0.0
-maxLensZ=1.0
-minLensMass=12.
-maxLensMass=15.
 
 ; ordered bottom to top on plot
 cenNames=['mmgg_r200','mlgg_r200','mlgg_scale','cm','cl','cn','xray']
@@ -66,7 +89,7 @@ lensOutFileArrCen=strcompress(fileDir+'center_'+cenNames+'_'+refNames+'.fits',/r
 plotFileArrCen=strcompress(plotDir+'center_'+cenNames+'_'+refNames,/remove_all)
 lensOutFileArrRef=strcompress(fileDir+'center_'+refNames+'_'+cenNames+'.fits',/remove_all)
 plotFileArrRef=strcompress(plotDir+'center_'+refNames+'_'+cenNames,/remove_all)
-diffPlotFile=plotDir+'diff_stacks.eps'
+diffPlotFile=plotDir+'diff_stacks_'+refNames[0]+'.eps'
 
 ; create 2d array to save fit types, 1 row for each center
 fitTypeAllCen=rebin(fit_t,n_elements(fit_t),n_elements(cenNames))
@@ -87,7 +110,7 @@ for i=0,n_elements(cenNames)-1 do begin
    print,'---------------------------'
    print,refNames[i],' and  ',cenNames[i]
 
-   run_gg_offset, infile_source, infile_lens, lensOutFileArrRef[i], minRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=refNames[i],refcen=cenNames[i],stackx=keyword_set(stackx),emp_var=keyword_set(emp_var)
+   run_gg_offset, infile_source, infile_lens, lensOutFileArrRef[i], innerRadiusKpc, secondRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=refNames[i],refcen=cenNames[i],stackx=keyword_set(stackx),emp_var=keyword_set(emp_var)
 
    ; Fit model to the lensing signal around the good center
    run_ds_mcmc, lensOutFileArrRef[i], fitTypeAllRef[*,i], rob_p_mean, rob_p_sigma, stackx=keyword_set(stackx)
@@ -103,7 +126,7 @@ for i=0,n_elements(cenNames)-1 do begin
    print,'---------------------------'
    print,cenNames[i],' and  ',refNames[i]
 
-   run_gg_offset, infile_source, infile_lens, lensOutFileArrCen[i], minRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=cenNames[i],refcen=refNames[i],stackx=keyword_set(stackx),emp_var=keyword_set(emp_var)
+   run_gg_offset, infile_source, infile_lens, lensOutFileArrCen[i], innerRadiusKpc, secondRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=cenNames[i],refcen=refNames[i],stackx=keyword_set(stackx),emp_var=keyword_set(emp_var)
 
    ; Use the results from the good center model fit (rob_p_mean)
    ;  rather than rerunning run_ds_mcmc
@@ -139,6 +162,7 @@ for ii=0,n_elements(cenNames)-1 do printf,u,refNames[ii],cenNames[ii],massMeanRe
 close,u
 free_lun,u
 
+; make multi-panel plot to compare diff stacks
 plot_diff_stacks,cenNames,refNames,cenText,refText,lensOutFileArrCen,lensOutFileArrRef,diffPlotFile,infile_lens,massMeanRef,fitTypeAllCen,fitTypeAllRef,stackx=keyword_set(stackx),/use_m200
 
 end

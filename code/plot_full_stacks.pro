@@ -21,7 +21,7 @@ if(keyword_set(test)) then begin
    ptSrc=[2,2,2,2,0,0,0,0]      ; for fit_t
 
    lensFileArr=strcompress(fileDir+'center_'+cenNames+'.fits',/remove_all)
-   plotFile=plotDir+'full_stacks.eps'
+   plotFile=plotDir+'full_stacks_test.eps'
 
    ; create 2d array to save fit types, 1 row for each center
    fit_t = [$
@@ -94,7 +94,7 @@ for ii=0,nCen-1 do begin
    rnfw=10.0^(r_log)
 
    ; restrict to points with enough sources
-   sel=where(str.e1_num GE 10)
+   sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 10)
    if(keyword_set(stackx)) then begin
       x    = str.plot_radius_kpc[sel]*rnfw
       y    = str.we1_mean[sel]

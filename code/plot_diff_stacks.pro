@@ -25,7 +25,7 @@ if(keyword_set(test)) then begin
 
    lensFileArrCen=strcompress(fileDir+'center_'+cenNames+'_'+refNames+'.fits',/remove_all)
    lensFileArrRef=strcompress(fileDir+'center_'+refNames+'_'+cenNames+'.fits',/remove_all)
-   plotFile=plotDir+'diff_stacks.eps'
+   plotFile=plotDir+'diff_stacks_test.eps'
    groupFile='~alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits'
 
    ; create 2d array to save fit types, 1 row for each center
@@ -124,7 +124,7 @@ for ii=0,nCen-1 do begin
    rnfw=10.0^(r_log)
 
    ; restrict to points with enough sources
-   sel=where(str.e1_num GE 10)
+   sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 10)
    if(keyword_set(stackx)) then begin
       x    = str.plot_radius_kpc[sel]*rnfw
       y    = str.we1_mean[sel]
@@ -235,7 +235,7 @@ for ii=0,nCen-1 do begin
    rnfw=10.0^(r_log)
 
    ; restrict to points with enough sources
-   sel=where(str.e1_num GE 10)
+   sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 10)
    if(keyword_set(stackx)) then begin
       x    = str.plot_radius_kpc[sel]*rnfw
       y    = str.we1_mean[sel]
@@ -323,9 +323,9 @@ for ii=0,nCen-1 do begin
    endif else sm=textoidl('log(M')+star+'/M'+sun+'):'+string(0.0,format="(f6.2)")
 
    xyouts,xStrRight,yr[1]-1.*yLine,smstr,alignment=0.88,charsize=lCharSize
-   xyouts,xStrRight,yr[1]-2.*yLine,chisqstr,alignment=1.0,charsize=lCharSize
+;   xyouts,xStrRight,yr[1]-2.*yLine,chisqstr,alignment=1.0,charsize=lCharSize
    xyouts,xRight,yr[1]-1.*yLine,string(str.msun_lens,format=fmt),alignment=1,charsize=lCharSize
-   xyouts,xRight,yr[1]-2.*yLine,string(chisq,format=fmt),alignment=1,charsize=lCharSize
+;   xyouts,xRight,yr[1]-2.*yLine,string(chisq,format=fmt),alignment=1,charsize=lCharSize
 
    xyouts,xRight,yr[0]+0.5*yLine,cenText[ii],alignment=1,charsize=1.2*lCharSize
 
@@ -369,9 +369,12 @@ for ii=0,nCen-1 do begin
 
    ; LEGEND
    nstr=textoidl('N_{Lens}:')
+   zstr=textoidl('<z_{Lens}>:')
 
    xyouts,xStrRight,0.5*yrhist[1],nstr,alignment=1.0,charsize=lCharSize
+   xyouts,xStrRight,0.28*yrhist[1],zstr,alignment=1.0,charsize=lCharSize
    xyouts,xRight,0.5*yrhist[1],string(str.lens,format="(I6)"),alignment=1,charsize=lCharSize
+   xyouts,xRight,0.28*yrhist[1],string(str.z_lens,format="(F6.2)"),alignment=1,charsize=lCharSize
 
    axis,xaxis=0,xr=xr,xlog=xlog,xst=xst,xtickname=xtickname,xcharsize=tickCharSize
    axis,xaxis=1,xr=xr,xlog=xlog,xst=xst,xtickname=blank

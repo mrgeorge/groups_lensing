@@ -1,4 +1,4 @@
-pro full_stack,minRadiusKpc,maxRadiusKpc,nRadiusBins,stackx=stackx,emp_var=emp_var
+pro full_stack,innerRadiusKpc,secondRadiusKpc,maxRadiusKpc,nRadiusBins,stackx=stackx,emp_var=emp_var,loz=loz,hiz=hiz,loM=loM,hiM=hiM
 
 ; measure lensing signal for the full stack of groups around different centers
 ; plot results in one big figure for paper
@@ -10,6 +10,35 @@ pro full_stack,minRadiusKpc,maxRadiusKpc,nRadiusBins,stackx=stackx,emp_var=emp_v
 
 ; sample call: full_stack,50,2000,8,/stackx,/emp_var
 
+if(keyword_set(loz)) then begin
+   minLensZ=0.0
+   maxLensZ=0.5
+   zExt='_loz'
+endif else if(keyword_set(hiz)) then begin
+   minLensZ=0.5
+   maxLensZ=1.0
+   zExt='_hiz'
+endif else begin
+   minLensZ=0.0
+   maxLensZ=1.0
+   zExt=''
+endelse
+if(keyword_set(loM)) then begin
+   minLensMass=12.0
+   maxLensMass=13.5
+   mExt='_loM'
+endif else if(keyword_set(hiM)) then begin
+   minLensMass=13.5
+   maxLensMass=15.0
+   mExt='_hiM'
+endif else begin
+   minLensMass=12.0
+   maxLensMass=15.0
+   mExt=''
+endelse
+if(keyword_set(stackx)) then sxExt='_sx' else sxExt=''
+if(keyword_set(emp_var)) then empExt='_emp' else empExt=''
+
 ; Set paths for input files
 infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7.fits' ; Using the new catalog (photoz version 1.7)
 infile_lens = '/Users/alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits' ; group catalog with centers
@@ -17,9 +46,7 @@ infile_lens = '/Users/alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits' ; 
 
 
 ; Set paths for output files
-dirName='bin_'+string(minRadiusKpc,format='(I0)')+'_'+string(maxRadiusKpc,format='(I0)')+'_'+string(nRadiusBins,format='(I0)')
-if(keyword_set(stackx)) then dirName += '_sx'
-if(keyword_set(emp_var)) then dirName += '_emp'
+dirName='bin_'+string(innerRadiusKpc,format='(I0)')+'_'+string(secondRadiusKpc,format='(I0)')+'_'+string(maxRadiusKpc,format='(I0)')+'_'+string(nRadiusBins,format='(I0)')+sxExt+empExt+zExt+mExt
 fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'/'
 plotDir='~/data/cosmos/groups_lensing/plots/'+dirName+'/'
 if(NOT(file_test(fileDir))) then file_mkdir,fileDir
@@ -48,10 +75,6 @@ fit_t = [$
 ;----------------------------------------------------------------------
 zscheme=2 ; from ALs code
 box_factor=20 ; from ALs code
-minLensZ=0.0
-maxLensZ=1.0
-minLensMass=12.
-maxLensMass=15.
 
 ; ordered bottom left to top right on plot
 cenNames=['mmgg_scale','mmgg_r200','mlgg_scale','mlgg_r200','cl','cm','xray','cn']
@@ -77,7 +100,7 @@ for i=0, n_elements(cenNames)-1 do begin
     print,'---------------------------'
     print,cenNames[i]
 
-    run_gg_offset, infile_source, infile_lens, lensOutFileArr[i], minRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=cenNames[i],stackx=keyword_set(stackx),emp_var=keyword_set(emp_var)
+    run_gg_offset, infile_source, infile_lens, lensOutFileArr[i], innerRadiusKpc, secondRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=cenNames[i],stackx=keyword_set(stackx),emp_var=keyword_set(emp_var)
 
    ; Fit model to the lensing signal
    run_ds_mcmc, lensOutFileArr[i], fitTypeAll[*,i], rob_p_mean, rob_p_sigma, stackx=keyword_set(stackx)
@@ -113,6 +136,7 @@ for ii=0,n_elements(cenNames)-1 do printf,u,cenNames[ii],massMean[ii],massErr[ii
 close,u
 free_lun,u
 
+; make multi-panel plot to compare full stacks
 plot_full_stacks,cenTitles,lensOutFileArr,fullPlotFile,massMean,fitTypeAll,stackx=keyword_set(stackx),/use_m200
 
 end
