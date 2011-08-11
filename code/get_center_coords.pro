@@ -57,6 +57,10 @@ case name of
       ra=group.alpha_bcg1
       dec=group.delta_bcg1
    end
+   'visual': begin ; see mrg_center_notes_20110808_distilled.txt and weird_stack.pro
+      ra=group.alpha_visual
+      dec=group.delta_visual
+   end
    'e1': begin
       ra=group.alpha_e1
       dec=group.delta_e1
