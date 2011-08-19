@@ -77,9 +77,11 @@ zscheme=2 ; from ALs code
 box_factor=20 ; from ALs code
 
 ; ordered bottom left to top right on plot
-cenNames=['mmgg_scale','mmgg_r200','mlgg_scale','mlgg_r200','cl','cm','xray','cn']
-cenTitles=textoidl(['MMGG_{scale}','MMGG_{R200}','MLGG_{scale}','MLGG_{R200}','CL','CM','X-ray','CN'])
-ptSrc=[2,2,2,2,0,0,0,0] ; for fit_t
+;cenNames=['mmgg_scale','mmgg_r200','mlgg_scale','mlgg_r200','cl','cm','xray','cn']
+;cenTitles=textoidl(['MMGG_{scale}','MMGG_{R200}','MLGG_{scale}','MLGG_{R200}','CL','CM','X-ray','CN'])
+cenNames=['cl','xray','cn','cm','mlgg_scale','mlgg_r200','mmgg_scale','mmgg_r200']
+cenTitles=textoidl(['CL','X-ray','CN','CM','MLGG_{scale}','MLGG_{R200}','MMGG_{scale}','MMGG_{R200}'])
+ptSrc=[0,0,0,0,2,2,2,2] ; for fit_t
 
 lensOutFileArr=strcompress(fileDir+'center_'+cenNames+'.fits',/remove_all)
 plotFileArr=strcompress(plotDir+'center_'+cenNames,/remove_all)
