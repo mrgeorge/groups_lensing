@@ -66,7 +66,7 @@ xst=1
 yst=1
 xlog=1
 ylog=0
-if(keyword_set(xlog)) then xr = [0.02,2] else xr=[0,1.5]
+if(keyword_set(xlog)) then xr = [0.03,1.3] else xr=[0,1.5]
 if(keyword_set(ylog)) then yr = [0.5,3000] else yr = [-99,200]
 ;if(keyword_set(ylog)) then ytickf='loglabels' else ytickf=''
 ;if(keyword_set(xlog)) then xtickf='loglabels' else xtickf=''
