@@ -9,8 +9,8 @@ pro do_weird_stack, groupSel, cenName, selType
 
 ; Set paths for output files
 dirName='weird_stack'
-fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'/'
-plotDir='~/data/cosmos/groups_lensing/plots/'+dirName+'/'
+fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'/bin_10_70_1000_7/'
+plotDir='~/data/cosmos/groups_lensing/plots/'+dirName+'/bin_10_70_1000_7/'
 if(NOT(file_test(fileDir))) then file_mkdir,fileDir
 if(NOT(file_test(plotDir))) then file_mkdir,plotDir
 
@@ -21,7 +21,7 @@ infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7
 mwrfits,groupSel,groupFile,/create
 
 innerRadiusKpc=10.
-secondRadiusKpc=50.
+secondRadiusKpc=70.
 maxRadiusKpc=1000.
 nRadiusBins=7
 minLensZ=0.
@@ -79,15 +79,15 @@ blueMMGGscale=where(acs[mmggScaleInd].mnuv_mr LT 1.2) ; 8
 greenMMGGscale=where(acs[mmggScaleInd].mnuv_mr GT 1.2 AND acs[mmggScaleInd].mnuv_mr LT 3.5) ; 24
 redMMGGscale=where(acs[mmggScaleInd].mnuv_mr GT 3.5) ; 97
 
-do_weird_stack,group[blueMLGG200],'mlgg_r200','blue_mlgg200'
-do_weird_stack,group[greenMLGG200],'mlgg_r200','green_mlgg200'
-do_weird_stack,group[redMLGG200],'mlgg_r200','red_mlgg200'
-do_weird_stack,group[blueMMGG200],'mmgg_r200','blue_mmgg200'
-do_weird_stack,group[greenMMGG200],'mmgg_r200','green_mmgg200'
-do_weird_stack,group[redMMGG200],'mmgg_r200','red_mmgg200'
-do_weird_stack,group[blueMMGGscale],'mmgg_scale','blue_mmgg_scale'
-do_weird_stack,group[greenMMGGscale],'mmgg_scale','green_mmgg_scale'
-do_weird_stack,group[redMMGGscale],'mmgg_scale','red_mmgg_scale'
+;do_weird_stack,group[blueMLGG200],'mlgg_r200','blue_mlgg200'
+;do_weird_stack,group[greenMLGG200],'mlgg_r200','green_mlgg200'
+;do_weird_stack,group[redMLGG200],'mlgg_r200','red_mlgg200'
+;do_weird_stack,group[blueMMGG200],'mmgg_r200','blue_mmgg200'
+;do_weird_stack,group[greenMMGG200],'mmgg_r200','green_mmgg200'
+;do_weird_stack,group[redMMGG200],'mmgg_r200','red_mmgg200'
+;do_weird_stack,group[blueMMGGscale],'mmgg_scale','blue_mmgg_scale'
+;do_weird_stack,group[greenMMGGscale],'mmgg_scale','green_mmgg_scale'
+;do_weird_stack,group[redMMGGscale],'mmgg_scale','red_mmgg_scale'
 
 ; define centers by morphology
 ; note "late" includes lates, irregulars, and a few failed or "other" classifications
@@ -95,12 +95,12 @@ earlyMLGG200=where(acs[mlgg200Ind].zest_type EQ 1 OR (acs[mlgg200Ind].zest_type 
 earlyMMGG200=where(acs[mmgg200Ind].zest_type EQ 1 OR (acs[mmgg200Ind].zest_type EQ 2 AND acs[mmgg200Ind].zest_bulge EQ 0),complement=lateMMGG200)
 earlyMMGGscale=where(acs[mmggScaleInd].zest_type EQ 1 OR (acs[mmggScaleInd].zest_type EQ 2 AND acs[mmggScaleInd].zest_bulge EQ 0),complement=lateMMGGscale)
 
-do_weird_stack,group[earlyMLGG200],'mlgg_r200','early_mlgg200'
-do_weird_stack,group[lateMLGG200],'mlgg_r200','late_mlgg200'
-do_weird_stack,group[earlyMMGG200],'mmgg_r200','early_mmgg200'
-do_weird_stack,group[lateMMGG200],'mmgg_r200','late_mmgg200'
-do_weird_stack,group[earlyMMGGscale],'mmgg_scale','early_mmgg_scale'
-do_weird_stack,group[lateMMGGscale],'mmgg_scale','late_mmgg_scale'
+;do_weird_stack,group[earlyMLGG200],'mlgg_r200','early_mlgg200'
+;do_weird_stack,group[lateMLGG200],'mlgg_r200','late_mlgg200'
+;do_weird_stack,group[earlyMMGG200],'mmgg_r200','early_mmgg200'
+;do_weird_stack,group[lateMMGG200],'mmgg_r200','late_mmgg200'
+;do_weird_stack,group[earlyMMGGscale],'mmgg_scale','early_mmgg_scale'
+;do_weird_stack,group[lateMMGGscale],'mmgg_scale','late_mmgg_scale'
 
 ; select groups with a nearby group in projection
 dis_as=fltarr(nGroups)
@@ -110,8 +110,8 @@ for ii=0,nGroups-1 do begin
 endfor
 nearby=where(dis_as LT 1.5*group.lensing_r200_as,complement=far)
 
-do_weird_stack,group[nearby],'mmgg_scale','nearby_mmgg_scale'
-do_weird_stack,group[far],'mmgg_scale','far_mmgg_scale'
+;do_weird_stack,group[nearby],'mmgg_scale','nearby_mmgg_scale'
+;do_weird_stack,group[far],'mmgg_scale','far_mmgg_scale'
 
 
 ;;; FOCUSING ON GROUPS WITH DISCREPANT GALAXY CENTERS
@@ -120,6 +120,12 @@ do_weird_stack,group[far],'mmgg_scale','far_mmgg_scale'
 readcol,'mrg_center_notes_20110808_distilled.txt',id,imnum,flag,msm2,msls,msl2,m2ls,m2l2,lsl2,best,conf,merg,proj,bad,format='i,i,i,i,i,i,i,i,i,a,i,i,i,i'
 match,id,group.id,m1,m2
 groupWeird=group[m2] 
+groupNonWeird=group[where(group.id_mmgg_scale EQ group.id_mmgg_r200 $
+                          AND group.id_mmgg_scale EQ group.id_mlgg_scale $
+                          AND group.id_mmgg_scale EQ group.id_mlgg_r200 $
+                          AND group.id_mmgg_r200 EQ group.id_mlgg_scale $
+                          AND group.id_mmgg_r200 EQ group.id_mlgg_r200 $
+                          AND group.id_mlgg_scale EQ group.id_mlgg_r200)]
 
 alpha_visual=fltarr(n_elements(m1))
 delta_visual=fltarr(n_elements(m1))
@@ -162,10 +168,10 @@ for ii=0,n_elements(m1)-1 do begin
       endelse
    endcase
 endfor
-mrg_addcol,groupWeird,'ALPHA_VISUAL',alpha_visual
-mrg_addcol,groupWeird,'DELTA_VISUAL',alpha_visual
-mrg_addcol,groupWeird,'ID_VISUAL',id_visual
-mrg_addcol,groupWeird,'VISUAL_MSTAR',visual_mstar
+groupWeird=mrg_addcol(groupWeird,'ALPHA_VISUAL',alpha_visual)
+groupWeird=mrg_addcol(groupWeird,'DELTA_VISUAL',delta_visual)
+groupWeird=mrg_addcol(groupWeird,'ID_VISUAL',id_visual)
+groupWeird=mrg_addcol(groupWeird,'VISUAL_MSTAR',visual_mstar)
 
 ; Stack on different centers for this sample of groups which has
 ; discrepant centers that were visually inspected
@@ -174,9 +180,9 @@ do_weird_stack,groupWeird,'mmgg_scale','weird_mmgg_scale'
 do_weird_stack,groupWeird,'mlgg_scale','weird_mlgg_scale'
 do_weird_stack,groupWeird,'mmgg_r200','weird_mmgg_r200'
 do_weird_stack,groupWeird,'mlgg_r200','weird_mlgg_r200'
-do_weird_stack,groupWeird,'alpha_cn','weird_cn'
-do_weird_stack,groupWeird,'alpha_cm','weird_cm'
-do_weird_stack,groupWeird,'alpha_cl','weird_cl'
+do_weird_stack,groupWeird,'cn','weird_cn'
+do_weird_stack,groupWeird,'cm','weird_cm'
+do_weird_stack,groupWeird,'cl','weird_cl'
 
 ; try getting rid of different cases like mergers or possible projections
 nonBad=where(bad[m1] EQ 0)
@@ -187,5 +193,49 @@ do_weird_stack,groupWeird[nonBad],'visual','weird_nonBad_visual'
 do_weird_stack,groupWeird[nonProj],'visual','weird_nonProj_visual'
 do_weird_stack,groupWeird[nonMerg],'visual','weird_nonMerg_visual'
 do_weird_stack,groupWeird[confident],'visual','weird_confident_visual'
+
+
+; compare with stack of groups where all gal centers agree
+do_weird_stack,groupNonWeird,'mmgg_scale','nonWeird_mmgg_scale'
+;do_weird_stack,groupNonWeird,'mmgg_r200','nonWeird_mmgg_r200'
+;do_weird_stack,groupNonWeird,'mlgg_scale','nonWeird_mlgg_scale'
+;do_weird_stack,groupNonWeird,'mlgg_r200','nonWeird_mlgg_r200'
+
+; try to get a cleaner signal from the nonWeird sample
+hiM=where(groupNonWeird.mmgg_scale_mstar GT 11.)
+do_weird_stack,groupNonWeird[hiM],'mmgg_scale','nonWeirdHiM_mmgg_scale'
+
+gap=fltarr(n_elements(groupNonWeird))
+for ii=0,n_elements(gap)-1 do begin
+   mem=where(acs.p_mem_best GT 0.5 AND acs.group_id_best EQ groupNonWeird[ii].id)
+   topTwo=acs[mem[(reverse(sort(acs[mem].kevin_mstar)))[0:1]]].kevin_mstar
+   gap[ii]=topTwo[0]-topTwo[1]
+endfor   
+bigGap=where(gap GT 0.3,complement=smallGap)
+
+do_weird_stack,groupNonWeird[bigGap],'mmgg_scale','nonWeirdBigGap_mmgg_scale'
+do_weird_stack,groupNonWeird[smallGap],'mmgg_scale','nonWeirdSmallGap_mmgg_scale'
+
+rich=where(groupNonWeird.n_mem LT 20,complement=poor)
+
+do_weird_stack,groupNonWeird[rich],'mmgg_scale','nonWeirdRich_mmgg_scale'
+do_weird_stack,groupNonWeird[poor],'mmgg_scale','nonWeirdPoor_mmgg_scale'
+
+
+;loz=where(groupNonWeird.zphot GT 0.2 $
+;          AND groupNonWeird.zphot LT 0.6)
+;hiz=where(groupNonWeird.zphot GT 0.6 $
+;          AND groupNonWeird.zphot LT 1.0)
+loz=where(group.zphot GT 0.2 $
+          AND group.zphot LT 0.6)
+hiz=where(group.zphot GT 0.6 $
+          AND group.zphot LT 1.0)
+allz=where(group.zphot GT 0.2 $
+           AND group.zphot LT 1.0)
+;do_weird_stack,group[loz],'mmgg_scale','loZ_mmgg_scale'
+;do_weird_stack,group[hiz],'mmgg_scale','hiZ_mmgg_scale'
+;do_weird_stack,group[allz],'mmgg_scale','allZ_mmgg_scale'
+
+
 
 end
