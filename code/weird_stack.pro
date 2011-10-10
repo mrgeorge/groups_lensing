@@ -237,5 +237,33 @@ allz=where(group.zphot GT 0.2 $
 ;do_weird_stack,group[allz],'mmgg_scale','allZ_mmgg_scale'
 
 
+; compare centers for groups where X-ray and MMGG_scale are offset
+; more than the X-ray uncertainty (and more than 50 kpc)
+d_x_ms_kpc=distance(group.alpha_ellipse,group.delta_ellipse,group.alpha_mmgg_scale,group.delta_mmgg_scale)*3600.*group.lensing_r200_mpc*1000./group.lensing_r200_as
+xoff=where(group.flag1 EQ 1 $
+           AND d_x_ms_kpc GT 50. $
+           AND group.pos_err_ellipse*3600.*group.lensing_r200_mpc*1000./group.lensing_r200_as LT 50.)
+do_weird_stack,group[xoff],'mmgg_scale','xoff_mmgg_scale'
+do_weird_stack,group[xoff],'xray','xoff_xray'
+
+; repeat using AF's centers (alpha_j2000) instead of ellipse
+d_xaf_ms_kpc=distance(group.alpha_j2000,group.delta_j2000,group.alpha_mmgg_scale,group.delta_mmgg_scale)*3600.*group.lensing_r200_mpc*1000./group.lensing_r200_as
+xaf_off=where(group.flag1 EQ 1 $
+           AND d_xaf_ms_kpc GT 50. $
+           AND group.pos_err_ellipse*3600.*group.lensing_r200_mpc*1000./group.lensing_r200_as LT 50.)
+do_weird_stack,group[xaf_off],'mmgg_scale','xaf_off_mmgg_scale'
+do_weird_stack,group[xaf_off],'af','xaf_off_af'
+
+; AL saw problems with a hi-M sample
+hiM=where(group.zphot GT 0.2 $
+          AND group.zphot LT 1. $
+          AND group.lensing_m200 GT 13.55)
+do_weird_stack,group[hiM],'mmgg_scale','hiM_mmgg_scale'
+
+hiMClean=where(group.zphot GT 0.2 $
+               AND group.zphot LT 1. $
+               AND group.lensing_m200 GT 13.55 $
+               AND group.id_mmgg_scale EQ group.id_mlgg_scale)
+do_weird_stack,group[hiMClean],'mmgg_scale','hiMClean_mmgg_scale'
 
 end
