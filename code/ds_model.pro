@@ -48,9 +48,10 @@ if(n_elements(zl) EQ 0) then zl = lens_redshift
 ; 3  alpha : fraction
 ; 4  Bias
 ; 5  m_sigma : dispersion in central mass
+; 6  offset : mean offset distance
 ;-------------------------------------------------------------------------
 
-b1 = 1.0 & n1 = 1.0 & g1 = 1.0 & t1 = 1.0 & s1 = 1.0
+b1 = 1.0 & n1 = 1.0 & g1 = 1.0 & t1 = 1.0 & s1 = 1.0 & o1 = 1.0
 
 ; Baryonic term
 if (fit_type[0] eq 0) then begin
@@ -79,6 +80,11 @@ if (fit_type[5] eq 0) then begin
     s1 = 0.0 
 endif
 
+; Offset distance
+if (fit_type[6] eq 0) then begin 
+    o1 = 0.0 
+endif
+
 ; If we ignore a term then return array of zero's
 zero_array    = fltarr(n_elements(X))
 zero_array(*) = 0.0
@@ -91,6 +97,7 @@ zero_array(*) = 0.0
 ; 3  alpha  : fraction
 ; 4  b      : bias
 ; 5  m_sigma: dispersion in central mass
+; 6  offset : mean offset distance
 ;-------------------------------------------------------------------------
 
 i = 0
@@ -165,6 +172,14 @@ endif else begin
     m_sigma = 0.1 
 endelse
 
+; offset distance
+if(fit_type[6] EQ 1) then begin
+   offset=P[i]
+   i=i+1
+endif else begin
+   offset=0.
+endelse
+
 ;-------------------------------------------------------------------------
 ; ********************* NFW TERM *****************************************
 ;-------------------------------------------------------------------------
@@ -202,14 +217,12 @@ endif else begin
     X2=X
 endelse
 
-; Include the dispersion in mass selection here
-if (fit_type[5] eq 0) then begin 
-   if (use_m200 eq 1) then begin
-      nfw_term = nfw_ds(X2,[rnfw,Conc],zl,/r200)
-   endif else begin
-      nfw_term = nfw_ds(X2,[rnfw,Conc],zl)
-   endelse
-endif else begin
+; Include the offset distance and dispersion in mass selection here if needed
+if (fit_type[5] eq 0 AND fit_type[6] EQ 0) then $
+   nfw_term = nfw_ds(X2,[rnfw,Conc],zl,r200=(use_m200 EQ 1)) $
+else if (fit_type[5] EQ 0 AND fit_type[6] GT 0) then $
+   nfw_term=nfw_ds_offset(X2,[rnfw,conc],zl,r200=(use_m200 EQ 1),roff=offset) $
+else begin ; fit mass dispersion, no offset currently included
    ; This is with a central dispersion
    ; mnfw is not in log units
    nfw_term = nfw_ds_sig( X2, 10.0^(Mnfw), Conc, m_sigma, zl)
