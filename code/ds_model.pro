@@ -7,7 +7,6 @@ function ds_model, X, P,$
                    ds_z0=ds_z0,$
                    return_all=return_all,$
                    skip_dslin=skip_dslin,$
-                   offset=offset,$
                    center=center,$
                    refcen=refcen,$
                    zl=zl
@@ -205,18 +204,10 @@ endelse
 
 ; Include the dispersion in mass selection here
 if (fit_type[5] eq 0) then begin 
-   if(keyword_set(offset)) then begin
-      if (use_m200 eq 1) then begin
-         nfw_term = nfw_ds_offset(X2,[rnfw,Conc],zl,/r200,center=center,refcen=refcen)
-      endif else begin
-         nfw_term = nfw_ds_offset(X2,[rnfw,Conc],zl,center=center,refcen=refcen)
-      endelse
+   if (use_m200 eq 1) then begin
+      nfw_term = nfw_ds(X2,[rnfw,Conc],zl,/r200)
    endif else begin
-      if (use_m200 eq 1) then begin
-         nfw_term = nfw_ds(X2,[rnfw,Conc],zl,/r200)
-      endif else begin
-         nfw_term = nfw_ds(X2,[rnfw,Conc],zl)
-      endelse
+      nfw_term = nfw_ds(X2,[rnfw,Conc],zl)
    endelse
 endif else begin
    ; This is with a central dispersion
