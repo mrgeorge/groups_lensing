@@ -67,7 +67,7 @@ yst=1
 xlog=1
 ylog=0
 if(keyword_set(xlog)) then xr = [0.03,1.3] else xr=[0,1.5]
-if(keyword_set(ylog)) then yr = [0.5,3000] else yr = [-99,200]
+if(keyword_set(ylog)) then yr = [0.5,3000] else yr = [-50,249]
 ;if(keyword_set(ylog)) then ytickf='loglabels' else ytickf=''
 ;if(keyword_set(xlog)) then xtickf='loglabels' else xtickf=''
 xtitle=textoidl('Physical transverse distance,  R (h_{72}^{-1} Mpc)')
@@ -168,13 +168,13 @@ for ii=0,nCen-1 do begin
    cstr='Concentration:'
    chisqstr=textoidl('\chi^2:')
    dof_str='d.o.f.:'
-   if(fitTypeAll[0,ii] NE 0) then begin
+;   if(fitTypeAll[0,ii] NE 0) then begin
       smstr=textoidl('log(M')+star+'/M'+sun+'):'
-   endif else sm=textoidl('log(M')+star+'/M'+sun+'):'+string(0.0,format="(f6.2)")
+;   endif else smstr=textoidl('log(M')+star+'/M'+sun+'):'+string(0.0,format="(f6.2)")
 
    yLine=0.1*(yr[1]-yr[0])
    xRight=0.8*xr[1]
-   xStrRight=0.33*xr[1]
+   xStrRight=0.4*xr[1]
    fmt="(F6.2)"
    xyouts,xStrRight,yr[1]-1.*yLine,mstr,alignment=0.99,charsize=0.9
    xyouts,xStrRight,yr[1]-2.*yLine,smstr,alignment=0.88,charsize=0.9
