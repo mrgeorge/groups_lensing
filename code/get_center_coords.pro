@@ -105,6 +105,10 @@ case name of
       ra=group.alpha_j2000
       dec=group.delta_j2000
    end
+   'af': begin
+      ra=group.alpha_j2000
+      dec=group.delta_j2000
+   end
 endcase
 
 sel=where(ra GT -360. and dec GT -90.)
