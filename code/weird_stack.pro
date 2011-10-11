@@ -1,4 +1,4 @@
-pro do_weird_stack, groupSel, cenName, selType
+pro do_weird_stack, groupSel, cenName, selType, compare_offset=compare_offset
 ; write a group file
 ; measure the lensing signal
 ; plot the lensing signal
@@ -6,6 +6,9 @@ pro do_weird_stack, groupSel, cenName, selType
 ; groupSel is group[sel], i.e. a subarray of group structures
 ; cenName is the name of the center used, e.g. 'mlgg_r200'
 ; selType is a description of the selection of groups, for filenames
+
+; if compare_offset is set, plot a regular centered model AND an
+; offset model
 
 ; Set paths for output files
 dirName='weird_stack'
@@ -37,11 +40,28 @@ fitType = [$
 2,$             ; 0  M0    : baryonic mass
 1,$             ; 1  R_vir : NFW virial mass
 2,$             ; 2  C     : NFW concentration
-0,$             ; 5  alpha : fraction
-0,$             ; 6  bias
-0 ]             ; 6  m_sigma
+0,$             ; 3  alpha : fraction
+0,$             ; 4  bias
+0,$             ; 5  m_sigma
+0 ]             ; 6  offset
 run_ds_mcmc, lensOutFile, fitType, rob_p_mean, rob_p_sigma
-plot_lensing_results,lensOutFile,plotDir+selType,rob_p_mean,fitType,/use_m200,/models
+
+if(NOT(keyword_set(compare_offset))) then $
+   plot_lensing_results,lensOutFile,plotDir+selType,rob_p_mean,fitType,/use_m200,/models $
+else begin
+   fitTypeOff = [$
+                2,$             ; 0  M0    : baryonic mass
+                1,$             ; 1  R_vir : NFW virial mass
+                2,$             ; 2  C     : NFW concentration
+                0,$             ; 3  alpha : fraction
+                0,$             ; 4  bias
+                0,$             ; 5  m_sigma
+                1 ]             ; 6  offset
+   run_ds_mcmc, lensOutFile, fitTypeOff, rob_p_mean_off, rob_p_sigma_off
+
+   plot_lensing_results,lensOutFile,plotDir+selType+'_comp',[[rob_p_mean],[rob_p_mean_off]],[[fitType],[fitTypeOff]],/use_m200,/models
+endelse 
+
 end
 
 pro weird_stack
