@@ -80,10 +80,6 @@ if (fit_type[5] eq 0) then begin
     s1 = 0.0 
 endif
 
-; Offset distance
-if (fit_type[6] eq 0) then begin 
-    o1 = 0.0 
-endif
 
 ; If we ignore a term then return array of zero's
 zero_array    = fltarr(n_elements(X))
