@@ -223,49 +223,54 @@ if(keyword_set(models)) then begin
       x_mpc = 10.^(findgen(nxMpc)/(nxMpc-1)*alog10((xr[1]*xbuffer)/(xr[0]/xbuffer)))*xr[0]/xbuffer
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
    
-   get_ds_model,fit_type,p_mean,full_str,x_mpc,ps_term=ps_term,nfw_term=nfw_term,$
+   nModels=(size(fit_type))[0]
+   chisq=fltarr(nModels)
+   dof=fltarr(nModels)
+   for nn=0,nModels-1 do begin
+      get_ds_model,fit_type[*,nn],p_mean[*,nn],full_str,x_mpc,ps_term=ps_term,nfw_term=nfw_term,$
                 center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off
 
-   ; Baryonic point source term
-   if(fit_type[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1
+      ; Baryonic point source term
+      if(fit_type[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1
 
-   ; NFW term
-   oplot,x_mpc,nfw_term,color=!green,linestyle=2
+      ; NFW term
+      oplot,x_mpc,nfw_term,color=!green,linestyle=2
 
-   ; NFW term with offset distribution
-   if(keyword_set(center) AND keyword_set(refcen)) then begin
-      oplot,x_mpc,nfw_off,color=!orange,linestyle=3
-   endif
+      ; NFW term with offset distribution
+      if(keyword_set(center) AND keyword_set(refcen)) then begin
+         oplot,x_mpc,nfw_off,color=!orange,linestyle=3
+      endif
 
-   ; Sum of terms (currently just NFW + point source if point source is included in model)
-   if(fit_type[0] NE 0) then begin
-      if(keyword_set(center) AND keyword_set(refcen)) then tot = ps_term + nfw_off $
-      else tot = ps_term + nfw
-      oplot,x_mpc,tot,color=!blue
-   endif
+      ; Sum of terms (currently just NFW + point source if point source is included in model)
+      if(fit_type[0] NE 0) then begin
+         if(keyword_set(center) AND keyword_set(refcen)) then tot = ps_term + nfw_off $
+         else tot = ps_term + nfw
+         oplot,x_mpc,tot,color=!blue
+      endif
 
-   ;-------------------------------------------------------------------------
-   ; Replot points
-   ;-------------------------------------------------------------------------
-   oploterror,x,y,yerr,psym=8,symsize=1.0,color=!black
+      ;-------------------------------------------------------------------------
+      ; Replot points
+      ;-------------------------------------------------------------------------
+      oploterror,x,y,yerr,psym=8,symsize=1.0,color=!black
 
-   ;-------------------------------------------------------------------------
-   ; Calculate chi^2
-   ;-------------------------------------------------------------------------
-   ; currently just NFW + point source if point source is included in model
+      ;-------------------------------------------------------------------------
+      ; Calculate chi^2
+      ;-------------------------------------------------------------------------
+      ; currently just NFW + point source if point source is included in model
 
-   ; calculate expected model values at locations of data points
-   get_ds_model,fit_type,p_mean,full_str,x,ps_term=model_ps,nfw_term=model_nfw,$
-                center=center,refcen=refcen,groupFile=groupFile,nfw_off=model_nfw_off
+      ; calculate expected model values at locations of data points
+      get_ds_model,fit_type[*,nn],p_mean[*,nn],full_str,x,ps_term=model_ps,nfw_term=model_nfw,$
+                   center=center,refcen=refcen,groupFile=groupFile,nfw_off=model_nfw_off
 
-   if(keyword_set(center) AND keyword_set(refcen)) then $
-      model_tot=model_nfw_off $
-   else model_tot=model_nfw
+      if(keyword_set(center) AND keyword_set(refcen)) then $
+         model_tot=model_nfw_off $
+      else model_tot=model_nfw
 
-   if(fit_type[0] NE 0) then model_tot+=model_ps
+      if(fit_type[0] NE 0) then model_tot+=model_ps
 
-   chisq = total((model_tot-y)^2/yerr^2)
-   dof = n_elements(x)-n_elements(where(fit_type EQ 1))
+      chisq[nn]= total((model_tot-y)^2/yerr^2)
+      dof[nn]= n_elements(x)-n_elements(where(fit_type[*,nn] EQ 1))
+   endfor
 endif
 
 ;-------------------------------------------------------------------------
