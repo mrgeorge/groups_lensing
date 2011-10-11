@@ -18,7 +18,11 @@ function nfw_ds_offset, r, p, zl, groupFile, $
 ; r200   -> 200 x critical density
 
 if(n_elements(roff) GT 0) then begin
-   ngroups=1
+   if(min(roff) LT 0.) then stop ; bad input, roff should be non-negative
+   if(max(roff) EQ 0.) then return nfw_ds(r,p,zl,r200=r200,r180=r180) ; no offsets
+
+   ; (else)
+   ngroups=n_elements(roff)
 endif else begin
    if(NOT(keyword_set(refcen))) then refcen='mmgg_scale'
 
