@@ -69,7 +69,9 @@ for g=0,ngroups-1 do begin
 endfor
 
 ; \Delta\Sigma(R|R_{off})
-deltaSigma = total((sigmaMean-sigmaR),2)
+if(ngroups GT 1) then $
+   deltaSigma = total((sigmaMean-sigmaR),2) $
+else deltaSigma = (sigmaMean-sigmaR)
 
 return, deltaSigma
 end
