@@ -1,21 +1,19 @@
-pro plot_lensing_results, lensing_infile, ps_file, p_mean, fit_type,$
-                          center=center,$
-                          refcen=refcen,$
-                          groupFile=groupFile,$
-                          stackx=stackx,$
-                          use_m200=use_m200,$
-                          use_maccio=use_maccio, $
-                          models=models
+pro get_ds_model, fit_type, p_mean, lens_str, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
+                  center=center,refcen=refcen,groupFile=groupFile, nfw_off=nfw_off
+; determine model components for a given set of parameters
+; this duplicates what ds_model.pro is supposed to do, but avoids the
+; common block dependency
 
-defsysv,'!Omega_m', exists=exists
-if NOT exists THEN define_cosmo
+; fit_type is array telling which parameters are included in fit
+; p_mean gives mean fit parameters
+; lens_str is struct containing mean z and point source mass
+; ps_term, nfw_term return model values at radii x_mpc
+; if center, refcen, and groupFile are set, nfw_off will contain the
+;   model NFW (assumed to be fit around refcen) convolved with the offset distribution between center
+;   and refcen, to give the predicted signal around center
+; note that nfw_term may include a centering offset if fit_type[6]>0
 
-;-------------------------------------------------------------------------
-; Data Struct
-;-------------------------------------------------------------------------
-full_str=mrdfits(lensing_infile,1)
-sel_str=where(full_str.e1_num GE 10)
-zl = full_str.z_lens
+zl=lens_str.z_lens
 
 ;-------------------------------------------------------------------------
 ; VARIABLES
@@ -28,6 +26,7 @@ zl = full_str.z_lens
 ; 3  alpha  : fraction
 ; 4  b      : bias
 ; 5  m_sigma: dispersion in central mass
+; 6  offset : offset distance
 ;-------------------------------------------------------------------------
 
 i=0
@@ -38,7 +37,7 @@ if(fit_type[0] eq 1) then begin
    i = i+1
 endif else begin
 ; Fix from the data
-   M0 = full_str.msun_lens      ; alog10 units
+   M0 = lens_str.msun_lens      ; alog10 units
 endelse
 
 ; M_vir
@@ -49,7 +48,7 @@ endif
 
 ; Concentration
 if(fit_type[2] eq 1) then begin
-   Conc = 10.0^(P[i])           ; LOG
+   Conc = 10.0^(p_mean[i])           ; LOG
    i = i+1
 endif else begin
    if(fit_type[2] EQ 2) then begin
@@ -115,6 +114,15 @@ endif else begin
    m_sigma = 0.1 
 endelse
 
+; offset distance
+if(fit_type[6] GT 0) then begin
+   offset=p_mean[i]
+   i=i+1
+endif else begin
+   offset=0.
+endelse
+
+
 ; Calculate r200
 if (use_m200 eq 1) then begin
    overdensity = get_overdensity( zl, /r200)
@@ -125,6 +133,41 @@ rho_crit = critical_density(zl)
 factor   = alog10(double((4.0/3.0)*!Pi*overdensity*rho_crit))
 r_log    = (1.0/3.0)*(Mnfw-factor)
 rnfw     = 10.0^(r_log)
+
+
+; Calculate model curves
+ps_term=10^(M0)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
+nfw_term=nfw_ds_offset(x_mpc,[rnfw,conc],zl,r200=keyword_set(use_m200),roff=offset)
+if(keyword_set(center) AND keyword_set(refcen) AND keyword_set(groupFile)) then $
+   nfw_off=nfw_ds_offset(x_mpc,[rnfw,conc],zl,groupFile,r200=keyword_set(use_m200),center=center,refcen=refcen)
+
+end
+
+pro plot_lensing_results, lensing_infile, ps_file, p_mean, fit_type,$
+                          center=center,$
+                          refcen=refcen,$
+                          groupFile=groupFile,$
+                          stackx=stackx,$
+                          use_m200=use_m200,$
+                          use_maccio=use_maccio, $
+                          models=models
+
+; plot delta sigma vs r from lensing infile
+; if models keyword is set, overplot model curves using fitted parameters p_mean
+;   based on what parameters are fit from fit_type (may be centered
+;   NFW, single offset NFW, w/ or w/o PS term)
+; if center, refcen, and groupFile are given, plot model NFW offset by the distribution of distances between centers
+
+defsysv,'!Omega_m', exists=exists
+if NOT exists THEN define_cosmo
+
+;-------------------------------------------------------------------------
+; Data Struct
+;-------------------------------------------------------------------------
+full_str=mrdfits(lensing_infile,1)
+sel_str=where(full_str.e1_num GE 10)
+zl = full_str.z_lens
+
 
 ;-------------------------------------------------------------------------
 ; SET UP PLOT
@@ -151,7 +194,7 @@ if(keyword_set(ylog)) then ytickf='loglabels' else ytickf=''
 if(keyword_set(xlog)) then xtickf='loglabels' else xtickf=''
 
 if(keyword_set(stackx)) then begin
-   x    = full_str.plot_radius_kpc[sel_str]*rnfw
+   x    = full_str.plot_radius_kpc[sel_str]*rnfw ; this will break since rnfw no longer defined here, but stackx is currently not used
    y    = full_str.we1_mean[sel_str]
    yerr = full_str.we1_error[sel_str]
 endif else begin
@@ -159,6 +202,8 @@ endif else begin
    y    = full_str.we1_mean[sel_str]
    yerr = full_str.we1_error[sel_str]
 endelse
+
+
 
 ;-------------------------------------------------------------------------
 ; PLOT POINTS
@@ -168,6 +213,7 @@ ploterror,x,y,yerr,xlog=xlog,ylog=ylog,yr=yr,xr=xr,xtickf=xtickf,ytickf=ytickf,$
 
 
 if(keyword_set(models)) then begin
+
    ;-------------------------------------------------------------------------
    ; PLOT THE MODEL
    ;-------------------------------------------------------------------------
@@ -177,19 +223,17 @@ if(keyword_set(models)) then begin
       x_mpc = 10.^(findgen(nxMpc)/(nxMpc-1)*alog10((xr[1]*xbuffer)/(xr[0]/xbuffer)))*xr[0]/xbuffer
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
    
+   get_ds_model,fit_type,p_mean,full_str,x_mpc,ps_term=ps_term,nfw_term=nfw_term,$
+                center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off
+
    ; Baryonic point source term
-   if(fit_type[0] NE 0) then begin
-      ps_term = 10^(M0)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
-      oplot,x_mpc,ps_term,color=!red,linestyle=1
-   endif
+   if(fit_type[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1
 
    ; NFW term
-   nfw = nfw_ds(x_mpc,[rnfw,conc],zl,r200=keyword_set(use_m200))
-   oplot,x_mpc,nfw,color=!green,linestyle=2
+   oplot,x_mpc,nfw_term,color=!green,linestyle=2
 
-   ; Offset NFW term
+   ; NFW term with offset distribution
    if(keyword_set(center) AND keyword_set(refcen)) then begin
-      nfw_off = nfw_ds_offset(x_mpc,[rnfw,conc],zl,groupFile,r200=keyword_set(use_m200),center=center,refcen=refcen)
       oplot,x_mpc,nfw_off,color=!orange,linestyle=3
    endif
 
@@ -211,14 +255,14 @@ if(keyword_set(models)) then begin
    ; currently just NFW + point source if point source is included in model
 
    ; calculate expected model values at locations of data points
-   if(keyword_set(center) AND keyword_set(refcen)) then $
-      model_nfw = nfw_ds_offset(x,[rnfw,conc],zl,groupFile,r200=keyword_set(use_m200),center=center,refcen=refcen) $
-   else model_nfw = nfw_ds(x,[rnfw,conc],zl,r200=keyword_set(use_m200))
+   get_ds_model,fit_type,p_mean,full_str,x,ps_term=model_ps,nfw_term=model_nfw,$
+                center=center,refcen=refcen,groupFile=groupFile,nfw_off=model_nfw_off
 
-   if(fit_type[0] NE 0) then begin
-      model_ps = 10^(M0)/1.e12/(!pi*x^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
-      model_tot = model_ps + model_nfw
-   endif else model_tot = model_nfw
+   if(keyword_set(center) AND keyword_set(refcen)) then $
+      model_tot=model_nfw_off $
+   else model_tot=model_nfw
+
+   if(fit_type[0] NE 0) then model_tot+=model_ps
 
    chisq = total((model_tot-y)^2/yerr^2)
    dof = n_elements(x)-n_elements(where(fit_type EQ 1))
