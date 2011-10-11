@@ -98,7 +98,10 @@ common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, 
    ; NOTE :
    ; This is where you can put a prior on a variable to be more than 0 for example !!!
    ; e.g : NOTE : I MAY NEED TO CHECK THAT m_sigma remains positive
-   
+
+   ; require offset to be positive - this code assumes offset is the *last* parameter in pars
+   if(fit_type[6] EQ 1 AND res[npars-1] LT 0) then res[npars-1]=0.
+
 return,res
 end 
 
