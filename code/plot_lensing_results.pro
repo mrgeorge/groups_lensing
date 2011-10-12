@@ -1,5 +1,5 @@
 pro get_ds_model, fit_type, p_mean, lens_str, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
-                  center=center,refcen=refcen,groupFile=groupFile, nfw_off=nfw_off
+                  center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,use_m200=use_m200
 ; determine model components for a given set of parameters
 ; this duplicates what ds_model.pro is supposed to do, but avoids the
 ; common block dependency
@@ -52,7 +52,7 @@ if(fit_type[2] eq 1) then begin
    i = i+1
 endif else begin
    if(fit_type[2] EQ 2) then begin
-      if (use_m200 eq 1) then begin
+      if (keyword_set(use_m200)) then begin
          if (keyword_set(use_maccio)) then begin
             conc = get_conc(Mnfw,zl,/use200,/maccio) ; Maccio
          endif else begin
@@ -124,7 +124,7 @@ endelse
 
 
 ; Calculate r200
-if (use_m200 eq 1) then begin
+if (keyword_set(use_m200) eq 1) then begin
    overdensity = get_overdensity( zl, /r200)
 endif else begin
    overdensity = density_contrast(zl) ; virial
@@ -150,7 +150,7 @@ function get_ds_chisq,fit_type,p_mean,full_str,x,center=center,refcen=refcen,gro
 
 ; calculate expected model values at locations of data points
 get_ds_model,fit_type,p_mean,full_str,x,ps_term=model_ps,nfw_term=model_nfw,$
-             center=center,refcen=refcen,groupFile=groupFile,nfw_off=model_nfw_off
+             center=center,refcen=refcen,groupFile=groupFile,nfw_off=model_nfw_off,use_m200=use_m200
 
 if(keyword_set(center) AND keyword_set(refcen)) then $
    model_tot=model_nfw_off $
@@ -248,7 +248,7 @@ if(keyword_set(models)) then begin
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
 
    get_ds_model,fit_type,p_mean,full_str,x_mpc,ps_term=ps_term,nfw_term=nfw_term,$
-                center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off
+                center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,use_m200=use_m200
 
    ; Baryonic point source term
    if(fit_type[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1
@@ -275,7 +275,7 @@ if(keyword_set(models)) then begin
       ; PLOT 2ND MODEL
       ;-------------------------------------------------------------------------
       get_ds_model,fit_type2,p_mean2,full_str,x_mpc,ps_term=ps_term,nfw_term=nfw_term,$
-                   center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off
+                   center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,use_m200=use_m200
 
       ; Baryonic point source term
       if(fit_type2[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1
