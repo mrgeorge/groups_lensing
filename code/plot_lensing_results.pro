@@ -143,7 +143,7 @@ if(keyword_set(center) AND keyword_set(refcen) AND keyword_set(groupFile)) then 
 
 end
 
-function get_ds_chisq,fit_type,p_mean,full_str,x,dof=dof,center=center,refcen=refcen,groupFile=groupFile,use_m200=use_m200
+function get_ds_chisq,fit_type,p_mean,full_str,x,y,yerr,dof=dof,center=center,refcen=refcen,groupFile=groupFile,use_m200=use_m200
 ; Calculate chi^2
 ; currently just NFW + point source if point source is included in model
 ; dof keyword will be filled and returned if provided
@@ -268,7 +268,7 @@ if(keyword_set(models)) then begin
       oplot,x_mpc,tot,color=!blue
    endif
 
-   chisq=get_ds_chisq(fit_type,p_mean,full_str,x,center=center,refcen=refcen,groupFile=groupFile,dof=dof,use_m200=use_m200)
+   chisq=get_ds_chisq(fit_type,p_mean,full_str,x,y,yerr,center=center,refcen=refcen,groupFile=groupFile,dof=dof,use_m200=use_m200)
 
    if(keyword_set(fit_type2) AND keyword_set(p_mean2)) then begin
       ;-------------------------------------------------------------------------
@@ -295,7 +295,7 @@ if(keyword_set(models)) then begin
          oplot,x_mpc,tot,color=!blue
       endif
 
-      chisq2=get_ds_chisq(fit_type,p_mean,full_str,x,center=center,refcen=refcen,groupFile=groupFile,dof=dof2,use_m200=use_m200)
+      chisq2=get_ds_chisq(fit_type,p_mean,full_str,x,y,yerr,center=center,refcen=refcen,groupFile=groupFile,dof=dof2,use_m200=use_m200)
    endif
 
    ;-------------------------------------------------------------------------
