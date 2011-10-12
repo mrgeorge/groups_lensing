@@ -15,18 +15,11 @@ npts=1000 ; doesn't matter much for small offsets, but important for precision w
 dtheta=2*!pi/npts
 theta=dindgen(npts)*dtheta
 
-; loop over each element of r
-sigma_off=dblarr(n_elements(r))
-for i=0,n_elements(r)-1 do begin
+arg=sqrt(rebin([r^2],[n_elements(r),npts]) + roff^2 - 2.*roff*r#cos(theta)) ; offset radius, [nr x ntheta] array
+sigma=reform(nfw_sigma(arg,p,zl,r200=r200,r180=r180),[n_elements(r),npts])
 
-   ;offset radius - array of length npts(theta)
-   arg=sqrt(r[i]^2 + roff^2 + 2.*r[i]*roff*cos(theta))
-
-   sigma=nfw_sigma(arg,p,zl,r200=keyword_set(r200),r180=keyword_set(r180))
-
-   ; assume random orientation of offsets and take azimuthal average
-   sigma_off[i]=1./(2*!pi) * total(sigma*dtheta)
-endfor
+; assume random orientation of offsets and take azimuthal average
+sigma_off=1./(2.*!pi) * total(sigma*dtheta,2)
 
 return, sigma_off
 end
