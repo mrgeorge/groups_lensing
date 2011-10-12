@@ -10,26 +10,15 @@ res = 0.0
 
 common common_nfw_sig_offset, reset_tab, r_tab, nfw_sig_offset_tab 
 
-;!EXCEPT=2
-
 ; Define variables if not previously defined
 s=size(r_tab)
 
 if(s[1] eq 0) then begin ; Tabulate r in log space
-   npts = 2000.0 ; high number just to begin with
-   fac = 1.02    ; 
-   reset_tab = 1
-   
-   r_tab    = dindgen(npts)
-   r_tab[0] = 1e-4  ; minimum valid radius
-   for j=1,n_elements(r_tab)-1 do begin
-      r_tab[j] = r_tab[j-1]*fac     
-   endfor
-
-   ; Valid to 4Mpc
-   sel=where(r_tab le 4)
-   r_tab = r_tab(sel)
-   npts = n_elements(sel)
+   minRad=1.e-4 ; Mpc
+   maxRad=4. ; Mpc
+   npts=500 ; in log r
+   step=(maxRad/minRad)^(1./npts)
+   r_tab=minRad*step^indgen(npts)
    nfw_sig_offset_tab = dindgen(npts)
 endif
 
@@ -62,17 +51,9 @@ endif else begin ; otherwise, interpolate between index and index-1, linear inte
    if (r le min(r_tab)) then begin
       res = nfw_sig_offset_tab[0]
    endif else begin
-       ; problems with this because DS goes neg
-      ;a   = (alog10(nfw_sig_offset_tab[index])-alog10(nfw_sig_offset_tab[index-1]))/(alog10(r_tab[index])-alog10(r_tab[index-1]))
-      ;b   = alog10(nfw_sig_offset_tab[index]) - (a*alog10(r_tab[index])) 
-      ;res = 10.0^((a*alog10(r))+b)
-
       a   = ((nfw_sig_offset_tab[index])-(nfw_sig_offset_tab[index-1]))/((r_tab[index])-(r_tab[index-1]))
       b   = (nfw_sig_offset_tab[index]) - (a*(r_tab[index])) 
       res = (a*r)+b
-
-      ;a=CHECK_MATH()
-      ;if (a gt 0) then stop
    endelse
 endelse
 return, res
