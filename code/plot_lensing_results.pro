@@ -143,6 +143,27 @@ if(keyword_set(center) AND keyword_set(refcen) AND keyword_set(groupFile)) then 
 
 end
 
+function get_ds_chisq,fit_type,p_mean,full_str,x,center=center,refcen=refcen,groupFile=groupFile,dof=dof
+; Calculate chi^2
+; currently just NFW + point source if point source is included in model
+; dof keyword will be filled and returned if provided
+
+; calculate expected model values at locations of data points
+get_ds_model,fit_type,p_mean,full_str,x,ps_term=model_ps,nfw_term=model_nfw,$
+             center=center,refcen=refcen,groupFile=groupFile,nfw_off=model_nfw_off
+
+if(keyword_set(center) AND keyword_set(refcen)) then $
+   model_tot=model_nfw_off $
+else model_tot=model_nfw
+
+if(fit_type[0] NE 0) then model_tot+=model_ps
+
+chisq=total((model_tot-y)^2/yerr^2)
+dof=n_elements(x)-n_elements(where(fit_type EQ 1))
+
+return, chisq
+end
+
 pro plot_lensing_results, lensing_infile, ps_file, p_mean, fit_type,$
                           center=center,$
                           refcen=refcen,$
@@ -150,13 +171,16 @@ pro plot_lensing_results, lensing_infile, ps_file, p_mean, fit_type,$
                           stackx=stackx,$
                           use_m200=use_m200,$
                           use_maccio=use_maccio, $
-                          models=models
+                          models=models,$
+                          fit_type2=fit_type2,$
+                          p_mean2=p_mean2
 
 ; plot delta sigma vs r from lensing infile
 ; if models keyword is set, overplot model curves using fitted parameters p_mean
 ;   based on what parameters are fit from fit_type (may be centered
 ;   NFW, single offset NFW, w/ or w/o PS term)
 ; if center, refcen, and groupFile are given, plot model NFW offset by the distribution of distances between centers
+; if fit_type2 and p_mean2 are given, plot two models for comparison
 
 defsysv,'!Omega_m', exists=exists
 if NOT exists THEN define_cosmo
@@ -222,16 +246,39 @@ if(keyword_set(models)) then begin
       xbuffer=1.3
       x_mpc = 10.^(findgen(nxMpc)/(nxMpc-1)*alog10((xr[1]*xbuffer)/(xr[0]/xbuffer)))*xr[0]/xbuffer
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
-   
-   nModels=(size(fit_type))[0]
-   chisq=fltarr(nModels)
-   dof=fltarr(nModels)
-   for nn=0,nModels-1 do begin
-      get_ds_model,fit_type[*,nn],p_mean[*,nn],full_str,x_mpc,ps_term=ps_term,nfw_term=nfw_term,$
+
+   get_ds_model,fit_type,p_mean,full_str,x_mpc,ps_term=ps_term,nfw_term=nfw_term,$
                 center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off
 
+   ; Baryonic point source term
+   if(fit_type[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1
+
+   ; NFW term
+   oplot,x_mpc,nfw_term,color=!green,linestyle=2
+
+   ; NFW term with offset distribution
+   if(keyword_set(center) AND keyword_set(refcen)) then begin
+      oplot,x_mpc,nfw_off,color=!orange,linestyle=3
+   endif
+
+   ; Sum of terms (currently just NFW + point source if point source is included in model)
+   if(fit_type[0] NE 0) then begin
+      if(keyword_set(center) AND keyword_set(refcen)) then tot = ps_term + nfw_off $
+      else tot = ps_term + nfw
+      oplot,x_mpc,tot,color=!blue
+   endif
+
+   chisq=get_ds_chisq(fit_type,p_mean,full_str,x,center=center,refcen=refcen,groupFile=groupFile,dof=dof)
+
+   if(keyword_set(fit_type2) AND keyword_set(p_mean2)) then begin
+      ;-------------------------------------------------------------------------
+      ; PLOT 2ND MODEL
+      ;-------------------------------------------------------------------------
+      get_ds_model,fit_type2,p_mean2,full_str,x_mpc,ps_term=ps_term,nfw_term=nfw_term,$
+                   center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off
+
       ; Baryonic point source term
-      if(fit_type[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1
+      if(fit_type2[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1
 
       ; NFW term
       oplot,x_mpc,nfw_term,color=!green,linestyle=2
@@ -242,35 +289,20 @@ if(keyword_set(models)) then begin
       endif
 
       ; Sum of terms (currently just NFW + point source if point source is included in model)
-      if(fit_type[0] NE 0) then begin
+      if(fit_type2[0] NE 0) then begin
          if(keyword_set(center) AND keyword_set(refcen)) then tot = ps_term + nfw_off $
          else tot = ps_term + nfw
          oplot,x_mpc,tot,color=!blue
       endif
 
-      ;-------------------------------------------------------------------------
-      ; Replot points
-      ;-------------------------------------------------------------------------
-      oploterror,x,y,yerr,psym=8,symsize=1.0,color=!black
+      chisq2=get_ds_chisq(fit_type,p_mean,full_str,x,center=center,refcen=refcen,groupFile=groupFile,dof=dof2)
+   endif
 
-      ;-------------------------------------------------------------------------
-      ; Calculate chi^2
-      ;-------------------------------------------------------------------------
-      ; currently just NFW + point source if point source is included in model
+   ;-------------------------------------------------------------------------
+   ; Replot points
+   ;-------------------------------------------------------------------------
+   oploterror,x,y,yerr,psym=8,symsize=1.0,color=!black
 
-      ; calculate expected model values at locations of data points
-      get_ds_model,fit_type[*,nn],p_mean[*,nn],full_str,x,ps_term=model_ps,nfw_term=model_nfw,$
-                   center=center,refcen=refcen,groupFile=groupFile,nfw_off=model_nfw_off
-
-      if(keyword_set(center) AND keyword_set(refcen)) then $
-         model_tot=model_nfw_off $
-      else model_tot=model_nfw
-
-      if(fit_type[0] NE 0) then model_tot+=model_ps
-
-      chisq[nn]= total((model_tot-y)^2/yerr^2)
-      dof[nn]= n_elements(x)-n_elements(where(fit_type[*,nn] EQ 1))
-   endfor
 endif
 
 ;-------------------------------------------------------------------------
@@ -295,8 +327,13 @@ if(keyword_set(models)) then begin
 
    ;box = flag to include/omit box around the legend (D=include)
    ;		  outline_color = color of box outline (D = !P.color)
-   chisq_str = textoidl('\chi^2:')+string(chisq,format='(f10.2)')
-   dof_str = 'd.o.f.:'+string(dof,format='(I)')
+   if(NOT(keyword_set(fit_type2) AND keyword_set(p_mean2))) then begin
+      chisq_str = textoidl('\chi^2:')+string(chisq,format='(f10.2)')
+      dof_str = 'd.o.f.:'+string(dof,format='(I)')
+   endif else begin
+      chisq_str = textoidl('\chi^2:')+string(chisq,format='(f6.2)')+','+string(chisq2,format='(f6.2)')
+      dof_str = 'd.o.f.:'+string(dof,format='(I)')+','+string(dof2,format='(I)')
+   endelse
    items=[nlens,z,m,c,chisq_str,dof_str]
 endif else items=[nlens,z]
 legend,items,/right,linestyle=-99,box=0,spacing=1.5

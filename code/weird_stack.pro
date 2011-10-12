@@ -57,7 +57,7 @@ else begin
                 0,$             ; 4  bias
                 0,$             ; 5  m_sigma
                 1 ]             ; 6  offset
-   run_ds_mcmc, lensOutFile, fitTypeOff, rob_p_mean_off, rob_p_sigma_off
+   run_ds_mcmc, lensOutFile, fitTypeOff, rob_p_mean_off, rob_p_sigma_off,/fast
 
    plot_lensing_results,lensOutFile,plotDir+selType+'_comp',[[rob_p_mean],[rob_p_mean_off]],[[fitType],[fitTypeOff]],/use_m200,/models
 endelse 
@@ -284,6 +284,6 @@ hiMClean=where(group.zphot GT 0.2 $
                AND group.zphot LT 1. $
                AND group.lensing_m200 GT 13.55 $
                AND group.id_mmgg_scale EQ group.id_mlgg_scale)
-do_weird_stack,group[hiMClean],'mmgg_scale','hiMClean_mmgg_scale'
+do_weird_stack,group[hiMClean],'mmgg_scale','hiMClean_mmgg_scale',/compare
 
 end
