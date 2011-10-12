@@ -1,7 +1,6 @@
 function nfw_ds_offset_sat, r, p, zl, roff, $
                         r200 = r200, $
-                        r180 = r180, $
-                        sigma=sigma
+                        r180 = r180
 
 ; To analytically calculate the satellite term in mock catalogs
 ; Alexie's version of Matt's code for gg-lensing + clustering project
@@ -36,21 +35,12 @@ for i=0,n_elements(r)-1 do begin
    sigmaR[i] = tabulate_nfw_sigma_offset(r[i],roff,p,zl,r200=keyword_set(r200),r180=keyword_set(r180))
 endfor
 
-; Just calculate SIGMA :
-if keyword_set(sigma) then begin
-   res = sigmaR
 
-; Calculate DeltaSigma :
-endif else begin
+; \bar{\Sigma}(<R|R_{off})
+sigmaMean=(2./r^2) * QROMO('nfw_sigma_offset_function',replicate(1e-4,n_elements(r)),r,EPS=1e-2) ; can increase precision here using EPS
 
-   ; \bar{\Sigma}(<R|R_{off})
-   for i=0,n_elements(r)-1 do begin
-      sigmaMean[i] = (2./r[i]^2) * QROMO('nfw_sigma_offset_function', 1e-4, r[i] , /DOUBLE , EPS=1e-2 ) ; can increase precision here using EPS
-   endfor
-
-   ; \Delta\Sigma(R|R_{off})
-   res = sigmaMean-sigmaR
-endelse
+; \Delta\Sigma(R|R_{off})
+res = sigmaMean-sigmaR
 
 return, res
 end
