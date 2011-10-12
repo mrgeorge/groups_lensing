@@ -1,5 +1,6 @@
 pro get_ds_model, fit_type, p_mean, lens_str, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
-                  center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,use_m200=use_m200
+                  center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,use_m200=use_m200,$
+                  mnfw=mnfw,conc=conc,rnfw=rnfw
 ; determine model components for a given set of parameters
 ; this duplicates what ds_model.pro is supposed to do, but avoids the
 ; common block dependency
@@ -248,8 +249,8 @@ if(keyword_set(models)) then begin
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
 
    get_ds_model,fit_type,p_mean,full_str,x_mpc,ps_term=ps_term,nfw_term=nfw_term,$
-                center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,use_m200=use_m200
-
+                center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,use_m200=use_m200,$
+                mnfw=mnfw,conc=conc,rnfw=rnfw
    ; Baryonic point source term
    if(fit_type[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1
 
@@ -275,7 +276,8 @@ if(keyword_set(models)) then begin
       ; PLOT 2ND MODEL
       ;-------------------------------------------------------------------------
       get_ds_model,fit_type2,p_mean2,full_str,x_mpc,ps_term=ps_term,nfw_term=nfw_term,$
-                   center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,use_m200=use_m200
+                   center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,use_m200=use_m200,$
+                   mnfw=mnfw2,conc=conc2,rnfw=rnfw2
 
       ; Baryonic point source term
       if(fit_type2[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1
@@ -311,28 +313,28 @@ endif
 nlens    = textoidl('N_{Lens}:')+string(full_str.lens,format="(I)")
 z        = 'Redshift:'+string(full_str.z_lens,format="(f10.2)")
 if(keyword_set(models)) then begin
-   if keyword_set(use_m200) then begin
-      m        = textoidl('log_{10}(M_{200}):')+string(mnfw,format="(f10.2)")
-      r        = textoidl('R_{200}:')+string(rnfw,format="(f10.2)")
-   endif else begin
-      m        = textoidl('log(M_{vir}):')+string(mnfw,format="(f10.2)")
-      r        = textoidl('R_{vir}:')+string(rnfw,format="(f10.2)")
-   endelse
-   c        = 'Concentration:'+string(Conc,format="(f10.2)")
-   ;msun     = textoidl('log_{10}(M_{stellar}):')+string(stellar,format="(f10.2)") 
-   ;eta      = 'SF eff:'+string(eta,format="(f10.1)") 
-   ;bias     = 'Bias:'+string(bias,format="(f10.2)") 
-   ;alpha    = 'Alpha:'+string(alpha,format="(f10.2)") 
-   ;m_sigma  = 'm_sigma:'+string(m_sigma,format="(f10.1)") 
-
-   ;box = flag to include/omit box around the legend (D=include)
-   ;		  outline_color = color of box outline (D = !P.color)
    if(NOT(keyword_set(fit_type2) AND keyword_set(p_mean2))) then begin
       chisq_str = textoidl('\chi^2:')+string(chisq,format='(f10.2)')
       dof_str = 'd.o.f.:'+string(dof,format='(I)')
+      if keyword_set(use_m200) then begin
+         m        = textoidl('log_{10}(M_{200}):')+string(mnfw,format="(f10.2)")
+         r        = textoidl('R_{200}:')+string(rnfw,format="(f10.2)")
+      endif else begin
+         m        = textoidl('log(M_{vir}):')+string(mnfw,format="(f10.2)")
+         r        = textoidl('R_{vir}:')+string(rnfw,format="(f10.2)")
+      endelse
+      c        = 'Concentration:'+string(Conc,format="(f10.2)")
    endif else begin
       chisq_str = textoidl('\chi^2:')+string(chisq,format='(f6.2)')+','+string(chisq2,format='(f6.2)')
       dof_str = 'd.o.f.:'+string(dof,format='(I)')+','+string(dof2,format='(I)')
+      if keyword_set(use_m200) then begin
+         m        = textoidl('log_{10}(M_{200}):')+string(mnfw,format="(f6.2)")+','+string(mnfw2,format='(f6.2)')
+         r        = textoidl('R_{200}:')+string(rnfw,format="(f6.2)")+','+string(rnfw2,format='(f6.2)')
+      endif else begin
+         m        = textoidl('log(M_{vir}):')+string(mnfw,format="(f6.2)")+','+string(mnfw2,format='(f6.2)')
+         r        = textoidl('R_{vir}:')+string(rnfw,format="(f6.2)")+','+string(rnfw2,format='(f6.2)')
+      endelse
+      c        = 'Concentration:'+string(Conc,format="(f6.2)")+','+string(conc2,format='(f6.2)')
    endelse
    items=[nlens,z,m,c,chisq_str,dof_str]
 endif else items=[nlens,z]
