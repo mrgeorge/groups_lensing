@@ -63,9 +63,10 @@ fit_t = [$
 2,$             ; 0  M0    : baryonic mass
 1,$             ; 1  R_vir : NFW virial mass
 2,$             ; 2  C     : NFW concentration
-0,$             ; 5  alpha : fraction
-0,$             ; 6  bias
-0 ]             ; 6  m_sigma
+0,$             ; 3  alpha : fraction
+0,$             ; 4  bias
+0,$             ; 5  m_sigma
+0]              ; 6  offset
 ;----------------------------------------------------------------------
 ; Various tests 
 ; zscheme 0 -> 68 % cut + sigma cut=0.1
