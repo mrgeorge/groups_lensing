@@ -46,9 +46,8 @@ if(min(index) LT 0) then begin
    stop
 endif
 
-; for r<minRad, fill with lowest tabulated ds value, else interpolate
-; in log R
-low=where(index EQ 0,nLow,complement=middle,ncomplement=nMiddle) ; where r<minRad
+; for r<minRad, fill with lowest tabulated ds value, else interpolate in log R
+low=where(index EQ 0,nLow,complement=middle,ncomplement=nMiddle) ; low is where r<minRad, middle is where minRad<r<maxRad. r>maxRad has already been flagged
 if(nLow GT 0) then res[low]=nfw_sig_offset_tab[0]
 if(nMiddle GT 0) then res[middle]=interpol(nfw_sig_offset_tab,alog10(r_tab),alog10(r[middle]))
 
