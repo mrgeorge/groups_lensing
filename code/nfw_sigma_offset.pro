@@ -15,7 +15,7 @@ npts=1000 ; doesn't matter much for small offsets, but important for precision w
 dtheta=2*!pi/npts
 theta=dindgen(npts)*dtheta
 
-arg=sqrt(rebin([r^2],[n_elements(r),npts]) + roff^2 - 2.*roff*r#cos(theta)) ; offset radius, [nr x ntheta] array
+arg=sqrt(abs(rebin([r^2],[n_elements(r),npts]) + roff^2 - 2.*roff*r#cos(theta))) ; offset radius, [nr x ntheta] array
 
 ; avoid arg=0 where r=roff
 zero=where(arg EQ 0.,nZero)
