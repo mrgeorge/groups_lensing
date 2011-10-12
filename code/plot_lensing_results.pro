@@ -297,7 +297,7 @@ if(keyword_set(models)) then begin
          oplot,x_mpc,tot,color=!blue
       endif
 
-      chisq2=get_ds_chisq(fit_type,p_mean,full_str,x,y,yerr,center=center,refcen=refcen,groupFile=groupFile,dof=dof2,use_m200=use_m200)
+      chisq2=get_ds_chisq(fit_type2,p_mean2,full_str,x,y,yerr,center=center,refcen=refcen,groupFile=groupFile,dof=dof2,use_m200=use_m200)
    endif
 
    ;-------------------------------------------------------------------------
@@ -324,6 +324,7 @@ if(keyword_set(models)) then begin
          r        = textoidl('R_{vir}:')+string(rnfw,format="(f10.2)")
       endelse
       c        = 'Concentration:'+string(Conc,format="(f10.2)")
+      items=[nlens,z,m,chisq_str,dof_str]
    endif else begin
       chisq_str = textoidl('\chi^2:')+string(chisq,format='(f6.2)')+','+string(chisq2,format='(f6.2)')
       dof_str = 'd.o.f.:'+string(dof,format='(I)')+','+string(dof2,format='(I)')
@@ -335,8 +336,9 @@ if(keyword_set(models)) then begin
          r        = textoidl('R_{vir}:')+string(rnfw,format="(f6.2)")+','+string(rnfw2,format='(f6.2)')
       endelse
       c        = 'Concentration:'+string(Conc,format="(f6.2)")+','+string(conc2,format='(f6.2)')
+      roff_str='Offset: 0,'+string(p_mean2[1],format='(F6.2)')
+      items=[nlens,z,m,roff_str,chisq_str,dof_str]
    endelse
-   items=[nlens,z,m,c,chisq_str,dof_str]
 endif else items=[nlens,z]
 legend,items,/right,linestyle=-99,box=0,spacing=1.5
     
