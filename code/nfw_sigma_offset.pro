@@ -16,6 +16,11 @@ dtheta=2*!pi/npts
 theta=dindgen(npts)*dtheta
 
 arg=sqrt(rebin([r^2],[n_elements(r),npts]) + roff^2 - 2.*roff*r#cos(theta)) ; offset radius, [nr x ntheta] array
+
+; avoid arg=0 where r=roff
+zero=where(arg EQ 0.,nZero)
+if(nZero GT 0) then arg[zero]=min([arg[where(arg GT 0)],1.e-4]) ; assign arg=0 to a small positive value
+
 sigma=reform(nfw_sigma(arg,p,zl,r200=r200,r180=r180),[n_elements(r),npts])
 
 ; assume random orientation of offsets and take azimuthal average
