@@ -39,7 +39,7 @@ endif
 ; Calculate using tabulated values
 index=lonarr(n_elements(r))
 res=fltarr(n_elements(r))
-for ii=0,n_elements(r)-1 do index[ii]=min(where(r_tab GT r[ii]))
+for ii=0,n_elements(r)-1 do index[ii]=min(where(r_tab GE r[ii]))
 
 if(min(index) LT 0) then begin
    print,'Stopped in tabulate_nfw_sigma_offset.pro, invalid selection'
