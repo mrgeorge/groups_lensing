@@ -59,7 +59,7 @@ else begin
                 1 ]             ; 6  offset
    run_ds_mcmc, lensOutFile, fitTypeOff, rob_p_mean_off, rob_p_sigma_off,/fast
 
-   plot_lensing_results,lensOutFile,plotDir+selType+'_comp',[[rob_p_mean],[rob_p_mean_off]],[[fitType],[fitTypeOff]],/use_m200,/models
+   plot_lensing_results,lensOutFile,plotDir+selType+'_comp',rob_p_mean,fitType,p_mean2=rob_p_mean_off,fit_type2=fitTypeOff,/use_m200,/models
 endelse 
 
 end
