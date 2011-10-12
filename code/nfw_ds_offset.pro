@@ -18,7 +18,6 @@ function nfw_ds_offset, r, p, zl, groupFile, $
 ; r200   -> 200 x critical density
 
 if(n_elements(roff) GT 0) then begin
-   print,'roff:',roff
    if(min(roff) LT 0.) then begin
       print,'nfw_ds_offset returning ds=0: roff=',roff
       return, 0.*r              ; return 0's since roff shouldn't be negative
