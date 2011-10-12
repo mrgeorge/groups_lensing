@@ -4,7 +4,7 @@ function tabulate_nfw_sigma_offset,r, roff, p, zl,$
 
 ; Tabulate nfw_sigma_offset. Valid between 1e-4 and 4Mpc
 ; Could make smaller by using a smaller array
-; Note: in this function input r is one elements (not an array)
+; Note: in this function input r can be a scalar or array
 
 res = 0.0
 
@@ -26,7 +26,7 @@ if(s[1] eq 0) then begin ; Tabulate r in log space
 endif
 
 ; check limits on r
-if(r gt max(r_tab)) then begin
+if(max(r) gt max(r_tab)) then begin
    print,'Stopped in tabulate_nfw_sigma_offset.pro, input r in out of limits (>3Mpc)'
    stop
 endif
@@ -37,25 +37,20 @@ if (reset_tab eq 1) then begin  ; Retabulate
 endif
 
 ; Calculate using tabulated values
-sel=where(r_tab gt r)
-index = sel[0]
+index=lonarr(n_elements(r))
+res=fltarr(n_elements(r))
+for ii=0,n_elements(r)-1 do index[ii]=min(where(r_tab GT r))
 
-if(index eq -1) then begin
+if(min(index) LT 0) then begin
    print,'Stopped in tabulate_nfw_sigma_offset.pro, invalid selection'
    stop
 endif
- 
-; if close to this bin, return this value
-if(abs(r-r_tab[index]) lt 1e-5) then begin
-   res = nfw_sig_offset_tab[index]
-endif else begin ; otherwise, interpolate between index and index-1, linear interpolation in log space is more precise
-   if (r le min(r_tab)) then begin
-      res = nfw_sig_offset_tab[0]
-   endif else begin
-      a   = ((nfw_sig_offset_tab[index])-(nfw_sig_offset_tab[index-1]))/((r_tab[index])-(r_tab[index-1]))
-      b   = (nfw_sig_offset_tab[index]) - (a*(r_tab[index])) 
-      res = (a*r)+b
-   endelse
-endelse
+
+; for r<minRad, fill with lowest tabulated ds value, else interpolate
+; in log R
+low=where(index EQ 0,nLow,complement=middle,ncomplement=nMiddle) ; where r<minRad
+if(nLow GT 0) then res[low]=nfw_sig_offset_tab[0]
+if(nMiddle GT 0) then res[middle]=interpol(nfw_sig_offset_tab,alog10(r_tab),alog10(r[middle]))
+
 return, res
 end
