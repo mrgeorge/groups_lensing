@@ -31,10 +31,7 @@ sigmaR    = dblarr(n_elements(r))
 sigmaMean = dblarr(n_elements(r))
 
 ; r is an array :
-for i=0,n_elements(r)-1 do begin
-   sigmaR[i] = tabulate_nfw_sigma_offset(r[i],roff,p,zl,r200=keyword_set(r200),r180=keyword_set(r180))
-endfor
-
+sigmaR=tabulate_nfw_sigma_offset(r,roff,p,zl,r200=keyword_set(r200),r180=keyword_set(r180))
 
 ; \bar{\Sigma}(<R|R_{off})
 sigmaMean=(2./r^2) * QROMO('nfw_sigma_offset_function',replicate(1e-4,n_elements(r)),r,EPS=1e-2) ; can increase precision here using EPS
