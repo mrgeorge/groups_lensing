@@ -8,7 +8,7 @@ pro full_stack,innerRadiusKpc,secondRadiusKpc,maxRadiusKpc,nRadiusBins,stackx=st
 ; diff_stack.pro to measuring lensing signal comparing two different
 ; centers
 
-; sample call: full_stack,50,2000,8,/stackx,/emp_var
+; sample call: full_stack,10,50,2000,8,/stackx,/emp_var
 
 if(keyword_set(loz)) then begin
    minLensZ=0.0
@@ -94,9 +94,15 @@ massComparisonTextFile='mass_comparison_full.txt'
 fitTypeAll=rebin(fit_t,n_elements(fit_t),n_elements(cenNames))
 fitTypeAll[0,*]=ptSrc
 
+; repeat for offset model
+fitTypeAll2=fitTypeAll
+fitTypeAll2[6,*]=1 ; this leaves the offset as a free parameter
+
 ; arrays to record mean and stddev mass from mcmc
 massMean=fltarr(n_elements(cenNames))
 massErr=fltarr(n_elements(cenNames))
+massMean2=fltarr(n_elements(cenNames))
+massErr2=fltarr(n_elements(cenNames))
 
 ; For one center:
 for i=0, n_elements(cenNames)-1 do begin
@@ -106,13 +112,20 @@ for i=0, n_elements(cenNames)-1 do begin
     run_gg_offset, infile_source, infile_lens, lensOutFileArr[i], innerRadiusKpc, secondRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=cenNames[i],stackx=keyword_set(stackx),emp_var=keyword_set(emp_var)
 
    ; Fit model to the lensing signal
+    ; fit pars are returned as rob_p_mean and also written to lensOutFile
    run_ds_mcmc, lensOutFileArr[i], fitTypeAll[*,i], rob_p_mean, rob_p_sigma, stackx=keyword_set(stackx)
    massMean[i]=rob_p_mean
    massErr[i]=rob_p_sigma
 
+   ; Fit offset model to the lensing signal
+    ; fit pars are returned as rob_p_mean and also written to lensOutFile
+   run_ds_mcmc, lensOutFileArr[i], fitTypeAll2[*,i], rob_p_mean2, rob_p_sigma2, stackx=keyword_set(stackx),/fast
+   massMean2[i]=rob_p_mean2
+   massErr2[i]=rob_p_sigma2
+
    ; Plot the results, with and without the models
-   plot_lensing_results,lensOutFileArr[i],plotFileArr[i],rob_p_mean,fitTypeAll[*,i],stackx=keyword_set(stackx),/use_m200
-   plot_lensing_results,lensOutFileArr[i],plotFileArr[i]+'_models',rob_p_mean,fitTypeAll[*,i],stackx=keyword_set(stackx),/use_m200,/models
+;   plot_lensing_results,lensOutFileArr[i],plotFileArr[i],rob_p_mean,fitTypeAll[*,i],stackx=keyword_set(stackx),/use_m200
+;   plot_lensing_results,lensOutFileArr[i],plotFileArr[i]+'_models',rob_p_mean,fitTypeAll[*,i],stackx=keyword_set(stackx),/use_m200,/models
 endfor
 
 ; plot halo masses and uncertainties from different centers for comparison
@@ -140,6 +153,6 @@ close,u
 free_lun,u
 
 ; make multi-panel plot to compare full stacks
-plot_full_stacks,cenTitles,lensOutFileArr,fullPlotFile,massMean,fitTypeAll,stackx=keyword_set(stackx),/use_m200
+plot_full_stacks,cenTitles,lensOutFileArr,fullPlotFile,stackx=keyword_set(stackx),/use_m200
 
 end
