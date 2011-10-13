@@ -1,5 +1,4 @@
-pro plot_full_stacks,cenText,lensFileArr,plotFile,pMean,fitTypeAll,stackx=stackx,use_m200=use_m200,test=test,$
-                     fitTypeAll2=fitTypeAll2,pMean2=pMean2
+pro plot_full_stacks,cenText,lensFileArr,plotFile,stackx=stackx,use_m200=use_m200,test=test
 
 ; plot the full lensing stacks with model fits for different centers
 ; in separate panels
@@ -23,30 +22,7 @@ if(keyword_set(test)) then begin
 
    lensFileArr=strcompress(fileDir+'center_'+cenNames+'.fits',/remove_all)
    plotFile=plotDir+'full_stacks_test.eps'
-
-   ; create 2d array to save fit types, 1 row for each center
-   fit_t = [$
-           2,$                  ; 0  M0    : baryonic mass
-           1,$                  ; 1  R_vir : NFW virial mass
-           2,$                  ; 2  C     : NFW concentration
-           0,$                  ; 3  alpha : fraction
-           0,$                  ; 4  bias
-           0,$                  ; 5  m_sigma
-           0]                   ; 6  offset
-   fitTypeAll=rebin(fit_t,n_elements(fit_t),n_elements(cenNames))
-   fitTypeAll[0,*]=ptSrc
-
-   ; arrays to record mean and stddev mass from mcmc
-   pMean=replicate(13.0,n_elements(cenNames))
-   pMean2=rebin([13.1,0.05],[2,n_elements(cenNames)])
-   fitTypeAll2=fitTypeAll
-   fitTypeAll2[6,*]=1
 endif
-
-; rebin pMean to be npar x ncenters array
-if((size(pMean))[0] EQ 1) then pMean=rebin(pMean,[1,n_elements(pMean)])
-if(keyword_set(pMean2)) then $
-   if((size(pMean2))[0] EQ 1) then pMean2=rebin(pMean2,[1,n_elements(pMean2)])
 
 nCols=2
 nRows=4
@@ -96,6 +72,10 @@ for ii=0,nCen-1 do begin
    ; read data file and get parameters
    str=mrdfits(lensFileArr[ii],1)
 
+   fitType=str.fit_type
+   pMean=str.p_mean
+   pSigma=str.p_sigma
+
    ; restrict to points with enough sources
    sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 10)
    if(keyword_set(stackx)) then begin
@@ -127,11 +107,11 @@ for ii=0,nCen-1 do begin
       x_mpc=10.^(findgen(nxMpc)/(nxMpc-1)*alog10((xr[1]*xbuffer)/(xr[0]/xbuffer)))*xr[0]/xbuffer
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
 
-   get_ds_model, fitTypeAll[*,ii], pMean[*,ii], str, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
+   get_ds_model, fitType, pMean, str, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
                   use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw
    
    ; Sum of terms
-   if(fitTypeAll[0,ii] NE 0) then tot=ps_term + nfw_term $
+   if(fitType NE 0) then tot=ps_term + nfw_term $
    else tot=nfw_term
    oplot,x_mpc,tot,color=!blue,thick=12
 
@@ -139,20 +119,24 @@ for ii=0,nCen-1 do begin
    if(cenText[ii] EQ textoidl('MMGG_{scale}')) then oplot,x_mpc,nfw_term,color=!darkgreen,linestyle=2,thick=18
 
    ; Baryonic point source term
-   if(fitTypeAll[0,ii] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=5
+   if(fitType[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=5
 
    ; CALCULATE CHI^2
-   chisq=get_ds_chisq(fitTypeAll[*,ii],pMean[*,ii],str,x,y,yerr,dof=dof,use_m200=use_m200)
+   chisq=get_ds_chisq(fitType,pMean,str,x,y,yerr,dof=dof,use_m200=use_m200)
 
-   if(keyword_set(fitTypeAll2) AND keyword_set(pMean2)) then begin
+   if(tag_exist(str,'FIT_TYPE2')) then begin
       ;-------------------------------------------------------------------------
       ; PLOT 2ND MODEL
       ;-------------------------------------------------------------------------
-      get_ds_model,fitTypeAll2[*,ii],pMean2[*,ii],str,x_mpc,ps_term=ps_term,nfw_term=nfw_term,$
+      fitType2=str.fit_type2
+      pMean2=str.p_mean2
+      pSigma2=str.p_sigma2
+
+      get_ds_model,fitType2,pMean2,str,x_mpc,ps_term=ps_term,nfw_term=nfw_term,$
                    use_m200=use_m200,mnfw=mnfw2,conc=conc2,rnfw=rnfw2
 
       ; Sum of terms
-      if(fitTypeAll2[0,ii] NE 0) then tot = ps_term + nfw_term $
+      if(fitType2[0] NE 0) then tot = ps_term + nfw_term $
       else tot=nfw_term
       oplot,x_mpc,tot,color=!magenta,thick=3
 
@@ -160,10 +144,10 @@ for ii=0,nCen-1 do begin
       if(cenText[ii] EQ textoidl('MMGG_{scale}')) then oplot,x_mpc,nfw_term,color=!orange,linestyle=3,thick=8
 
       ; Baryonic point source term
-      if(fitTypeAll2[0,ii] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=4
+      if(fitType2[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=4
 
       ; Calculate chi^2
-      chisq2=get_ds_chisq(fitTypeAll2[*,ii],pMean2[*,ii],str,x,y,yerr,dof=dof2,use_m200=use_m200)
+      chisq2=get_ds_chisq(fitType2,pMean2,str,x,y,yerr,dof=dof2,use_m200=use_m200)
    endif
 
    ; PLOT DATA POINTS
