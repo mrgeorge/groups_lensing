@@ -1,4 +1,5 @@
-pro plot_full_stacks,cenText,lensFileArr,plotFile,pMean,fitTypeAll,stackx=stackx,use_m200=use_m200,test=test
+pro plot_full_stacks,cenText,lensFileArr,plotFile,pMean,fitTypeAll,stackx=stackx,use_m200=use_m200,test=test,$
+                     fitTypeAll2=fitTypeAll2,pMean2=pMean2
 
 ; plot the full lensing stacks with model fits for different centers
 ; in separate panels
@@ -37,10 +38,15 @@ if(keyword_set(test)) then begin
 
    ; arrays to record mean and stddev mass from mcmc
    pMean=replicate(13.0,n_elements(cenNames))
+   pMean2=rebin([13.1,0.05],[2,n_elements(cenNames)])
+   fitTypeAll2=fitTypeAll
+   fitTypeAll2[6,*]=1
 endif
 
 ; rebin pMean to be npar x ncenters array
 if((size(pMean))[0] EQ 1) then pMean=rebin(pMean,[1,n_elements(pMean)])
+if(keyword_set(pMean2)) then $
+   if((size(pMean2))[0] EQ 1) then pMean2=rebin(pMean2,[1,n_elements(pMean2)])
 
 nCols=2
 nRows=4
@@ -127,21 +133,42 @@ for ii=0,nCen-1 do begin
    ; Sum of terms
    if(fitTypeAll[0,ii] NE 0) then tot=ps_term + nfw_term $
    else tot=nfw_term
-   oplot,x_mpc,tot,color=!blue,thick=3
+   oplot,x_mpc,tot,color=!blue,thick=12
 
    ; NFW term
-   oplot,x_mpc,nfw_term,color=!darkgreen,linestyle=2,thick=8
+   if(cenText[ii] EQ textoidl('MMGG_{scale}')) then oplot,x_mpc,nfw_term,color=!darkgreen,linestyle=2,thick=18
 
    ; Baryonic point source term
-   if(fitTypeAll[0,ii] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=4
+   if(fitTypeAll[0,ii] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=5
 
+   ; CALCULATE CHI^2
+   chisq=get_ds_chisq(fitTypeAll[*,ii],pMean[*,ii],str,x,y,yerr,dof=dof,use_m200=use_m200)
+
+   if(keyword_set(fitTypeAll2) AND keyword_set(pMean2)) then begin
+      ;-------------------------------------------------------------------------
+      ; PLOT 2ND MODEL
+      ;-------------------------------------------------------------------------
+      get_ds_model,fitTypeAll2[*,ii],pMean2[*,ii],str,x_mpc,ps_term=ps_term,nfw_term=nfw_term,$
+                   use_m200=use_m200,mnfw=mnfw2,conc=conc2,rnfw=rnfw2
+
+      ; Sum of terms
+      if(fitTypeAll2[0,ii] NE 0) then tot = ps_term + nfw_term $
+      else tot=nfw_term
+      oplot,x_mpc,tot,color=!magenta,thick=3
+
+      ; NFW term
+      if(cenText[ii] EQ textoidl('MMGG_{scale}')) then oplot,x_mpc,nfw_term,color=!orange,linestyle=3,thick=8
+
+      ; Baryonic point source term
+      if(fitTypeAll2[0,ii] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=4
+
+      ; Calculate chi^2
+      chisq2=get_ds_chisq(fitTypeAll2[*,ii],pMean2[*,ii],str,x,y,yerr,dof=dof2,use_m200=use_m200)
+   endif
 
    ; PLOT DATA POINTS
    oploterror,x,y,yerr,psym=8,color=!black
    
-   ; CALCULATE CHI^2
-   chisq=get_ds_chisq(fitTypeAll[*,ii],pMean[*,ii],str,x,y,yerr,dof=dof,use_m200=use_m200)
-
    ; LEGEND
    nlens=textoidl('N_{Lens}:')
    zstr='Redshift:'
