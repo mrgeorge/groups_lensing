@@ -33,9 +33,10 @@ if(keyword_set(test)) then begin
            2,$                  ; 0  M0    : baryonic mass
            1,$                  ; 1  R_vir : NFW virial mass
            2,$                  ; 2  C     : NFW concentration
-           0,$                  ; 5  alpha : fraction
-           0,$                  ; 6  bias
-           0 ]                  ; 6  m_sigma
+           0,$                  ; 3  alpha : fraction
+           0,$                  ; 4  bias
+           0,$                  ; 5  m_sigma
+           0]                   ; 6  offset
    fitTypeAllCen=rebin(fitType,n_elements(fitType),n_elements(cenNames))
    fitTypeAllCen[0,*]=ptSrcCen
    fitTypeAllRef=rebin(fitType,n_elements(fitType),n_elements(refNames))
@@ -45,6 +46,7 @@ if(keyword_set(test)) then begin
    massMeanRef=replicate(13.0,n_elements(cenNames))
 endif
 
+; group file needs to be read in for histogram of offsets
 group=mrdfits(groupFile,1)
 sel=where(group.flag_include EQ 1)
 group=group[sel]
@@ -116,12 +118,6 @@ for ii=0,nCen-1 do begin
 
    ; read data file and get parameters
    str=mrdfits(lensFileArrRef[ii],1)
-   conc=get_conc(massMeanRef[ii],str.z_lens,use200=keyword_set(use_m200)) ; Zhao
-   overdensity=get_overdensity(str.z_lens,r200=keyword_set(use_m200))
-   rho_crit=critical_density(str.z_lens)
-   factor=alog10(double((4.0/3.0)*!Pi*overdensity*rho_crit))
-   r_log=(1.0/3.0)*(massMeanRef[ii]-factor)
-   rnfw=10.0^(r_log)
 
    ; restrict to points with enough sources
    sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 10)
@@ -160,17 +156,18 @@ for ii=0,nCen-1 do begin
       x_mpc=10.^(findgen(nxMpc)/(nxMpc-1)*alog10((xr[1]*xbuffer)/(xr[0]/xbuffer)))*xr[0]/xbuffer
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
    
+   get_ds_model, fitTypeAllRef[*,ii], massMeanRef[ii], str, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
+                 use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw  
+
+   ; Sum of terms
+   if(fitTypeAllRef[0,ii] NE 0) then tot=ps_term + nfw_term $
+   else tot=nfw_term
+   oplot,x_mpc,tot,color=!blue,thick=3
+
    ; NFW term
-   nfw=nfw_ds(x_mpc,[rnfw,conc],str.z_lens,r200=keyword_set(use_m200))
+   oplot,x_mpc,nfw_term,color=!darkgreen,linestyle=2,thick=8
 
    ; Baryonic point source term
-   if(fitTypeAllRef[0,ii] NE 0) then begin
-      ps_term=10^(str.msun_lens)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
-      tot=ps_term + nfw
-   endif else tot=nfw
-
-   oplot,x_mpc,tot,color=!blue,thick=3
-   oplot,x_mpc,nfw,color=!darkgreen,linestyle=2,thick=8
    if(fitTypeAllRef[0,ii] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=6
 
 
@@ -178,18 +175,7 @@ for ii=0,nCen-1 do begin
    oploterror,x,y,yerr,psym=8,color=!black
 
    ; CALCULATE CHI^2
-   ; currently just NFW + point source if point source is included in model
-
-   ; calculate expected model values at locations of data points
-   modelNFW=nfw_ds(x,[rnfw,conc],str.z_lens,r200=keyword_set(use_m200))
-
-   if(fitTypeAllRef[0,ii] NE 0) then begin
-      modelPS=10^(str.msun_lens)/1.e12/(!pi*x^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
-      modelTot=modelPS + modelNFW
-   endif else modelTot=modelNFW
-
-   chisq = total((modelTot-y)^2/yerr^2)
-   dof = n_elements(x)-n_elements(where(fitTypeAllRef[*,ii] EQ 1))
+   chisq=get_ds_chisq(fitTypeAllRef[*,ii],massMeanRef[ii],str,x,y,yerr,dof=dof,use_m200=use_m200)
 
    ; LEGEND
    nstr=textoidl('N_{Lens}:')
@@ -227,12 +213,6 @@ for ii=0,nCen-1 do begin
 
    ; read data file and get parameters
    str=mrdfits(lensFileArrCen[ii],1)
-   conc=get_conc(massMeanRef[ii],str.z_lens,use200=keyword_set(use_m200)) ; Zhao
-   overdensity=get_overdensity(str.z_lens,r200=keyword_set(use_m200))
-   rho_crit=critical_density(str.z_lens)
-   factor=alog10(double((4.0/3.0)*!Pi*overdensity*rho_crit))
-   r_log=(1.0/3.0)*(massMeanRef[ii]-factor)
-   rnfw=10.0^(r_log)
 
    ; restrict to points with enough sources
    sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 10)
@@ -265,22 +245,20 @@ for ii=0,nCen-1 do begin
       xbuffer=1.3
       x_mpc=10.^(findgen(nxMpc)/(nxMpc-1)*alog10((xr[1]*xbuffer)/(xr[0]/xbuffer)))*xr[0]/xbuffer
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
+
+   get_ds_model, fitTypeAllCen[*,ii], massMeanRef[ii], str, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
+                 center=cenNames[ii],refcen=refNames[ii],groupFile=groupFile,nfw_off=nfw_off, $
+                 use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw
    
+   ; Sum of terms
+   if(fitTypeAllCen[0,ii] NE 0) then tot=ps_term + nfw_off $
+   else tot=nfw_off
+   oplot,x_mpc,tot,color=!blue,thick=3
+
    ; Offset NFW term
-   if(keyword_set(test)) then begin
-      nfwOff=x_mpc
-   endif else begin
-      nfwOff=nfw_ds_offset(x_mpc,[rnfw,conc],str.z_lens,groupFile,r200=keyword_set(use_m200),center=cenNames[ii],refcen=refNames[ii])
-   endelse
+   oplot,x_mpc,nfw_off,color=!orange,linestyle=3,thick=8
 
    ; Baryonic point source term
-   if(fitTypeAllCen[0,ii] NE 0) then begin
-      ps_term=10^(str.msun_lens)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
-      tot=ps_term + nfwOff
-   endif else tot=nfwOff
-
-   oplot,x_mpc,tot,color=!blue,thick=3
-   oplot,x_mpc,nfwOff,color=!orange,linestyle=3,thick=8
    if(fitTypeAllCen[0,ii] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=6
 
 
@@ -288,22 +266,8 @@ for ii=0,nCen-1 do begin
    oploterror,x,y,yerr,psym=8,color=!black
 
    ; CALCULATE CHI^2
-   ; currently just NFW + point source if point source is included in model
-
-   ; calculate expected model values at locations of data points
-   if(keyword_set(test)) then begin
-      modelNFWOff=x
-   endif else begin
-      modelNFWOff=nfw_ds_offset(x,[rnfw,conc],str.z_lens,groupFile,r200=keyword_set(use_m200),center=cenNames[ii],refcen=refNames[ii])
-   endelse
-
-   if(fitTypeAllCen[0,ii] NE 0) then begin
-      modelPS=10^(str.msun_lens)/1.e12/(!pi*x^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
-      modelTot=modelPS + modelNFWOff
-   endif else modelTot=modelNFWOff
-
-   chisq=total((modelTot-y)^2/yerr^2)
-   dof=n_elements(x)-n_elements(where(fitTypeAllRef[*,ii] EQ 1)) ; not quite sure since model is fit to different data than the ones we're fitting here.
+   chisq=get_ds_chisq(fitTypeAllCen[*,ii],massMeanRef[ii],str,x,y,yerr,dof=dof,$
+                      center=cenNames[ii],refcen=refNames[ii],groupFile=groupFile,use_m200=use_m200)
 
    ; LEGEND
    nlens=textoidl('N_{Lens}:')
