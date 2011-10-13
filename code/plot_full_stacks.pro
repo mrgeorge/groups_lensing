@@ -1,4 +1,4 @@
-pro plot_full_stacks,cenText,lensFileArr,plotFile,massMean,fitTypeAll,stackx=stackx,use_m200=use_m200,test=test
+pro plot_full_stacks,cenText,lensFileArr,plotFile,pMean,fitTypeAll,stackx=stackx,use_m200=use_m200,test=test
 
 ; plot the full lensing stacks with model fits for different centers
 ; in separate panels
@@ -28,16 +28,19 @@ if(keyword_set(test)) then begin
            2,$                  ; 0  M0    : baryonic mass
            1,$                  ; 1  R_vir : NFW virial mass
            2,$                  ; 2  C     : NFW concentration
-           0,$                  ; 5  alpha : fraction
-           0,$                  ; 6  bias
-           0 ]                  ; 6  m_sigma
+           0,$                  ; 3  alpha : fraction
+           0,$                  ; 4  bias
+           0,$                  ; 5  m_sigma
+           0]                   ; 6  offset
    fitTypeAll=rebin(fit_t,n_elements(fit_t),n_elements(cenNames))
    fitTypeAll[0,*]=ptSrc
 
    ; arrays to record mean and stddev mass from mcmc
-   massMean=replicate(13.0,n_elements(cenNames))
+   pMean=replicate(13.0,n_elements(cenNames))
 endif
 
+; rebin pMean to be npar x ncenters array
+if((size(pMean))[0] EQ 1) then pMean=rebin(pMean,[1,n_elements(pMean)])
 
 nCols=2
 nRows=4
@@ -86,12 +89,6 @@ for ii=0,nCen-1 do begin
 
    ; read data file and get parameters
    str=mrdfits(lensFileArr[ii],1)
-   conc=get_conc(massMean[ii],str.z_lens,use200=keyword_set(use_m200)) ; Zhao
-   overdensity=get_overdensity(str.z_lens,r200=keyword_set(use_m200))
-   rho_crit=critical_density(str.z_lens)
-   factor=alog10(double((4.0/3.0)*!Pi*overdensity*rho_crit))
-   r_log=(1.0/3.0)*(massMean[ii]-factor)
-   rnfw=10.0^(r_log)
 
    ; restrict to points with enough sources
    sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 10)
@@ -123,18 +120,19 @@ for ii=0,nCen-1 do begin
       xbuffer=1.3
       x_mpc=10.^(findgen(nxMpc)/(nxMpc-1)*alog10((xr[1]*xbuffer)/(xr[0]/xbuffer)))*xr[0]/xbuffer
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
+
+   get_ds_model, fitTypeAll[*,ii], pMean[*,ii], str, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
+                  use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw
    
+   ; Sum of terms
+   if(fitTypeAll[0,ii] NE 0) then tot=ps_term + nfw_term $
+   else tot=nfw_term
+   oplot,x_mpc,tot,color=!blue,thick=3
+
    ; NFW term
-   nfw=nfw_ds(x_mpc,[rnfw,conc],str.z_lens,r200=keyword_set(use_m200))
+   oplot,x_mpc,nfw_term,color=!darkgreen,linestyle=2,thick=8
 
    ; Baryonic point source term
-   if(fitTypeAll[0,ii] NE 0) then begin
-      ps_term=10^(str.msun_lens)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
-      tot=ps_term + nfw
-   endif else tot=nfw
-
-   oplot,x_mpc,tot,color=!blue,thick=3
-   oplot,x_mpc,nfw,color=!darkgreen,linestyle=2,thick=8
    if(fitTypeAll[0,ii] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=4
 
 
@@ -142,18 +140,7 @@ for ii=0,nCen-1 do begin
    oploterror,x,y,yerr,psym=8,color=!black
    
    ; CALCULATE CHI^2
-   ; currently just NFW + point source if point source is included in model
-
-   ; calculate expected model values at locations of data points
-   model_nfw=nfw_ds(x,[rnfw,conc],str.z_lens,r200=keyword_set(use_m200))
-
-   if(fitTypeAll[0,ii] NE 0) then begin
-      model_ps=10^(str.msun_lens)/1.e12/(!pi*x^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
-      model_tot=model_ps + model_nfw
-   endif else model_tot=model_nfw
-
-   chisq = total((model_tot-y)^2/yerr^2)
-   dof = n_elements(x)-n_elements(where(fitTypeAll[*,ii] EQ 1))
+   chisq=get_ds_chisq(fitTypeAll[*,ii],pMean[*,ii],str,x,y,yerr,dof=dof,use_m200=use_m200)
 
    ; LEGEND
    nlens=textoidl('N_{Lens}:')
@@ -179,7 +166,7 @@ for ii=0,nCen-1 do begin
    xyouts,xStrRight,yr[1]-1.*yLine,mstr,alignment=0.99,charsize=0.9
    xyouts,xStrRight,yr[1]-2.*yLine,smstr,alignment=0.88,charsize=0.9
    xyouts,xStrRight,yr[1]-3.*yLine,chisqstr,alignment=1.0,charsize=0.9
-   xyouts,xRight,yr[1]-1.*yLine,string(massMean[ii],format=fmt),alignment=1,charsize=0.9
+   xyouts,xRight,yr[1]-1.*yLine,string(mnfw,format=fmt),alignment=1,charsize=0.9
    xyouts,xRight,yr[1]-2.*yLine,string(str.msun_lens,format=fmt),alignment=1,charsize=0.9
    xyouts,xRight,yr[1]-3.*yLine,string(chisq,format=fmt),alignment=1,charsize=0.9
 
