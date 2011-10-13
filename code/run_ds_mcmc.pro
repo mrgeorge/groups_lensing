@@ -75,7 +75,19 @@ print,p_mean,rob_p_mean
 print,p_sigma,rob_p_sigma
 print,'----------'
 
+; Write fit type and parameters to struct/file
+if(NOT(tag_exist(full_str,'FIT_TYPE'))) then $
+   full_str=create_struct(full_str,'FIT_TYPE',fit_type,'P_MEAN',rob_p_mean,'P_SIGMA',rob_p_sigma) $
+else if(NOT(tag_exist(full_str,'FIT_TYPE2'))) $
+   full_str=create_struct(full_str,'FIT_TYPE2',fit_type,'P_MEAN2',rob_p_mean,'P_SIGMA2',rob_p_sigma) $
+else begin
+   print,'run_ds_mcmc: tags FIT_TYPE and FIT_TYPE2 already exist in this struct' ; it's already been modeled twice, if you want more than two models rethink the data structure and code
+   stop
+endelse
+
+mwrfits,full_str,lens_infile,/create
+
 print,'END OF DS_MCMC ROUTINE'
 
-; rob_p_mean and rob_p_sigma are filled and returned
+; rob_p_mean and rob_p_sigma are filled and returned and written to lens_infile
 end
