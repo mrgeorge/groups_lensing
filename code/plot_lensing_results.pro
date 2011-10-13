@@ -24,8 +24,6 @@ if NOT exists THEN define_cosmo
 ;-------------------------------------------------------------------------
 full_str=mrdfits(lensing_infile,1)
 sel_str=where(full_str.e1_num GE 10)
-zl = full_str.z_lens
-
 
 ;-------------------------------------------------------------------------
 ; SET UP PLOT
