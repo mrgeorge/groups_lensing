@@ -1,4 +1,4 @@
-pro plot_diff_stacks,cenNames,refNames,cenText,refText,lensFileArrCen,lensFileArrRef,plotFile,groupFile,massMeanRef,fitTypeAllCen,fitTypeAllRef,stackx=stackx,use_m200=use_m200,test=test
+pro plot_diff_stacks,cenNames,refNames,cenText,refText,lensFileArrCen,lensFileArrRef,plotFile,groupFile,stackx=stackx,use_m200=use_m200,test=test
 
 ; plot the lensing stacks on different centers vs. mmgg_scale with model fits
 ; in separate panels, along with histogram of offsets
@@ -18,32 +18,13 @@ if(keyword_set(test)) then begin
 
    cenNames=['mmgg_r200','mlgg_r200','mlgg_scale','cm','cl','cn','xray']
    cenText=textoidl(['MMGG_{R200}','MLGG_{R200}','MLGG_{scale}','CM','CL','CN','X-ray'])
-   ptSrcCen=[2,2,2,0,0,0,0]     ; for fit_t
    refNames=replicate('mmgg_scale',n_elements(cenNames)) ; the "good center" to compare with the ones above
    refText=textoidl(replicate('MMGG_{scale}',n_elements(cenNames)))
-   ptSrcRef=replicate(2,n_elements(cenNames))
 
    lensFileArrCen=strcompress(fileDir+'center_'+cenNames+'_'+refNames+'.fits',/remove_all)
    lensFileArrRef=strcompress(fileDir+'center_'+refNames+'_'+cenNames+'.fits',/remove_all)
    plotFile=plotDir+'diff_stacks_test.eps'
    groupFile='~alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits'
-
-   ; create 2d array to save fit types, 1 row for each center
-   fitType = [$
-           2,$                  ; 0  M0    : baryonic mass
-           1,$                  ; 1  R_vir : NFW virial mass
-           2,$                  ; 2  C     : NFW concentration
-           0,$                  ; 3  alpha : fraction
-           0,$                  ; 4  bias
-           0,$                  ; 5  m_sigma
-           0]                   ; 6  offset
-   fitTypeAllCen=rebin(fitType,n_elements(fitType),n_elements(cenNames))
-   fitTypeAllCen[0,*]=ptSrcCen
-   fitTypeAllRef=rebin(fitType,n_elements(fitType),n_elements(refNames))
-   fitTypeAllRef[0,*]=ptSrcRef
-
-   ; arrays to record mean and stddev mass from mcmc
-   massMeanRef=replicate(13.0,n_elements(cenNames))
 endif
 
 ; group file needs to be read in for histogram of offsets
@@ -119,6 +100,10 @@ for ii=0,nCen-1 do begin
    ; read data file and get parameters
    str=mrdfits(lensFileArrRef[ii],1)
 
+   fitTypeRef=str.fit_type
+   pMeanRef=str.p_mean
+   pSigmaRef=str.p_sigma
+
    ; restrict to points with enough sources
    sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 10)
    if(keyword_set(stackx)) then begin
@@ -156,11 +141,11 @@ for ii=0,nCen-1 do begin
       x_mpc=10.^(findgen(nxMpc)/(nxMpc-1)*alog10((xr[1]*xbuffer)/(xr[0]/xbuffer)))*xr[0]/xbuffer
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
    
-   get_ds_model, fitTypeAllRef[*,ii], massMeanRef[ii], str, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
+   get_ds_model, fitTypeRef, pMeanRef, str, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
                  use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw  
 
    ; Sum of terms
-   if(fitTypeAllRef[0,ii] NE 0) then tot=ps_term + nfw_term $
+   if(fitTypeRef[0] NE 0) then tot=ps_term + nfw_term $
    else tot=nfw_term
    oplot,x_mpc,tot,color=!blue,thick=3
 
@@ -168,14 +153,14 @@ for ii=0,nCen-1 do begin
    oplot,x_mpc,nfw_term,color=!darkgreen,linestyle=2,thick=8
 
    ; Baryonic point source term
-   if(fitTypeAllRef[0,ii] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=6
+   if(fitTypeRef[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=6
 
 
    ; PLOT DATA POINTS
    oploterror,x,y,yerr,psym=8,color=!black
 
    ; CALCULATE CHI^2
-   chisq=get_ds_chisq(fitTypeAllRef[*,ii],massMeanRef[ii],str,x,y,yerr,dof=dof,use_m200=use_m200)
+   chisq=get_ds_chisq(fitTypeRef,pMeanRef,str,x,y,yerr,dof=dof,use_m200=use_m200)
 
    ; LEGEND
    nstr=textoidl('N_{Lens}:')
@@ -213,7 +198,7 @@ for ii=0,nCen-1 do begin
 
    ; read data file and get parameters
    str=mrdfits(lensFileArrCen[ii],1)
-
+   
    ; restrict to points with enough sources
    sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 10)
    if(keyword_set(stackx)) then begin
@@ -246,12 +231,17 @@ for ii=0,nCen-1 do begin
       x_mpc=10.^(findgen(nxMpc)/(nxMpc-1)*alog10((xr[1]*xbuffer)/(xr[0]/xbuffer)))*xr[0]/xbuffer
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
 
-   get_ds_model, fitTypeAllCen[*,ii], massMeanRef[ii], str, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
+                                ; NFW offset model comes from pMeanRef
+                                ; with offset distribution from
+                                ; groupFile. PS term comes from
+                                ; stellar mass saved in str.
+
+   get_ds_model, fitTypeRef, pMeanRef, str, x_mpc, ps_term=ps_term,$
                  center=cenNames[ii],refcen=refNames[ii],groupFile=groupFile,nfw_off=nfw_off, $
                  use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw
    
    ; Sum of terms
-   if(fitTypeAllCen[0,ii] NE 0) then tot=ps_term + nfw_off $
+   if(str.msun_lens GT 0.) then tot=ps_term + nfw_off $
    else tot=nfw_off
    oplot,x_mpc,tot,color=!blue,thick=3
 
@@ -259,15 +249,15 @@ for ii=0,nCen-1 do begin
    oplot,x_mpc,nfw_off,color=!orange,linestyle=3,thick=8
 
    ; Baryonic point source term
-   if(fitTypeAllCen[0,ii] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=6
+   if(str.msun_lens GT 0.) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=6
 
 
    ; PLOT DATA POINTS
    oploterror,x,y,yerr,psym=8,color=!black
 
    ; CALCULATE CHI^2
-   chisq=get_ds_chisq(fitTypeAllCen[*,ii],massMeanRef[ii],str,x,y,yerr,dof=dof,$
-                      center=cenNames[ii],refcen=refNames[ii],groupFile=groupFile,use_m200=use_m200)
+;   chisq=get_ds_chisq(fitTypeAllCen[*,ii],massMeanRef[ii],str,x,y,yerr,dof=dof,$
+;                      center=cenNames[ii],refcen=refNames[ii],groupFile=groupFile,use_m200=use_m200)
 
    ; LEGEND
    nlens=textoidl('N_{Lens}:')
@@ -282,7 +272,7 @@ for ii=0,nCen-1 do begin
    cstr='Concentration:'
    chisqstr=textoidl('\chi^2:')
    dof_str='d.o.f.:'
-   if(fitTypeAllCen[0,ii] NE 0) then begin
+   if(str.msun_lens GT 0.) then begin
       smstr=textoidl('log(M')+star+'/M'+sun+'):'
    endif else sm=textoidl('log(M')+star+'/M'+sun+'):'+string(0.0,format="(f6.2)")
 
