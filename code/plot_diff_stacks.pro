@@ -175,7 +175,7 @@ for ii=0,nCen-1 do begin
    cstr='Concentration:'
    chisqstr=textoidl('\chi^2:')
    dof_str='d.o.f.:'
-   if(fitTypeAllRef[0,ii] NE 0) then begin
+   if(fitTypeRef[0] NE 0) then begin
       smstr=textoidl('log(M')+star+'/M'+sun+'):'
    endif else sm=textoidl('log(M')+star+'/M'+sun+'):'+string(0.0,format="(f6.2)")
 
