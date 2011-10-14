@@ -138,7 +138,9 @@ rnfw     = 10.0^(r_log)
 
 ; Calculate model curves
 ps_term=10^(M0)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
+
 nfw_term=nfw_ds_offset(x_mpc,[rnfw,conc],zl,r200=keyword_set(use_m200),roff=offset)
+
 if(keyword_set(center) AND keyword_set(refcen) AND keyword_set(groupFile)) then $
    nfw_off=nfw_ds_offset(x_mpc,[rnfw,conc],zl,groupFile,r200=keyword_set(use_m200),center=center,refcen=refcen)
 
