@@ -93,8 +93,6 @@ plotFileArrRef=strcompress(plotDir+'center_'+refNames+'_'+cenNames,/remove_all)
 diffPlotFile=plotDir+'diff_stacks_'+refNames[0]+'.eps'
 
 ; create 2d array to save fit types, 1 row for each center
-fitTypeAllCen=rebin(fit_t,n_elements(fit_t),n_elements(cenNames))
-fitTypeAllCen[0,*]=ptSrcCen
 fitTypeAllRef=rebin(fit_t,n_elements(fit_t),n_elements(refNames))
 fitTypeAllRef[0,*]=ptSrcRef
 
@@ -119,8 +117,8 @@ for i=0,n_elements(cenNames)-1 do begin
    massErrRef[i]=rob_p_sigma
 
    ; Plot the results, with and without the models
-   plot_lensing_results,lensOutFileArrRef[i],plotFileArrRef[i],rob_p_mean,fitTypeAllRef[*,i],stackx=keyword_set(stackx),/use_m200
-   plot_lensing_results,lensOutFileArrRef[i],plotFileArrRef[i]+'_models',rob_p_mean,fitTypeAllRef[*,i],stackx=keyword_set(stackx),/use_m200,/models
+;   plot_lensing_results,lensOutFileArrRef[i],plotFileArrRef[i],rob_p_mean,fitTypeAllRef[*,i],stackx=keyword_set(stackx),/use_m200
+;   plot_lensing_results,lensOutFileArrRef[i],plotFileArrRef[i]+'_models',rob_p_mean,fitTypeAllRef[*,i],stackx=keyword_set(stackx),/use_m200,/models
 
 
   ; Now measure the lensing signal around the other center and plot both models
@@ -133,8 +131,8 @@ for i=0,n_elements(cenNames)-1 do begin
    ;  rather than rerunning run_ds_mcmc
 
    ; Plot the results with and without models
-   plot_lensing_results,lensOutFileArrCen[i],plotFileArrCen[i],rob_p_mean,fitTypeAllCen[*,i],stackx=keyword_set(stackx),/use_m200,center=cenNames[i],refcen=refNames[i],groupFile=infile_lens
-   plot_lensing_results,lensOutFileArrCen[i],plotFileArrCen[i]+'_models',rob_p_mean,fitTypeAllCen[*,i],stackx=keyword_set(stackx),/use_m200,center=cenNames[i],refcen=refNames[i],groupFile=infile_lens,/models
+;   plot_lensing_results,lensOutFileArrCen[i],plotFileArrCen[i],rob_p_mean,fitTypeAllCen[*,i],stackx=keyword_set(stackx),/use_m200,center=cenNames[i],refcen=refNames[i],groupFile=infile_lens
+;   plot_lensing_results,lensOutFileArrCen[i],plotFileArrCen[i]+'_models',rob_p_mean,fitTypeAllCen[*,i],stackx=keyword_set(stackx),/use_m200,center=cenNames[i],refcen=refNames[i],groupFile=infile_lens,/models
 
 endfor
 
@@ -164,6 +162,6 @@ close,u
 free_lun,u
 
 ; make multi-panel plot to compare diff stacks
-plot_diff_stacks,cenNames,refNames,cenText,refText,lensOutFileArrCen,lensOutFileArrRef,diffPlotFile,infile_lens,massMeanRef,fitTypeAllCen,fitTypeAllRef,stackx=keyword_set(stackx),/use_m200
+plot_diff_stacks,cenNames,refNames,cenText,refText,lensOutFileArrCen,lensOutFileArrRef,diffPlotFile,infile_lens,stackx=keyword_set(stackx),/use_m200
 
 end
