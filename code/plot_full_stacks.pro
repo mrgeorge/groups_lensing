@@ -18,7 +18,6 @@ if(keyword_set(test)) then begin
 
    cenNames=['mmgg_scale','mmgg_r200','mlgg_scale','mlgg_r200','cl','cm','xray','cn']
    cenText=textoidl(['MMGG_{scale}','MMGG_{R200}','MLGG_{scale}','MLGG_{R200}','CL','CM','X-ray','CN'])
-   ptSrc=[2,2,2,2,0,0,0,0]      ; for fit_t
 
    lensFileArr=strcompress(fileDir+'center_'+cenNames+'.fits',/remove_all)
    plotFile=plotDir+'full_stacks_test.eps'
