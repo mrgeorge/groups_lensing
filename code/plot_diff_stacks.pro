@@ -182,7 +182,7 @@ for ii=0,nCen-1 do begin
    xyouts,xStrRight,yr[1]-1.*yLine,mstr,alignment=0.99,charsize=lCharSize
    xyouts,xStrRight,yr[1]-2.*yLine,smstr,alignment=0.88,charsize=lCharSize
    xyouts,xStrRight,yr[1]-3.*yLine,chisqstr,alignment=1.0,charsize=lCharSize
-   xyouts,xRight,yr[1]-1.*yLine,string(massMeanRef[ii],format=fmt),alignment=1,charsize=lCharSize
+   xyouts,xRight,yr[1]-1.*yLine,string(pMeanRef,format=fmt),alignment=1,charsize=lCharSize
    xyouts,xRight,yr[1]-2.*yLine,string(str.msun_lens,format=fmt),alignment=1,charsize=lCharSize
    xyouts,xRight,yr[1]-3.*yLine,string(chisq,format=fmt),alignment=1,charsize=lCharSize
 
