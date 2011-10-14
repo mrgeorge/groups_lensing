@@ -111,7 +111,7 @@ for ii=0,nCen-1 do begin
                   use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw
    
    ; Sum of terms
-   if(fitType NE 0) then tot=ps_term + nfw_term $
+   if(fitType[0] NE 0) then tot=ps_term + nfw_term $
    else tot=nfw_term
    oplot,x_mpc,tot,color=!blue,thick=12
 
