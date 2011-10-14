@@ -101,8 +101,8 @@ fitTypeAll2[6,*]=1 ; this leaves the offset as a free parameter
 ; arrays to record mean and stddev mass from mcmc
 massMean=fltarr(n_elements(cenNames))
 massErr=fltarr(n_elements(cenNames))
-massMean2=fltarr(n_elements(cenNames))
-massErr2=fltarr(n_elements(cenNames))
+;massMean2=fltarr(n_elements(cenNames))
+;massErr2=fltarr(n_elements(cenNames))
 
 ; For one center:
 for i=0, n_elements(cenNames)-1 do begin
@@ -120,8 +120,8 @@ for i=0, n_elements(cenNames)-1 do begin
    ; Fit offset model to the lensing signal
     ; fit pars are returned as rob_p_mean and also written to lensOutFile
    run_ds_mcmc, lensOutFileArr[i], fitTypeAll2[*,i], rob_p_mean2, rob_p_sigma2, stackx=keyword_set(stackx),/fast
-   massMean2[i]=rob_p_mean2
-   massErr2[i]=rob_p_sigma2
+;   massMean2[i]=rob_p_mean2
+;   massErr2[i]=rob_p_sigma2
 
    ; Plot the results, with and without the models
 ;   plot_lensing_results,lensOutFileArr[i],plotFileArr[i],rob_p_mean,fitTypeAll[*,i],stackx=keyword_set(stackx),/use_m200
