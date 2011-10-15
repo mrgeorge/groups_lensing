@@ -58,6 +58,48 @@ endfor
 
 end
 
+pro table_full_stack,cenTitles,lensFileArr,tableFile,stackx=stackx
+  
+; reorder center arrays so that table order corresponds with plot from
+; top to bottom
+reorder=[6,7,4,5,2,3,0,1]
+cenTitles=cenTitles[reorder]
+lensFileArr=lensFileArr[reorder]
+
+openw,u,tableFile,/get_lun
+printf,u,'# Center  Mcen  Mnfw  dMnfw  chisq  Mnfw_off  dMnfw_off  Roff  dRoff  chisq_off'
+
+for ii=0,n_elements(cenTitles)-1 do begin
+   str=mrdfits(lensFileArr[ii],1)
+
+   ; restrict to points with enough sources
+   sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 10)
+   if(keyword_set(stackx)) then begin
+      stop ; need to rewrite this to determine rnfw if needed
+      x    = str.plot_radius_kpc[sel]*rnfw
+      y    = str.we1_mean[sel]
+      yerr = str.we1_error[sel]
+   endif else begin
+      x    = str.plot_radius_kpc[sel]/1e3
+      y    = str.we1_mean[sel]
+      yerr = str.we1_error[sel]
+   endelse
+   
+   chisq=get_ds_chisq(str.fit_type,str.p_mean,str,x,y,yerr,dof=dof,/use_m200)
+   chisq2=get_ds_chisq(str.fit_type2,str.p_mean2,str,x,y,yerr,dof=dof2,/use_m200)
+
+   if(str.msun_lens EQ 0.) then mcen='-' else mcen=string(str.msun_lens,format='(F4.1)')
+      
+   if(ii EQ 0) then printf,u,'# dof (centered, offset): ',dof,dof2
+
+   printf,u,cenTitles[ii],mcen,str.p_mean,str.p_sigma,chisq,str.p_mean2[0],str.p_sigma2[0],1000.*str.p_mean2[1],1000.*str.p_sigma2[1],chisq2, $
+          FORMAT='(A15," &",A5," &",F6.2," &",F6.2," &",F5.1," &",F6.2," &",F6.2," &",F6.1," &",F6.1," &",F5.1," \\")'
+endfor
+
+close,u
+free_lun,u
+end
+
 pro full_stack,innerRadiusKpc,secondRadiusKpc,maxRadiusKpc,nRadiusBins,stackx=stackx,emp_var=emp_var,loz=loz,hiz=hiz,loM=loM,hiM=hiM
 
 ; measure lensing signal for the full stack of groups around different centers
@@ -112,20 +154,25 @@ if(NOT(file_test(plotDir))) then file_mkdir,plotDir
 
 ; Centers ordered bottom left to top right on plot
 cenNames=['cl','xray','cn','cm','mlgg_scale','mlgg_r200','mmgg_scale','mmgg_r200']
-cenTitles=textoidl(['CL','X-ray','CN','CM','MLGG_{scale}','MLGG_{R200}','MMGG_{scale}','MMGG_{R200}'])
+cenTitlesTex=['CL','X-ray','CN','CM','MLGG_{scale}','MLGG_{R200}','MMGG_{scale}','MMGG_{R200}']
+cenTitles=textoidl(cenTitlesTex)
 ptSrc=[0,0,0,0,2,2,2,2] ; for fit_t
 
 lensOutFileArr=strcompress(fileDir+'center_'+cenNames+'.fits',/remove_all)
 plotFileArr=strcompress(plotDir+'center_'+cenNames,/remove_all)
 fullPlotFile=plotDir+'full_stacks.eps'
+tableFile=plotDir+'full_stack_fit_pars.tex'
 
 ; Measure and Model the lensing signal
-model_full_stack,cenNames,ptSrc,infile_source,infile_lens,lensOutFileArr,$
-                     innerRadiusKpc,secondRadiusKpc,maxRadiusKpc,nRadiusBins,$
-                     minLensZ,maxLensZ,minLensMass,maxLensMass,$
-                     stackx=stackx,emp_var=emp_var
+;model_full_stack,cenNames,ptSrc,infile_source,infile_lens,lensOutFileArr,$
+;                     innerRadiusKpc,secondRadiusKpc,maxRadiusKpc,nRadiusBins,$
+;                     minLensZ,maxLensZ,minLensMass,maxLensMass,$
+;                     stackx=stackx,emp_var=emp_var
 
 ; Make multi-panel plot to compare full stacks
 plot_full_stacks,cenTitles,lensOutFileArr,fullPlotFile,stackx=keyword_set(stackx),/use_m200
+
+; Print latex formatted table with fit parameters
+table_full_stack,cenTitlesTex,lensOutFileArr,tableFile,stackx=stackx
 
 end
