@@ -51,7 +51,7 @@ yst=1
 xlog=1
 ylog=0
 if(keyword_set(xlog)) then xr = [0.03,1.3] else xr=[0,1.5]
-if(keyword_set(ylog)) then yr = [0.5,3000] else yr = [-50,249]
+if(keyword_set(ylog)) then yr = [0.5,3000] else yr = [-50,199]
 ;if(keyword_set(ylog)) then ytickf='loglabels' else ytickf=''
 ;if(keyword_set(xlog)) then xtickf='loglabels' else xtickf=''
 xtitle=textoidl('Physical transverse distance,  R (h_{72}^{-1} Mpc)')
@@ -173,14 +173,15 @@ for ii=0,nCen-1 do begin
    xRight=0.8*xr[1]
    xStrRight=0.4*xr[1]
    fmt="(F6.2)"
-   xyouts,xStrRight,yr[1]-1.*yLine,mstr,alignment=0.99,charsize=0.9
-   xyouts,xStrRight,yr[1]-2.*yLine,smstr,alignment=0.88,charsize=0.9
-   xyouts,xStrRight,yr[1]-3.*yLine,chisqstr,alignment=1.0,charsize=0.9
-   xyouts,xRight,yr[1]-1.*yLine,string(mnfw,format=fmt),alignment=1,charsize=0.9
-   xyouts,xRight,yr[1]-2.*yLine,string(str.msun_lens,format=fmt),alignment=1,charsize=0.9
-   xyouts,xRight,yr[1]-3.*yLine,string(chisq,format=fmt),alignment=1,charsize=0.9
+;   xyouts,xStrRight,yr[1]-1.*yLine,mstr,alignment=0.99,charsize=0.9
+;   xyouts,xStrRight,yr[1]-2.*yLine,smstr,alignment=0.88,charsize=0.9
+;   xyouts,xStrRight,yr[1]-3.*yLine,chisqstr,alignment=1.0,charsize=0.9
+;   xyouts,xRight,yr[1]-1.*yLine,string(mnfw,format=fmt),alignment=1,charsize=0.9
+;   xyouts,xRight,yr[1]-2.*yLine,string(str.msun_lens,format=fmt),alignment=1,charsize=0.9
+;   xyouts,xRight,yr[1]-3.*yLine,string(chisq,format=fmt),alignment=1,charsize=0.9
 
-   xyouts,xRight,yr[0]+0.5*yLine,cenText[ii],alignment=1
+;   xyouts,xRight,yr[0]+0.5*yLine,cenText[ii],alignment=1
+   xyouts,xRight,yr[1]-1.5*yLine,cenText[ii],alignment=1
 
 endfor
 device,/close
