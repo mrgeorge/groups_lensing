@@ -118,7 +118,7 @@ for ii=0,nCen-1 do begin
    if(cenText[ii] EQ textoidl('MMGG_{scale}')) then oplot,x_mpc,nfw_term,color=!darkgreen,linestyle=2,thick=18
 
    ; Baryonic point source term
-   if(fitType[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=5
+   if(cenText[ii] EQ textoidl('MMGG_{scale}')) then if(fitType[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=5
 
    ; CALCULATE CHI^2
    chisq=get_ds_chisq(fitType,pMean,str,x,y,yerr,dof=dof,use_m200=use_m200)
@@ -143,7 +143,7 @@ for ii=0,nCen-1 do begin
       if(cenText[ii] EQ textoidl('MMGG_{scale}')) then oplot,x_mpc,nfw_term,color=!orange,linestyle=3,thick=8
 
       ; Baryonic point source term
-      if(fitType2[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=4
+      if(cenText[ii] EQ textoidl('MMGG_{scale}')) then if(fitType2[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=4
 
       ; Calculate chi^2
       chisq2=get_ds_chisq(fitType2,pMean2,str,x,y,yerr,dof=dof2,use_m200=use_m200)
