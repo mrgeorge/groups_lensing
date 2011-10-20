@@ -66,7 +66,7 @@ reorder=[6,7,4,5,2,3,0,1]
 cenTitles=cenTitles[reorder]
 lensFileArr=lensFileArr[reorder]
 
-openw,u,tableFile,/get_lun
+openw,u,tableFile,/get_lun,width=1000
 printf,u,'# Center  Mcen  Mnfw  dMnfw  chisq  Mnfw_off  dMnfw_off  Roff  dRoff  chisq_off'
 
 for ii=0,n_elements(cenTitles)-1 do begin
@@ -93,7 +93,7 @@ for ii=0,n_elements(cenTitles)-1 do begin
    if(ii EQ 0) then printf,u,'# dof (centered, offset): ',dof,dof2
 
    printf,u,cenTitles[ii],mcen,str.p_mean,str.p_sigma,chisq,str.p_mean2[0],str.p_sigma2[0],1000.*str.p_mean2[1],1000.*str.p_sigma2[1],chisq2, $
-          FORMAT='(A15," &",A5," &",F6.2," &",F6.2," &",F5.1," &",F6.2," &",F6.2," &",F6.1," &",F6.1," &",F5.1," \\")'
+          FORMAT='(A15," &",A5," &",F6.2," $\pm$",F6.2," &",F5.1," &",F6.2," $\pm$",F6.2," &",F6.1," $\pm$",F6.1," &",F5.1," \\")'
 endfor
 
 close,u
