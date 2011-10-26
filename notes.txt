@@ -1,0 +1,1422 @@
+######################################################################
+Sun Jan  9 16:36:05 PST 2011
+
+Currently using mocks to test reliability of selection. From Oct. 26 email to JT, AL, KB regarding tests with Michael Busha's mocks for the reliability of BCG selection:
+"For galaxies which Michael calls centrals in halos with mass > 10^13, the photoz selection correctly calls ~82% of them BCGs in the corresponding groups. ~3% are selected to be in a nearby group (most of these have P>0.7 for more than one group -> mergers), ~3% have a galaxy that belongs in a different group selected as the BCG (-> projection), and ~12% have a galaxy that belongs to the same group but has a larger stellar mass than the true central galaxy (-> scatter in stellar mass assignment, either in DM density - luminosity relation, SED/color - density relation, or SED - stellar mass estimate). In selecting BCGs on the mocks, I'm assuming I know the position of the center of the group perfectly, so there will be some additional loss if the X-ray positions are significantly off."
+
+
+Test scripts test_mock_mcen in ~/data/cosmos/mocks and ~/data/cosmos/mocks/busha
+calculate what fraction of groups in Busha's and Behroozi+JT+AL's mocks have a member with higher stellar mass than the central galaxy. The fraction is 13.9% in Busha's and 17.0% in Behroozi's mocks which were populated with JT+AL's HOD. Initially we thought Busha's had too large a scatter in the central Mstar - Mhalo relation, which would lead to some of them having to small a mass and a higher fraction of groups with a satellite as the most massive galaxy. Instead they're pretty similar. In both cases, there's a few % of other groups having failed BCG selection due to interlopers or incompleteness.
+
+-Rewrite memstat_mock to save BCG stats and to compile results from the 10 separate lightcones together. 
+-Get find_bcg_mock to calculate other centers. Does centroid of members do better on the mocks?
+-Improve memstat with speczs to use realistic RSD rather than fixed dz cut for membership.
+
+-try miscentering by 32" and by, say 32"/10 to show what improved X-ray data would do.
+-what is mean SM offset when satellite is more massive than central?
+
+######################################################################
+Tue Jan 11 15:56:51 PST 2011
+
+updated memstat_mock to handle 10 lightcones on its own and to save some BCG success stats, as well as to print out plot values to text files for later compilation.
+
+Improved find_bcg_mock's pick_centers, but will still want to carefully select groups that go into plots - exceptional cases include BCGs selected to multiple groups, few members, zero members, few/zero members above P=0.5, etc.
+
+Centroids look comparable with distribution of distances between centers from real catalog. It looks like there may be an excess of mock groups with too small offsets between member centroids and "true" central galaxy. Probably due in part to giving the group the true center, rather than approximating X-ray uncertainty.
+
+Updated mock2cosmos to randomly assign X-ray flag 1 or 2 in proportion to AF's catalog, everything gets a significance of 5.0 (typical of real catalog) and X-ray uncertainties are treated accordingly. Now, group.alpha_j2000 is the true center and location of central galaxy, and alpha_ellipse is the mock X-ray position.
+
+- in mock groups where satellite is more massive than center, are most inside Rscale or outside?
+    A: roughly 2/3 members are inside the scale radius + X-ray error and the same distribution 
+       holds for most massive satellites that are more massive than the central galaxy. 
+       See test_mock_gap.pro
+- plot distribution of offsets between centers for mock and compare with data
+    A: qualitative agreement is excellent
+- plot field density for mocks and compare with data
+    A: mock field density appears low compared with data across magnitude bins and redshifts.
+       See notes below on Jan 12-14.
+       This is due to redshift evolution in the stellar mass function not reflected in the mocks.
+- run latest code on real data and debug, send to AL to integrate in pipeline
+- test memstat with speczs and realistic velocity dispersions
+- gap statistics for mocks and for data
+ 
+###################################################################### 
+Wed Jan 12 13:05:53 PST 2011
+
+Ran find_bcg_mock with the updates to mock2cosmos which add mock X-ray offsets to the center. BCG success rate is a few percent lower, so not too bad.
+
+
+Problem with field density in mocks. It looks like the mock field density is low compared to data at basically all magnitudes and redshifts. Potential cause is that volumes around "detected groups" are excluded from field density calculation. This detection limit is fixed to M>10^13 for the mocks at all redshifts, but evolves from ~10^13 at low z to ~10^13.5 at higher z. So more volume is excluded from the mock calculations than the real data.
+--But wait, this should be taken care of by dividing the number counts by the area searched, so the mocks should have low counts but also low area and it ought to wash out, since we earlier saw that the field density wasn't sensitive to the group exclusion radius. ???
+
+######################################################################
+Thu Jan 13 17:02:38 PST 2011
+
+wrote test_mock_density to look into the possible problems with mock densities. When all 10 mocks are plotted against COSMOS data, without excluding group regions, the agreement is reasonable. COSMOS is on the high side but there are spikes in some lightcones that exceed it, so it's within the sample variance. But the outputs from field_density are still high for COSMOS relative to the mocks. This points to either a bug in accounting for the area (I don't think this is it) or possibly an issue with how groups are excluded. For the mocks, if a group is above M=10^13 it is an excluded region, at any redshift. For COSMOS only detected sources are excluded, and the detection limit exceeds 10^13 at high z, so we could possibly be excluding more dense regions in the mocks than in COSMOS, lowering the density.
+--Updated mock2cosmos and find_bcg_mock to deal with varying LX sensitivity. Doesn't appear to have an effect on field density.
+
+More tests with fd: fd is more sensitive to volume excluded than I had though. The difference between excluding groups out to 3*R200 and not excluding them at all gives a change in fd of several 10s of %, though it appears to always be less than a factor of 2 different. Testing how this affects membership selection results - outputs 201101130 have no groups excluded from fd calculations.
+
+Poisson errors are relatively small for fd so adding them didn't help much.
+
+-run with radfactor=0,3 for COSMOS and mocks, compare all 4 sets of outputs to see if there are still discrepancies or if it's just cosmic variance.
+
+0 - mocks is in 201101130
+3 - cosmos should be in 20110113
+
+Found a bug in how R200_Mpc is assigned, missing factor of E(z)^2. I had been using rho_crit, which it should be rho_crit(z) and since rho_crit \propto H^2, there are two factors of E(z) to be included, which matches what was used for the COSMOS catalog.
+--Updated mock2cosmos and reran test_mocks in 201101134, but it doesn't appear to make much of a difference.
+
+Used test_mock_density to compare mocks with COSMOS over all SM for fixed mag bins and over all mags for fixed SM bins. Discrepancy looks bigger at low SM than at higher SM (above 10.5), and seems to be an issue in all mag bins (though I haven't quantified it). This would seem to point to a problem in low SM number densities from mocks (we know it only goes down to 8.5 and is probably sketchy somewhat above that), but could also be partly due to how mags are assigned from SM.
+--Noticed that I left out a few cuts on ACS quality when matching mags and updated mock_mags to reflect this (mu_class EQ 1 and good_zphot_lens EQ 1).
+run test_mocks 201101135 with this change
+--net changes seem to improve P&C by maybe a couple percent, so not a huge deal.
+
+######################################################################
+Fri Jan 14 13:39:26 PST 2011
+
+Solved mock density problem. Used test_mock_smf to plot stellar mass function of COSMOS and mocks in a square degree region, over all magnitudes, in a few different redshift bins. The SMF is good for z=0.5-0.6 (as it should be since the HOD was matched to a box near that z), but bad at higher and lower redshifts, resulting in lower densities of galaxies than in COSMOS at stellar masses above ~10^9 or so up to ~10^11. We could try to make the mocks match an evolving stellar mass function, or just (test and) state that a ~20% discrepancy in galaxy density doesn't really influence membership selection statistics very much.
+
+######################################################################
+Tue Jan 18 17:07:14 PST 2011
+
+Copied a version of memstat_mock to code/analysis and renamed memstat_spec.pro. Updated "membership truth criterion" to require a specz within N*velocity dispersion of the group redshift, rather than a fixed cut. There is some freedom to choose the depth of the cylinder (1,2,3 sigma?), so the results broadly agree with the mock tests, though there are some discrepancies in the trends of purity and completeness vs. different variables.
+-sort this out
+
+
+Email from Alexie about the ratio of total stellar mass to halo mass in groups suggests a disagreement between results from their HOD constraints and Giodini's and Gonzalez's papers. Those group membership projects find total stellar masses to be a factor of 2-3 higher at fixed halo mass than the HOD. It could be due to underestimated background removal on their part, which would cause a higher contamination fraction and an excess stellar mass measurement??
+
+Started testing this with test_mock_stefania, applying a basic selection and background removal similar to that described in her paper. Initial results suggest that her total stellar mass and richness is within a few percent of the true values (as are the results from my selection algorithm). But it seems to suggest that my algorithm is doing better than memstat_mock says (memstat says I'm selecting ~20% more galaxies than the number of true members, but this new test is saying I'm only about 2% over, so sort this out.)
+-bug fixed, both methods overselect by ~30%, though direct mapping of Giodini's background subtraction to richness is different.
+
+######################################################################
+Wed Jan 19 13:47:34 PST 2011
+
+Both Giodini's and my methods overselect galaxies. The discrepancy yesterday between memstat and test_mock_stefania was due to a bug the included galaxies fainter than the magnitude limit, so the amount of unselected faint galaxies was coincidentally similar to the number of overselected galaxies, which apparently resulted in near perferct richness values.
+
+ 
+Wrote satellite_mf.pro in code/analysis to generate plot of satellite stellar mass contribution to the total halo mass as a function of halo mass. There's lots of scatter but the mean relation is plausibly in agreement with Alexie's plots from the HOD. These points may be a little higher, but not high enough to agree with Giodini's.
+
+######################################################################
+Thu Jan 20 15:33:11 PST 2011
+
+Write script to compile memstat_mock plots for different lightcones. Reformat plot to share y axes? P&C vs. z, SM, mag, Mhalo, R200 for mocks. Do same for memstat_spec with P&C vs. z, SM, mag, Mhalo, R200, color? 
+
+Clean up text comparing algorithm results with Giodini selection with some basic numbers.
+
+Throw in color-magnitude plot, set up section on star formation, update intro with SZ power spectrum issue ....
+
+######################################################################
+Mon Jan 24 10:51:01 PST 2011
+
+Checks on find_bcg outputs to make sure there are no problems before final version.
+
+Several groups throw errors in the log file saying there are no members or no photoz members:
+find_bcg: group[27] ERROR: no photoz members within scale radius
+find_bcg: group[27] ERROR: no members within scale radius
+
+Group ID   Index   XFLAG   Error   Comment
+59    	   27		2  	   both
+113	   	   62		4	   photoz    - ignore flag 4
+115		   64		5	   both	   - ignore flag 5
+144		   84		5	   both	   - ignore flag 5
+146		   86		5	   photoz    - ignore flag 5
+209		   126	5	   photoz      - ignore flag 5
+284		   171	5	   both	     -ignore flag 5
+308		   189	2	   photoz
+312		   193	5	   member    - ignore flag 5
+335		   207	2	   both
+
+These errors occur if there are no galaxies within Rscale+Xerr with Pmem>0.5.
+They are assigned no MMGG or any members, and their centers are flagged.
+
+
+
+Considered updating photoz PDF catalog from v1.7 to v1.8, but stellar masses have been computed with 1.7 and the new version isn't much different, so don't bother changing.
+
+
+######################################################################
+Tue Jan 25 12:56:52 PST 2011
+
+Skype with Jeremy:
+Q:How are total satellite masses put into the mocks?
+A: get mean number of satellites of a given stellar mass per halo, Poisson sample around that mean, and then get satellite masses drawn from the conditional mass function (conditional on halo mass).
+
+
+For the 3 groups with flag=2 and 0 members, figure out why the log would print that there are some objects with zweight > 0.5. Is it that there are no members within the scale radius but there are some within R200? How do the group redshift and X-ray centers look?
+
+For the 3 odd groups, I'm selecting all galaxies within dz=0.03 and R200 of the X-ray center, and looking at how many massive galaxies there are.
+
+Group ID   Index   XFLAG   Error   Comment
+59    	   27		2  	   both - 1 galaxy M=10.5 that is 0.9*R200=400kpc=180arcsec away from center. Next most massive has M=9.5
+
+308		   189	2	   photoz - has 2 galaxies with M>10.4 within Rscale which should probably be members. One has specz and is assigned mmgg_scale_specz. PDFs are narrow spikes at 0.37 and 0.38, with zG=0.374. Consider lowering threshold for initial MMGG selection? Rerun find_bcg with a stop line here to see what their Pmems are, since they don't get saved when the group gets tossed.
+
+335		   207	2	   both - zG=0.96, one M=10.9 galaxy just outside of Rscale+Xerr, nothing else above M=9.7
+
+
+######################################################################
+Tue Feb  1 12:32:43 PST 2011
+
+Reran lensing tests with doall_xgroups_matt_paper.pro to see if latest catalog still produces reliable centers.
+
+Latest catalog (20110114) produces different results than 20101005 (circa CINC talk), mainly just noisier. Noisier for mmgg_scale_models but possibly a cleaner off-center signal for some other centers. Let's look at the edge groups which are different between the two samples.
+
+oldcatalog = '/Users/alexie/Work/GroupCatalogs/cosmos_xgroups_20101005.fits'
+newcatalog = '/Users/mgeorge/data/cosmos/code/group5_20110114.fits'
+
+old has 213 members, 133 with flag_include=1
+new has 211 members, 129 with flag_include=1
+
+3 old groups missing (old index=122,167,198), 1 new one added (new index=178)
+-> 210 id matches
+
+of 210, 133 old with flag_include=1, 128 new with flag_include=1
+   125 with old and new flag_include=1
+
+All 125 have the same id_mmgg_scale and ra, dec.
+-> 8 old groups dropped out of lensing sample, 3 added in new one + 1 new object in catalog, 129 total in new one.
+
+of 3 groups added to lensing sample by flags:
+id=54, redshift updated from 0.47 to 0.31 - looks ok
+id=215, previously masked but now isn't - mmgg_scale and r200 disagree but are both near rscale 
+id=274, poorish high-z group (n_mem=4), mmgg_scale=10.0 Msun
+
+sample of 125 groups with flag_include=1 in both files written to group5_20110201match.fits for lensing tests.
+
+test0201 is run on old cosmos_xgroups_20101005.fits
+test0201b is run on new group5_20110114.fits
+test0201c is run on 125 subsample  group5_20110201match.fits
+test0201d is run on 125 subsample  group5_20111005match.fits
+test0201e is run on 125 subsample  group5_20110114matchbox.fits - assigned old.box to new.box
+test0201f is run on group6_20110114.fits
+
+Noticed that new group files do not have keyword "BOX" filled in. This array is used in the lensing code to assign a coordinate grid and is not filled in prior to the find_bcg stage, so it was all zeros in the 20110104 version but a bunch of numbers for the 20101005 version.
+
+
+To create group6_20110114.fits from group5_20110114.fits (only difference should be that BOX column is filled in), I adapted these lines from Alexie's doall_gglensing_05_2009.pro. The code tries to write to box_struct_file so I just commented that out and it writes idlsave.dat to current directory so make sure it's called in a place with write permissions:
+
+box_struct_file='/Users/alexie/Work/Weak_lensing/GG_cat_2006/box_struct.sav'
+box_factor=20
+infile='/Users/mgeorge/data/cosmos/code/group5_20110114.fits'
+outfile='/Users/mgeorge/data/cosmos/code/group6_20110114.fits'
+pre_gglensing,infile,outfile, box_factor ;, box_struct_file
+
+
+######################################################################
+Wed Feb  2 09:30:57 PST 2011
+
+Lensing issues have been resolved with pre_gglensing to add the box numbers to the group catalog. We should be good to move ahead with final catalogs.
+
+
+Added /faint option to find_bcg_mock to extend the magnitude bins from 24.2 to 25.0. This will allow us to compare with Stefania's selection down to her magnitude limit of 25, where the improved treatment of PDFs should show a clearer advantage over a basic photoz cut.
+
+-Next, modify find_bcg_mock to handle different levels of redshift uncertainty.
+e.g. fix all zerrs to 110 km/s to simulate zCOSMOS coverage of everything
+     	     	      	       ~0.5% PRIMUS errors (to 22.5 or 23.7 - Coil et al)
+			       ~5% for SDSS/DES errors
+These results can't  exactly be read off of the purity and completeness vs. magnitude plot. Completeness does seem to follow photoz uncertainty, but purity continues to increase at bright magnitudes even beyond where the photoz uncertainty bottoms out at 0.01. This is because the field density decreases so the bright objects are more easily picked out.
+
+
+-Then, modify mock2cosmos to generate group catalogs with X-ray uncertainties of ~32" and ~3.2" to see how different the centers end up, measuring both the change in P&C and in BCG success rate.
+
+-Implement different field density modules to test P&C with an annular ring around each group and with 20 circles like Giodini uses.
+
+######################################################################
+Thu Feb  3 14:22:42 PST 2011
+
+Added options /fd_annulus and /fd_circles in find_bcg_mock to calculate field_density in different ways.
+fd_annulus measures density in same mag bin and redshift slice but in annulus between 2 and 5 * R200 of the group.
+fd_circles measures density in 20 random circles, non-overlapping with other groups or field edges (but possibly with each other) in same mag bin and redshift slice, takes mean. This one is slower because it must find 20 random spots that don't overlap with groups, for each galaxy considered.
+
+Edited test_mocks to output files named for these options, ran on lightcone 0. date=20110203
+
+fd_annulus: typical P_mem is lower so fewer members are selected (threshold should be decreased). But of the sources selected, similar purity and completeness as the regular selection, probably worse by a few percent.
+fd_circles: quick look at pc_vs_all plots looks almost no different than v20110114 with normal bg subtraction.
+
+Updated create_mock_pdf with options for zcosmos, primus, and sdss to fill in redshift information appropriately. Next update find_bcg_mock with these options. Use /specz for zweight with zcosmos and primus to do hi-res sampling of PDF, and regular for sdss. Only call loadpdf for sdss and default cosmos.
+- done, also had to edit treatment of zerr_mag, outfiles are 20110204 zcosmos, primus, and sdss
+
+-also updated find_bcg_mocks with chandra option to have better group centers (both accuracy and precision, i.e. alpha_ellipse is closer to alpha_j2000 and pos_err_ellipse is smaller, assumes 10 sigma detections for everything, so 32/10=3.2" offsets and uncertainty) 20110204 chandra option running
+
+first results coming in for zcosmos. Looks like purity increases significantly, completeness drops -> probably need to add in group velocity dispersion to search depth. BCG failure rate doesn't change much because it's dominated by massive satellites.
+
+-rerunning zcosmos and primus with group vel disp included in group.group_z_err
+
+######################################################################
+Thu Feb 10 12:55:57 PST 2011
+
+Alexie reran doall_gglensing_05_2009.pro with updates to find_bcg and group_selection to produce output files labeled 20110209. It looks like this version applied an updated version of the photoz catalog - 2 groups ended up with different BCGs (both had flag_include EQ 0) and 81 galaxies crossed the P>0.5 threshold up or down. So the updated photoz catalog did not significantly affect the results (<2% change in membership). It will be rerun with pdzbay v1.7 to ensure consistency with the stellar masses used.
+
+Thoughts on paper:
+-construct 4 column plot showing mock results with different parameters for photoz errors (and maybe X-ray uncertainties)
+-leave in multi-panel plot of field density and sum of PDFs. discuss how it shows large-scale field fluctuations and then mention separate tests with fd calculation using annulus or circles.
+
+
+
+now rerunning test_mocks with zcosmos/primus/sdss/chandra options for all 10 lightcones. take average of the 10 for combined figure showing net effects of different errors.
+
+######################################################################
+Mon Feb 14 16:25:59 PST 2011
+
+On Fri. wrote boss_lrg_hod.pro in code/analysis to start looking at
+the HOD of LRGs and picking out odd groups where there are satellite
+LRGs but central is not an LRG.
+
+Spoke with David, Martin & Joanne, and Beth about ideas for
+constraining LRG HOD in COSMOS groups. Look at papers by Moore (?) and
+van Dokkum, talks by van den Bosch, about claims that satellite colors
+follow centrals. Martin says we could constrain scatter in central
+luminosity function, which is how he thinks of objects that fail LRG
+cuts. Blue fraction sounds more interesting. Talking with Beth, try
+looking at cases where centrals are missed but satellites are picked
+(and presumably modeled as centrals) and check the velocity
+separation, which tell how badly it affects model power spectrum. Can
+also try to constrain slope of satellite HOD, though it's probably
+more of a consistency check since we're only in the regime of ~0-1
+satellites.
+
+For paper, start by looking into quenched fraction and quantifying
+blue BCGs.
+
+
+Catalogs in /Users/alexie/Work/GroupCatalogs on macbeth with the date 20110209 look nearly identical to those in my work directories named 20110114. We'll plan to use them as the final catalogs for the catalog paper.
+
+######################################################################
+Wed Feb 16 09:15:55 PST 2011
+
+Wrote quenching.pro in code/analysis to generate plot of quenching fraction vs stellar mass for field and group populations at low and high redshift.
+- easily extended to look at morphological fraction, though ZEST incompleteness may fall out before the magnitude cut.
+
+quenched fraction for mmgg_scale galaxies appears consistent with that of galaxies in the high mass bin.
+
+
+Talked w/ AL and KB about quenching results. First, I'll need to make plot_sensitivity.pro with plots of stellar mass limits and group mass limits vs. z to make clean bins. The stellar mass sensitivity is a bit conservative (~80% complete for passive galaxies, higher for active). We could push the F814W cut down to ~24.5 where photozs blow up, since we really care more about stellar mass completeness rather than i-band completeness, but it's probably not worth it at this point. KB suggests plotting quenched fraction points even in some bins beyond completeness limit, just with a different symbol to indicate it (open vs. closed?). 
+
+Regarding quenched flag - check fraction with different z or with flag=-1. If significant (>~5-10%) we should track the issue down. Quenched = -1 objects should be excluded. Ilbert's unextincted rest-frame template NUV-R should accomplish the same goal as the 2-color cut that KB used (but should the cut that separates blue from red evolve with redshift b/c of aging populations?). Try both.
+
+Other papers - van der wel (SDSS red fraction vs. environment w/ Yang catalog), Wilman, Tasca. Discrepancy with Iovino is unclear
+
+To do: try adjusting stellar mass and redshift bins to account for completeness limit. Try bins in group-centric radius, halo mass. Redo morphology putting ellipticals and S0s together.
+ 
+######################################################################
+Thu Feb 17 14:46:57 PST 2011
+
+Constraints on the HOD from LRGs in COSMOS groups looks potentially interesting. I'm finding that for groups of mass 13-13.6, the mean LRG occupation number is ~0.5+-0.2, which is lower than the value of 1 from the HOD in Martin's paper.
+Things to check:
+-figure out boss_target1 flags, redshift distribution, etc. to make sure the boss catalog looks reasonable.
+-get Martin's HOD and figure out what how to match his linking length mass with M200c which we're using.
+-how to put error bars on f=A/B when A and B are both Poisson but may be correlated?
+   -for error bars, should be just the stddev of Nlrg divided by sqrt(Ngroups)
+
+It looks like COSMOS may be in BOSS chunk 4 and 15 (?). Target selection comes in a few steps: boss target main takes the data sweeps and includes everything that fits the basic color cuts. boss target main collate cuts that down a bit using some quality flags (probably affects QSOs more). then tiling applies fiber collisions, sometimes sparse sampling, etc. to determine what actually gets assigned to fibers. We want collate, which is what Jeremy sent. The number (007) is for different iterations of target selection, some of the earlier numbers are for specific chunks and later versions just included the whole footprint. Try updating to the latest number to see if there are differences with 007, though the galaxy selection hasn't evolved as much as QSOs, so it should be pretty similar.
+
+An issue will be using z=0.2-0.6 (or whatever) groups to compare with Martin's CMASS-only clustering result. Including groups at lower z to improve statistics means we'll be combining target galaxies from the LOWZ and CMASS samples, which have different color cuts for selection and may have different HODs.
+
+Regarding FOF masses, Tinker et al 08 looks at FOF vs SO masses. Linking length 0.2 and 200 (background?) SO masses agree to ~10%. People care about getting more precise definitions for cosmology, but that level shouldn't be a big deal here.
+
+Padmanabhan et al 09 look at clustering of photometric LRGs at 0.2 < z < 0.6 and show HODs in different redshift slices within that range. The focus of that paper was to compare clustering with quasars at those redshifts, but the LRG autocorrelation may be the best HOD to compare with, avoiding CMASS vs. LOWZ issues, if we can replicate their selection of LRGs.
+
+
+######################################################################
+Fri Feb 18 13:43:26 PST 2011
+
+sdss_cosmos.fits contains galaxies from SDSS DR7 obtained from CAS with this query:
+
+SELECT objID, ra, dec, 
+u, g, r, i, z, 
+psfMag_u, psfMag_g, psfMag_r, psfMag_i, psfMag_z, 
+petroMag_u, petroMag_g, petroMag_r, petroMag_i, petroMag_z, 
+devRad_u, devRad_g, devRad_r, devRad_i, devRad_z from Galaxy 
+WHERE 
+  ra between 149 and 151
+  and dec between 1 and 3
+
+######################################################################
+Tue Feb 22 15:07:27 PST 2011
+
+Setting aside the HOD stuff for now (look interesting though, try to do finer halo mass bins, look at centrals vs. satellites, extend beyond LRGs and compare with Zehavi, talk with Nikhil, etc).
+
+re quenching: there are a couple of ways to compute quenched fraction, can either do it group by group and take the average, or lump all galaxies in groups together and take the quenched fraction there. quenching_by_group and quenching_by_bin show these separately, and give qualitatively similar results but show differences in details, since some groups have more members than others. KB suggests showing group and field quenched fraction for the binned case, and showing group by group values on a separate plot w/o field values, since they're the same in either case. Individual groups can be plotted with small points and little error bars or sizes in proportion to the number of members. Interesting to point out that there are groups with a quenched fraction of zero in the sample.
+ 
+######################################################################
+Fri Feb 25 18:03:15 PST 2011
+
+See plot_quenchz, for quenching vs. redshift in groups and the field, and similar scripts for halo mass dependence, radial profiles, and morphologies. We see a clear dependence on environment out to z=1 for high and low stellar masses, and a weak halo mass dependence at low z. Most interesting is that high mass galaxies in the outskirts are similarly red as galaxies in the interior of groups but significantly less elliptical. Low mass galaxies are less red and less elliptical in the outskirts than in the centers, but likely more contaminated than high mass galaxies. But even if the high mass bin is contaminated, it is interesting that there must be a significant population of passive disks in the outskirts, and that color transformation happens before morphological transformation.
+
+######################################################################
+Mon Mar  7 17:14:33 PST 2011
+
+Shared results with Martin, Eliot, Joanne, Uros last week. Some suggestions use the quantity under study (redshift or halo mass dependence) as the x-axis and plot stellar mass bins as separate panels, rather than the current plots which show stellar mass on x-axis and other quantities as separate panels. To start with (for catalog paper), I'll stick with SM on x-axis and redshift bins as separate panels, since we're still trying to show that thereare both SM and z dependences. Martin also suggesting using binomial distribution for error bars on the top plot, and points out that the distribution of individual group red fractions is kind of messy and may not be sampled well (he said bimodal, but I think it's just noisy). The case for binomial error bars is that each galaxy is a trial (coin toss) and each red one is a success (heads). d'Agostini paper discusses this problem in the context of priors and background noise. Binomial errors come out smaller than the previously used Poisson (on both success and trial populations, since under the binomial assumption the number of trials is fixed, though d'Agostini allows background). I've also tried bootstrap estimates, using 1000 arrays of the same length as the number of trials with each value randomly sampled with replacement from the original array, and the results come out very similar to the binomial expectations.
+-just make the plots with one row of panels, since the two different calculations are somewhat confusing. 
+-in literature, (e.g. Gerke07), people usually just give the top value (not group to group average), so plot that with the bootstrap errors.
+-add the individual group points as gray circles in background, since they convey additional information and are in general agreement.
+
+Joanne suggested a few relevant papers/authors:
+berrier et al - fraction of gals into clusters from groups vs field
+	processing in groups?
+	the accretion of galaxies into groups and clusters 09080750
+mcgee, mccarthy
+zabludoff - group is the preprocessing environment
+
+######################################################################
+Thu Mar 10 13:28:01 PST 2011
+
+Asked DJS re: environmental dependence at low and high z. Some suggestions:
+Conroy for deep2/sdss comparison
+Kauffmann for sdss stellar masses and mass dependence
+Density estimators - Blanton, Hogg
+-> talk to Blanton at Cloudcroft? - van den Bosh, Kovac?
+
+MD - What about ~10% quenched galaxies at low mass and low z. Where do they live and how did they get that way? 
+
+######################################################################
+Wed Mar 16 15:38:52 PDT 2011
+
+Caught bug in memstat_mock.pro (also check memstat_spec.pro) which was excluding galaxies with dist_bcg_r200=0 (centrals) from purity and completeness estimates. Rerun test_mocks with different mock surveys and regular COSMOS mocks and update plots with plot_memstat... code. Will probably also have to update specz code too. Noticed this because PRIMUS and zCOSMOS completeness was ~100% over all group-centric distances, but ~97% over different magnitudes, masses, etc.
+
+AL has sent emails with specz origins and quality flags to include in paper. Mostly just included 3&4 from zCOSMOS, but there are also objects with good_specz=1 that have some AGN flags13 and 14, and FORS2 included flag 9 objects. Since specz's are secondary, just write up what we're using and don't worry about it being completely consistent. 
+
+mu_class is a morphological classification for star-galaxy separation. good_zphot_lens is ACS objects with a match in Subaru and a photoz that didn't fail (has nothing to do with masking).
+
+Update photoz test table with mask flag test and with only XMM AGNs.
+
+######################################################################
+Thu Mar 17 15:21:14 PDT 2011
+
+Updated LRG HOD plots for BOSS meeting next week. Changed error bars from Poisson to bootstrap, they shrunk a bit. Bootstrap error bars are identical to what you'd get assuming binomial distribution for centrals (haven't tried binomial+poisson for centrals+satellites, but the error bars for centrals and centrals+satellites are comparable so nothing should be wildly different) -> bootstrap is probably a robust way to estimate uncertainties on the mean.
+
+It looks like central HOD from COSMOS is a bit low compared to Nikhil's clustering results. If I accounted for the purity and completeness in the COSMOS groups, I'd expect the HOD values to go down a bit, since the number of false positives is larger than the number of false negatives. One could argue that the incompleteness on centrals is larger than the impurity, but I'm not sure why that would be true for centrals than membership as a whole. There's also sample variance not included in the COSMOS error bars, which might make things consistent.
+
+
+Noticed bug in morphology code: for spheroidals, should be using 
+zest_type=1 or (zest_type=2 AND zest_bulge=0).
+Need to fix in all plot_quench* codes.
+
+######################################################################
+Tue Mar 22 15:36:25 PDT 2011
+
+Putting together LRG HOD stuff for BOSS talk.
+Group id=149 is the one with 2 satellites as BOSS targets but not the central. The satellites have BOSS target flags GAL_LOZ and SDSS_KNOWN set. The central object in group 149 (acs id 150794) has these SDSS properties:
+   OBJID           LONG64        587727944034156582
+   RA              DOUBLE           150.41566
+   DEC             DOUBLE           2.4301941
+   U               DOUBLE           18.803043
+   G               DOUBLE           16.769592
+   R               DOUBLE           15.681646
+   I               DOUBLE           15.223874
+   Z               DOUBLE           14.903226 
+
+cparallel=0.7*(g-r)+1.2*(r-i-0.18)  = 1.0949
+cperp=(r-i)-(g-r)/4-0.18 = 0.00579
+dperp=(r-i)-(g-r)/8 = 0.32178
+
+GAL_LOZ 
+(aiming for z<0.4 LRGs)
+  r < 13.5 + cparallel/0.3   - yes 15.68<17.15
+   |cperp| < 0.2                   - yes |0.006|<0.2 
+   16 < r < 19.6                  - fail, too bright
+
+So the only real reason it fails the LOZ cuts is because it's too bright. It does fail CMASS cuts other than the bright-end limit, but those weren't made for such low redshift targets and so aren't that reasonably to compare with for this object.
+
+4 groups with BOSS target as satellite but no central.
+IDL> sel=where(nlrgcen EQ 0 AND nlrgsat GT 0)
+IDL> print,group[sel].id   
+      24      36     108     128
+IDL> print,group[sel].zphot
+     0.527000     0.531000     0.677000     0.556000
+IDL> print,group[sel].lensing_m200
+      13.6640      13.5799      13.5087      13.5137
+IDL> print,group[sel].n_mem       
+      49      10       9      22
+
+The X-ray detections look pretty featureless and these ones lack a central dominant galaxy. The BOSS targets are typically more massive than the selected central but fall outside of the scale radius+error. Unclear whether this is a failed X-ray centering problem  or just merging messy groups, but since they don't appear to have other clear central galaxies I can't say it's a BOSS targeting problem.
+
+The best looking of these four is group ID=24, and it's the one I've used before as an example where center is unclear.
+Assigned central ID=128897, mass=11.0
+LRG masses are 11.3 and 11.4
+Central has SDSS properties:
+   OBJID           LONG64        587726032235528891
+   RA              DOUBLE           150.29164
+   DEC             DOUBLE           1.6915857
+   U               DOUBLE           22.961432
+   G               DOUBLE           22.808392
+   R               DOUBLE           21.495337
+   I               DOUBLE           20.588776
+   Z               DOUBLE           19.751041
+
+######################################################################
+Fri Mar 25 13:46:17 MDT 2011
+
+new mocks from Jeremy copied from /Users/jeremy/MOCKS/LARGE_MOCKS
+to ~/data/cosmos/mocks/new_lightcone.?.mock
+
+moved old stuff to ~/data/cosmos/mocks/jeremy_v1
+
+New mocks with run date 20110325.
+
+######################################################################
+Sat Mar 26 10:56:11 MDT 2011
+
+New mocks appear to have similar fraction of groups with a satellite that is more massive than the central, ~20%. It's only ~10% when restricting to satellites within scale radius (in both old and new).
+
+JT on satellites that are more massive than centrals. Somewhat surprising that the parametrization doesn't make much of a difference, but ok. Should we parametrize this fraction in terms of the HOD, or do the integral over the satellite mass function to check consistency? JT says don't bother, and that we're not certain about the parametrization so we can't really say that this happens in 20% of real groups. HOD assumes central and satellite masses are basically independent, which may not be true.
+
+See test_mock_gap.pro in data/mocks for analysis and plot of gap vs mass.
+
+Just did SVN commits for lots of code modified in the last week. Fixed zest morphology bugs in quenching/morphology plots which did make qualitative changes for that stuff (all for paper 3 I think), along with hopefully cleaner and clearer plotting. Minor updates to mock codes and plots to change file name versions, etc. The new memstat plots are now committed into the paper, no big changes.
+
+To do: 
+-write script to calculate all numbers in text of paper on latest catalog versions, and incorporate into paper for "final" version.
+-fill out discussion in intro and science/conclusion sections
+
+
+######################################################################
+Fri Apr  1 11:24:15 PDT 2011
+
+Doing some tests to put final numbers into paper. See print_paper_numbers.pro
+
+Comparing mmgg_scale with the old BCG selection used in AL's LX-M paper. First matching group IDs between old and new catalogs, then selecting only those with flag_include EQ 1 in new catalog. This leaves 128 groups, of which 102 agree (80%). Of the 26 that disagree, 12 of AL's BCGs live outside the scale radius + X-ray error, and 5 are not even group members (Pmem<0.5, actually they're all zero.) The remaining 9 must live within the scale radius+Xerr but be less massive than the one I chose (must be closer to center I guess?).
+
+Added tests in print_paper_numbers to determine failure modes for assigning BCGs, this should supercede that in memstat_mock.
+Mock BCG assignment success rate
+# good mock BCG      2092.00
+# assigned BCGs that are not centrals      562.000
+# assigned BCGs that are centrals      1621.00
+# centrals that are not assigned BCGs      471.000
+Success % (fraction of centrals assigned as BCGs)     0.774857
+#,% centrals assigned as satellites         368     0.175908
+#,% centrals assigned to different groups          21    0.0100382
+#,% centrals assigned to field          82    0.0391969
+#,% centrals that are assigned as satellites b/c miscentering         115    0.0549713
+#,% centrals that are assigned as satellites b/c SM < BCG         261     0.124761
+
+So 77% of centrals are correctly called BCGs
+18% are called satellites in the correct group
+   12% are called satellites because the central is not the most massive member in the group 
+   5% are called satellites because of the mock X-ray centroiding errors
+4% are not assigned to any group
+1% are assigned to the wrong group
+
+
+
+Wrote group_sm_corrections in cosmos/mocks to compare the total stellar mass of selected galaxies to that of true members. This is to apply a correction for the points in AL's stellar mass fraction paper. The corrections appear to be very small.
+
+
+######################################################################
+Mon Apr 18 14:31:09 PDT 2011
+
+Added plot_memstat_color, a copy of plot_memstat_spec to plot only the color and mophology P&C statistics from the specz tests. Had to edit memstat_spec to output morphology tests, these are written to new directory memstat20110418, but the only new output from 20110316 is morph.dat, so no need to update other plots.
+
+Wrote print_fd.pro to generate new input files for the Veusz plotting code to make the field density plot. This approach to calculating FD is different from the one used in find_bcg, but is quicker and cleaner, should give similar results.
+
+######################################################################
+Tue Apr 19 04:40:48 PDT 2011
+
+Updated test_mock_stefania.pro in cosmos/mocks to determine the ratio of selected to true SM and Nmem for Stefania's approach and mine. It appears that hers typically does a bit better in both. No obvious trends in bias wrt halo mass or redshift.
+SMsel/SMtrue=1.04 (1.05 for mine) 
+NmemSel/NmemTrue=0.99 (1.14 for mine) 
+
+
+Updated numbers in paper with print_paper_numbers. Updated plot_memstat_all with a buggy version to compare all specz w/ zcosmos only using the new bootstrap error bars. Didn't fully update memstat_spec to do this, but just a test of how error bars overlap and it looks like they still do.
+
+Finished draft of paper and sent to Alexie. Added a bunch of svn commits to keep code library in shape.
+
+######################################################################
+Wed Apr 20 16:37:42 PDT 2011
+
+Set up svn repository for centering paper on macbeth. zanzibar local copy is at /Users/mgeorge/data/cosmos/tex/svn/centering
+
+
+Centering project TO DO:
+-format plots
+	compare lensing signal+model side by side?
+	update distribution of offsets
+	plot gap statistics: SMgap(<Rscale), SMgap(<R200), F814Wgap at 2 radii. Compare with mocks?
+
+-Read papers to synthesize reasons for studying centering:
+     Skibba mentions: satellite dynamics, WL, SL, halo modeling, cluster finding
+     add: mass-concentration (specific example with WL, cf Mandelbaum w/ maxBCG)
+            richness estimation (specific example of cluster finding, cf Rozo & Rykoff w/ maxBCG)
+
+-What questions do we want to / can we address?
+      -How well do different tracers agree?
+      	   What fraction of the time do they disagree, and what is the offset distribution?
+	   	Done, see grid plot of offsets
+      -What is the source of disagreement?
+      	    intrinsic factors like physical BCG/Xray offsets?
+	    	hard to say, see if offsets correlate w/ other properties
+		maybe MMGGscale vs MMGG200 suggests some physics (or projections)?
+		MOCKS
+	    contaminants due to poor member selection?
+	        mocks suggest no, but check how contamination affects member centroids
+	    scatter due to measurement uncertainties (e.g. SM)?
+	        test with gap statistics - are different candidates typically within SM uncertainty?
+	    scatter due to physics (e.g. most massive but not most luminous)?
+	        can again test with gap stats and compare how often two tracers are the same object
+      -What can we do about it? 
+      	    How could these lessons be applied to other data sets (optical only)?
+	        do we just inform them of the fuck-up fraction, or can you get a better center w/o X-rays?
+                I'm not optimistic that these results can be much help w/o significant work
+	    How much do these offsets affect other results?
+	    How do these estimates of offsets compare with others? (cf Skibba and refs therein)
+	    
+	    Advice: future lensing studies should carry out these tests to optimize their signal
+
+Intro
+Data + mocks
+Algorithm - brief overview + list of centers
+Results - offset distribution, lensing full stacks to identify best, lensing substacks comparing 2 centers, modeling of the lensing data
+Discussion - source of disagreement - intrinsic vs measurement vs contamination
+specifically look at : MMGGscale vs MMGG200 (unlear lensing signal), CSM vs MMGGscale
+
+centers: Xray, MMGGscale, MMGG200, MLGGscale, MLGG200, 
+
+######################################################################
+Fri Apr 22 14:30:27 PDT 2011
+
+talk about dusty galaxies at CMB lensing workshop: see Cherry & Elbaz 2001 for dusty SED templates?
+
+######################################################################
+Wed Apr 27 09:19:30 PDT 2011
+
+Wrote plot_interloper_distance.pro in cosmos/mocks to measure distribution of redshift offsets for interlopers. The distributions have a spike at dz=0 but broad wings since we're selecting candidates out to +/-3 sigma_z. Roughly half of interlopers come from dz>0.01, so several tens of Mpc away, and about 30% come from dz<0.003, so they're correlated. Selecting only objects with SM > 10.3, about 37% of interlopers come from dz>0.01 and an equal fraction come from dz<0.003.
+
+So, some of the interlopers are correlated structure, and some are from pretty far away. I may be missing a factor of 1+z to scale the dz separation, but it only shifted things by ~<10%.
+
+These fractions don't change much if you select all interlopers or just those >0.8R200 from the center. 
+
+######################################################################
+Mon May  2 17:07:13 PDT 2011
+
+Got updated mocks from Jeremy with the 2d projected distance replaced by a 3d separation in comoving Mpc/h between satellites and centrals. This is currently only needed by group_sm_corrections.pro, so I won't immediately rerun the test_mocks.pro pipeline.
+
+Updated group_sm_corrections to make this comparison of selected objects within cylinder of radius R500c to true members within sphere of radius R500c. Outputs are group_sm_correction_complete.txt and group_sm_correction_all.txt. The following email snippet from AL clarifies their usage:
+---
+"what I need is the conversion factor from :
+
+galaxies selected by your algorithm above completeness limit -> true mass down to the resolution of the mock simulation.
+
+So what I should actually take is as follows :
+
+So in this file, group_sm_correction_complete.txt, you give :
+log(SM Selected) - log(SM True) = y
+
+And in this file, group_sm_correction_all.txt, you give :
+log(SM TrueAll) - log(SM TrueComplete) =x
+
+So what I want is :
+log(SM TrueAll) = x+log(SM TrueComplete)
+                             = x+log(SM Selected)-y
+
+So I should multiply my masses by a factor of 10^(x-y) to get the correction from my measurements"
+---
+
+
+######################################################################
+Mon May  9 11:54:05 PDT 2011
+
+Compile a comparison of substack masses w/ error bars. Why is MMGGscale vs. MMGG200 so low?
+
+Look through lensing code and check for bugs.
+
+We decided not to worry too much about getting fancy with the lens modeling - e.g. don't try to weight groups by number of background sources or mass, might try to add in central galaxy to offset models or we could ignore that since it'll be a small signal. Leave those details for future work and focus on qualitative aspects for this work.
+
+Centers to use/try:
+X-ray
+MMGGscale
+MMGG200
+MLGGscale (ask KB re: using observed-frame magniture or rest-frame abs. kcorrected?)
+MLGG200
+CN (red only?)
+CSM
+CL
+(only mention iterative tests, don't include for plots)
+
+Plot layouts: test these out, but maybe,
+Fig 1 - grid of offset distributions
+Fig 2 - 4 rows x 2 columns full stack lensing for each center
+Fig 3 - 7 rows x 3 columns, 1 row for each center (not MMGGscale). left=substack(candidate), middle=substack(MMGGscale), right=offset distribution
+ 
+
+Old code specifically for lensing groups and making plots is in ~/idl/cosmos/groups_lensing on macbeth. Move this code to ~/data/cosmos/groups_lensing/code and send outputs to ~/data/cosmos/groups_lensing/plots and ~/data/cosmos/groups_lensing/outfiles . Put code subdir under svn repository. Remove old directory ~/idl/cosmos/groups_lensing. Eventually put all of ~/idl in svn repo.
+
+
+Split up doall_xgroups_matt_paper into a couple of scripts.
+- see full_stack.pro and diff_stack.pro
+some quick plots from these scripts are mass_comparison*eps
+these show how the total mass and mass uncertainty varies for different centers. The top few centers are statistically consisent, so we can't cleanly distinguish between MMGGscale and MMGG200 or MLGG200 from the full stacks. In substacks centered on MMGGscale but only selecting groups that disagree with certain other centers, most cases are in agreement but the counter-stacks to MMGG200, MLGGscale, and MLGG200 have significantly lower masses than the others. 
+
+######################################################################
+Thu May 12 12:06:43 PDT 2011
+
+Possible bug in group_sm_correction.pro
+- look into this further: what total group stellar masses do we actually want to compare? Previously, I was cutting the catalog at mag 24.2 before doing anything, so when I wanted to get a total stellar mass down to 10^8.5 it already had that 24.2 cut built in and missed some objects. Updated version changes this, and results aren't hugely different, but the relative changes at different redshifts are somewhat confusing.
+
+Sort this out because it may affect test_mock_stefania
+
+Just fixed a different bug in test_mock_stefania. When selecting members with her method, I was picking them within R500 of the true group center, rather than the offset X-ray center. Her approach had been comparing favorably with mine but will likely due worse with miscentering.
+- it doesn't change the results much
+
+
+tested excluding centrals from quenchz plot and it makes no difference because satellites dominate even in the highest sm bin.
+
+
+For centering: look at odd groups to see if there's anything strange about them. (z, Mass, NMem, X-ray morph)
+Test random subsets of full stacks to see how often a very low lensing signal is produced.
+Redefine list of centers mentioned above
+Probably scrap MMGG2 and leave for a different substructure project.
+
+For catalog paper: send to authors w/ two weeks notice for comments. Submit to COSMOS list for same.
+
+TO DO - update specz numbers with 10k v3.3 zCOSMOS catalog to address Jean Paul's comments.
+send updated group_sm_corrections when AL responds re: LX limits. 
+
+######################################################################
+Thu May 26 10:26:32 BST 2011
+
+Some numbers comparing the contribution of FORS2 data to the spectroscopic sample:
+# of members (P>0.5) in good groups (flag_include=1): 3415
+# of these members with good speczs: 774
+# of these speczs from zCOSMOS: 475
+# from FORS2: 224
+
+FORS2 contributes half as much as zCOSMOS to the list of members with speczs.
+
+# of MMGGs in good groups: 129
+# of these with good speczs: 89
+# of these from zCOSMOS: 30
+# from FORS2: 40
+
+FORS2 does help with centrals (though some of these are probably cases where zCOSMOS had a redshift and FORS2 added a higher resolution spectrum).
+
+There are also 51 members fainter than 22.5 with speczs, half of which come from FORS2. So it helps a little there, but the numbers are small.
+
+These are for the existing reductions, so if the reductions improve and more spectra are obtained, the FORS2 contribution to group members could become comparable to zCOSMOS. But the spectroscopic sample would still be down by a factor of ~3-4 from the photo-z sample.
+ 
+######################################################################
+Wed Jun  1 10:12:24 PDT 2011
+
+Updating paper with everyone's comments. Olivier pointed out the discrepancy in the factor of 1+z between PDF widths and sigma_dz/1+z. To investigate further, I remade the table without the factor of 1+z divided from the specz-photoz scatter, and now these values are biased high wrt PDF width. I also created zerr_specz plots analagous to PDF width plots but using specz-photoz scatter. Unfortunately we have to bin pretty coarsely in z, mag, and color to make the same plots, and there's not a clear signal that specz-photoz scatter increases with z when 1+z is not divided out. Playing with the catalog at fixed magnitude, my impression is that specz-photoz scatter is something like 0.005*(1+z) at mag~21.5. There is a slight increase with z, but when the slope is multiplied by such a small prefactor it becomes pretty shallow and looks nearly consistent with being independent of z.
+
+
+
+Played with plot_quenchz to test robustness of results. Plot_quenchz_specz replaces photozs with speczs when available and uses that version of membership selection. No significant change.
+quenchz_nodustcorr.eps used MNUV-MR instead of MNUV_MR from catalog, which I think should only differ in that the dust correction hasn't been applied. Qualitatively similar, but more things overall are red (because dust reddening hasn't been removed) - group members still clearly higher than field. I tried cutting down to only the specz sample but the numbers are too small to even make the plots.
+
+######################################################################
+Wed Jun 15 09:34:21 PDT 2011
+
+IDL is not currently working because the license server is down with the move. Tried installing GDL (a free GNU version) and after much hassle in compiling the code, it doesn't seem to have the full functionality (e.g. readcol doesn't work because file_lines fails.).
+
+######################################################################
+Sat Jun 25 18:47:58 KST 2011
+
+Wrote test_offset_range.pro based on plot_lensing_results to see what the mean offset could be for the full stack by plotting the delta sigma data points along with a few single-distance offset models. Mean offset appears to be <~20 kpc.
+
+Noticed a possible problem in nfw_ds_offset - may be using old group catalog??
+
+
+###################################################################### 
+Fri Jul  1 13:20:16 KST 2011
+
+Wrote memstat_color_r500.pro to give purity and completeness within R500 for bins of color based on speczs for AL's stellar mass fraction paper. It's unclear if she actually wants these quantities in terms of the total stellar mass that they contribute for each color bin or what, but to start with this gives the fraction of objects selected vs. true.
+
+###################################################################### 
+Tue Jul  5 10:26:25 PDT 2011
+
+Back to centering issues:
+We want to figure out why the substacks where MMGGscale disagrees with MMGG200 produce a small lensing signal. First, we should figure out whether the signal is significantly lower than one would expect given statistical fluctuations. I will write a code to stack subsamples of the same size (without replacement) and see what the distribution of best-fit masses is. See if the mean mass correlates with group properties, esp. Lx and with whether the centers disagree. Hypothesis is that groups with disagreement between centers have anomalously low lensing signal.
+
+Clean up centering lensing code:
+full_stack calls 
+   run_gg_offset which has a lot of extraneous options for other lensing applications and eventually calls 
+      gglensing_v6 which I've left under AL's control since she updates it occasionally
+   run_ds_mcmc which looks ok and calls
+      ds_mcmc which looks ok
+   plot_lensing_results which could be cleaned up a bit for unncessary options, or rewritten for paper plots
+
+diff_stack parallels full_stack in its function calls
+ 
+plot_lensing_results is where the call to nfw_ds_offset comes (if called from diff_stack). nfw_ds_offset and nfw_ds are the codes that create model curves for the plots and should be double-checked for any bugs (including the problem noted above that nfw_ds_offset uses an outdated group catalog to determine the distribution of offsets, which needs to be fixed)
+ 
+gut run_gg_offset to clean out the unnecessary options, calls to other codes like select_gg_lens, and unclear variables like 'type' and 'array'.
+-DONE
+
+write new plotting script to generate paper plots, based on plot_lensing_results
+- see plot_full_stacks.pro
+
+As part of the centering work, I probably also want to write a code that defines (new) centers based on the membership catalog - e.g., ones that weren't included in find_bcg like the centroid of red members, most massive that isn't MMGG_scale (which is different from the MMGG2 definition) ...
+
+###################################################################### 
+Wed Jul  6 11:49:37 PDT 2011
+
+Wrote jackknife_stack.pro to measure lensing signal from a large number of random subsamples from the group catalog. This will provide info about the distribution of masses, and we can see if the cases where centers disagree have unusually low masses, or whether there is just a large scatter that was missed earlier.
+
+Also wrote plot_full_stacks.pro and started plot_diff_stacks.pro to generate paper-quality plots with multiple panels showing the lensing signal from various centers.
+
+
+Cleaned up plots for full_stacks and diff_stacks. Started running jackknife but it takes a while. With a random seed, we can just append lines to the output file to build a larger sample.
+
+Next write a centering script or update find_bcg and finalize the list of centers we want to consider.
+
+###################################################################### 
+Fri Jul  8 01:56:25 PDT 2011
+
+Jackknife results suggest a mean offset of the new WL masses being ~0.2 dex lower than predicted by the LX-M relation, with a ~0.2 dex scatter about that mean offset. Is there something wrong with the lensing code? Or have the centers/groups/redshifts/? changed enough since the catalog used for AL's paper? To test this, I wrote test_al_mass.pro. Using an old group catalog with her centers, I'm trying to replicate the masses she got for different LX-z bins in her 2010 paper. They still seem to be coming out low, so I'll have to go through the lensing code again to see if anything is wrong. The /stackx option might be a good place to start. There is also something a little fishy going on with the single most massive group in the A0 bin. I replicated it's entry in the group catalog to avoid code limitations in gglensing_v6 which wouldn't handle a single group at a time (it expects arrays, not scalars), and the results seem to come out differently if I replicate the group one time or lots of times. There is some stochasticity because the fit is done with the MCMC code, so test it further to see if there is a significant dependence.
+
+###################################################################### 
+Fri Jul  8 13:06:41 PDT 2011
+
+Alexie notes that there may be some discrepancy between the LX-inferred masses (LENSING_M200 from the catalog), and the best fit WL masses because the LX relation used for the catalogs incorporates cluster data. There is some uncertainty in the amplitude of the relation when using groups alone, though the offset shouldn't be that large and it seems to go in the wrong direction. Otherwise, the LX-inferred masses incorporate all the correction factors (like for cool cores, etc.) or else those factors are small and shouldn't make a difference.
+She also suggests that the issue with how many times a group is replicated is probably not a problem, and that testing it out this way will be a little confusing because of correlated noise.
+
+Suggestions on the new diff_stacks plots - shrink the y axis range to better show the turnover in lensing signal at small radii for bad centers. Figure out why there are only 7 data points plotted in some cases - are these wildly discrepant points, or excluded because of a small number of sources, or some stackx radius issue, or ??
+Try adding in the "total model" curve in panels that don't have point source term. Remove chi^2 value from offset model plot?
+
+Try measuring lensing signal without stackx option and/or without emp_var option. In principle stackx should reduce some of the variance by using a physically motivated scaling of radial bins, but AL hasn't used it as much so it may not have been tested as thoroughly. James Taylor thinks that emp_var is overestimating uncertainties by 5% which isn't huge, but could partly explain why some of the chi^2 values on the good centers are very small.
+/Users/alexie/Work/Group_paper/group_paper_plots_final_paper.pro -> points to some relevant numbers and files used in AL's LX-M paper.
+
+AL is still interested in measuring satellite concentrations - may play into SHAM vs. HOD comparison, etc. AL predicts satellite concentrations would have to be ~2-3 times higher than DM conc. in order for the HOD (which requires sat. conc. to be = to DM conc.) to agree with SHAM results. Or there could be mass segregation, or ...?
+
+
+######################################################################
+Sun Jul 10 17:18:20 PDT 2011
+
+Played with different options for stackx and emp_var with test_al_mass.pro to try to replicate the WL masses from Table 1 of the LX-M paper. Caught a bug where run_ds_mcmc had the stackx option hard-coded so it returned strange results when stackx was turned off. After turning stackx and empvar options off, the WL masses are more closely in line with what AL got in her LX-M paper, though not perfect (I think they are all within the new 1-sigma errors, but not within the old 1-sigma errors in a few cases). I could probably play with the binning until they agree, but I'm now a litttle less worried about the offset in masses compared to LX. Probably want to try centering plots w/ and w/o stackx and empvar to see if it changes anything. Also should choose options that are consistent with what AL used in estimating M from LX when comparing the jackknife tests.
+
+######################################################################
+Tue Jul 12 11:14:16 PDT 2011
+
+Yesterday, wrote test_gal_conc.pro to plot the concentration of satellite galaxies vs. that in mocks. To start with, only taking the list of selected objects in projection and measuring surface density as a function of distance from the center. It appears that the mocks have a higher concentration of galaxies (more in the center, fewer in the outskirts) than the real data. This could be due to some greater contamination in the outskirts of the data (non-gaussian photozs, larger errors?, more structure in projection?) or some deficiency in the mocks (not going to low enough masses?, wrong HOD?, galaxies not tracing DM concentration?). AL suggests looking at this in SM bins. Other tentative evidence from HOD/SHAM matching suggests that galaxies should be more concentrated than DM, not less.
+
+TO DO:
+
+-continue testing effects of binning, stackx, emp_var
+It looks like stackx is producing somewhat erratic results and greater deviations from AL's previous results so I'll avoid it. It also can mess up the binning when the plot x-axis is in Mpc, since for stacks that turn out to have low mass, the inner point can fall out of the x-range. emp_var doesn't change the results very much so I'll probably stick with using it. 
+    -it does look like there is a consistent difference in masses such that sx+emp < no sx +emp < no sx, no emp
+      emp_var on or off makes only subtle changes in the lensing profile, but stackx can cause points to jump around a lot
+      	      --there may have been a bug in how signal was modeled for stackx option
+    -no significant change in diff_stacks plot with binning (50-2000 kpc w/ 8 pts vs 50-1500 kpc with 7 pts), though the masses went up slightly with fewer bins. We don't need 8 pts, so I'll lean to fewer for now.
+
+-redo jackknife tests without stackx option and emp_var option
+    -currently running
+
+-clean up full_stack and diff_stack plots - move label out of way of points, shrink y-range, oplot total model even when there is only one component
+   -done
+
+-settle on centers to use - eliminate 2nd MMGG and deal with subhalos (and covariance due to reusing background sources) later, test out centroids with only red members (?)
+    -to define a red center, we could consider the centroid of red member positions. In order to have a "red" galaxy
+in every good group we'd want to know the "bluest reddest members", which has MNUV_MR = 1.22. So we could get away with just throwing away the "active" members according to Ilbert's cut, restricting to mnuv_mr>1.2.
+    -updated find_bcg with red centers. output catalogs are 20110712 (group5 is find_bcg output, group6 just copies over BOX tag from older version 20110209)
+    -red centroids not much different from regular ones
+
+-test centering vs. z,M wrt Chung-Pei's question
+
+-gap statistics?
+
+######################################################################
+Wed Jul 13 10:36:07 PDT 2011
+
+New centers based on CN,CM,CL of "red" members (C>1.2, so actually green and red). CL and CN appear to improve slightly, while CM gets a bit worde, but it roughly looks like everything shifts wihtin the statistical error bars. See full_stacks_red and diff_stacks_red plots in bin_50_1500_7_emp.
+
+Double check that run_ds_mcmc is properly handling stackx and emp_var
+-actually it looks like I updated run_ds_mcmc to properly take these flags as inputs, but forgot to update calls to run_ds_mcmc from full_stack and diff_stack, so the modeling is probably being done incorrectly.
+
+
+Some more simple tests of the galaxy concentration in mocks and data may be needed - try measuring concentration vs. radius in stellar mass bins to see if there is a segregation effect. Also check that the radial profiles of satellites in the mocks are what we think they should be (i.e. have the same concentration as the DM). Get Jeremy and Risa involved in this since they're interested in the HOD/SHAM comparison.
+
+######################################################################
+Thu Jul 14 09:37:50 PDT 2011
+
+In updated diff_stack plots, none of the galaxy centers look very good and MLGG_scale may be better than MMGG_scale. Currently running these again with different stackx and emp_var options to see what the differences look like (initial version was stackx=0, emp_var=1)
+- qualitatively similar, still unclear why the masses can end up so different when the model fit looks rather similar, possibly still some issues with plotting or model fitting?
+
+-changed diff_stack to include reference center in the filename so I can try different centers. currently running diff_stack with MLGG_scale as the reference, later try it with MMGG_R200 and MLGG_R200
+	 -MLGG_scale ran, but due to a labeling bug, the diff_stack left column title still says MMGG_scale instead of MLGG_scale.
+	 - The mass model for the diff stack with  MLGG_scale as the reference still appears too low for the data and it's unclear why. Check for bugs here.
+	 -In the long run, I want to store the fitted masses, errors, and any other fit info in the lensing output fits file, so that the plots can be reconstructed without having to rerun everything. This may help with debugging the mass fits too.
+
+
+Wrote test_gap.pro to plot the stellar mass gap vs. redshift and halo mass in the group catalog. This is to address Chung-Pei's question about whether a "central galaxy" does a good job of tracing halo centers at z>~0.5. There are no strong trends in the mass difference between the two highest ranked galaxies with z or Mhalo, and the cases where the most massive galaxy is outside the scale radius appear to be distributed fairly evenly with z, M, and gap.
+-Try full_stack and diff_stack while restricting to high z and low z samples.
+
+
+Added loz,hiz,loM,hiM options to full_stack and diff_stack in order to see whether centering does any poorer at high z or low M as C-P suggested. Currently running.
+
+Comparing a loz and hiz plot, I noticed that two stacks had the same mass but a significantly different lensing signal. I tested this by plotting an NFW profile for a halo of mass (200c) 10^13 at z=0.25 and 0.75, and indeed, the high-z \Delta \Sigma profile is nearly 20% higher at small radii (0.02 Mpc). Higher z halos were more concentrated.
+
+######################################################################
+Tue Jul 19 10:53:17 PDT 2011
+
+There are some fossil groups in the sample (mag difference between first and second ranked galaxies is > 2). Two group satisfy the criterion and a third nearly does. Each has >=20 members and a pretty massive central. Of the centrals, two are red ellipticals, and one is a greenish merger remnant. (Email to Chung-Pei was slightly wrong - visual and automated color and morph classifications agree). C-P pointed out a paper on fossil groups by Aguerri 2011 who cites a Viklinin paper for the number density of fossils
+(this used F814W gap >2 on members within R200 for the criteria, Aguerri suggests criteria are gap>2 in R band on members within half the virial radius, whatever that means - switching from F814W to Subaru_R leaves 1 good fossil, adds another one which apparently doesn't have full R band coverage (bad), and drops the other two). Aguerri says fossils have a number density of (1-4)e-6 (h_50 Mpc)^-3. Counting 3 groups in the COSMOS volume out to z=1, I get 1e-7 (h_50 Mpc)^-3, a factor of ten lower. There are possibly completeness issues, but fossil groups may also be rarer at higher z. The 3 group are at z<=0.372, so if the volume is recomputed at that max z, the number density is consistent with Aguerri's.
+
+###################################################################### 
+Wed Jul 20 14:40:59 PDT 2011
+
+Why are there more groups for which MLGG_R200 disagrees with MMGG_SCALE than groups where MMGG_R200 disagrees with MMGG_SCALE?
+-in cases where MMGG_scale and R200 agree but MLGG_R200 differs, MLGG_R200 tends to be very blue.
+
+###################################################################### 
+Thu Jul 21 12:51:21 PDT 2011
+
+-discuss Chung-Pei's suggestions
+-fossil groups
+   - star-galaxy separation issues?
+-JT on satellite concentrations
+
+
+Met with Risa Wechsler at SLAC in between talks as the Suzaku meeting
+--risa suggests picking best center by eye for weird ones and re-stacking
+-will be interested in comparing SAM with morph/color results
+-will give sentences for citing Las Damas
+-be sure paper 1 makes it clear that mock/spec purity completeness tests are different things.
+-re: sat conc. - check in same z bin to control SMF evolution, could also check radial distribution in SHAM mocks
+-for centering, show what stack of good centers (no weirdos) looks like
+-compare with sims to see what fraction of groups have satellite that is more massive than central
+   -TO DO: FOLLOW UP on this
+
+
+###################################################################### 
+Tue Jul 26 12:04:00 PDT 2011
+
+Some updates from the past week:
+
+-Pierini, Giodini, Finoguenov et al. have a paper out about fossil groups in COSMOS http://arxiv.org/abs/1107.3986
+They find two fossils, one at z=0.372 that we noticed, and another at 0.425 that I had missed. I'm not sure yet about the other ones I noticed but they exclude. For the one we missed, I had selected another member that was slightly brighter than the central (so MLGG_R200 != MMGG_SCALE). Upon visual inspection of the group, that object looks like a star, so it shouldn't be a member and it is indeed a fossil group.
+
+This brought up the question of why there are stars in our sample. The galaxy catalog has star-galaxy separation info in the flag MU_CLASS (1=galaxy, 2=star, 3=cosmic ray or other defect). This is AL's separation criterion based on each object's location in the plane MU_MAX (peak surface brightness) vs MAG_AUTO (see her lensing catalog paper for details). In the case of our weird group (group ID=137, ACS ID = 74701), the object is on the borderline of the stellar locus. None of the AGN flags are set and it seems to have a good photoz and stellar mass estimate. There is a separate star-galaxy cut (which we haven't used) in the photometry catalog based on colors. AL sent a piece of code make_jeremy_may2011.pro which has some bits near the top about these color cuts. Check to see how many additional objects these would get rid of, particularly if any centers change or massive galaxies are different.
+
+
+-Satellite concentrations
+There seems to be something funny with the radial distribution of satellite galaxies. This comes in part from the disagreement between the SHAM and HOD methods, where the inclusion of lensing and clustering appears to suggest a different satellite fraction than SHAM. That work assumes that satellites are distributed following the dark matter (NFW with matching concentration), and that there is not a mass dependence (i.e. more massive satellites are not preferentially near the centers or outskirts). We can try to test this in the group catalog, first by comparing the projected radial distribution of objects in the data with the mocks. Initially things were all over the place, but after controlling for stellar mass and redshift they start to make a little sense. Looking at a zrange matched to ALs z2 bin (z=0.48-0.74) in fixed SM bins, there is general agreement at high masses, but at low masses the mocks have more galaxies near the center than the data (after excluding group centrals). This might be explained by the way we assign magnitudes to galaxies in the mocks: there is no environmental dependence given, and group members tend to be redder, so in the mocks group members are artificially given brighter magnitudes and more precise photo-zs than they should be. Since the mocks have more members in the centers than the data, this has the worrisome implication that we could be missing a bunch of low-mass red galaxies near the centers, so further tests would be good.
+
+At higher masses there is better agreement. The same trend continues to higher z, with low mass bins having more galaxies near the centers in the mocks than in the data. At lower z, it looks like the mocks have fewer galaxies in the outskirts than the data, which may be due to redshift evolution in the SMF, or something else. Unclear.
+
+
+
+
+
+What objects are classified as stars by color but not by morphology?
+To address this I looked at the Subaru photometry catalog 
+'/Users/alexie/Work/PhotozOlivier/photoz-1.7-aug2009/photoz_vers1.7_010809.fits'
+The flags chi and chis give the fit values for a galaxy and star template, so AL has been using chi-chis > 0.5 to select stars.
+I started by selecting objects that look like stars from the color criterion but which are also member galaxies. There are 7:
+
+     ID                zphot           Pmem          Group_flag  Group_ID     Mag_auto     SM
+      150794.     0.124000     0.833376      1.00000      149.000      15.2224      11.5763  - clear BCG and MMGG_SCALE for this group, not a star
+      74701.0     0.410000     0.798057      1.00000      137.000      18.6278      11.1384  - actually a star. this is the one in the fossil group that I wrongly called a member galaxy
+      75689.0     0.370000     0.868106      1.00000      17.0000      21.2980      10.2496 - maybe a double star? ACS image is double-peaked. mnuv_mr is quite red, but looks pretty green in 3-color subaru image. PDF is narrowly peaked around 0.37. No other info to go on.
+      25690.0     0.116800     0.645600      1.00000      166.000      23.1276      8.20267 - looks like a faint extended object to me
+     75580.0     0.328400     0.534290      1.00000      17.0000      23.6723      8.82749 - off image in outskirts
+      117991.     0.100000     0.701304      1.00000      142.000      23.8027      7.26833 
+     88185.0     0.125800     0.569964      0.00000      163.000      24.0239      7.62974
+
+
+I also picked a few objects that look like stars from the morphology selection but galaxies by color. Eyeballing 3 near elbow in mu_max/mag_auto space, 2 of them look like galaxies and the other is a star. (one ID=183681, has particularly interesting morphology, peaked center with a ring around it, has a specz=0.658, Knud and XMM AGN flags are set).
+
+Worrying that we might be wrongfully missing some objects which are members, and calling them stars under the morphological cut, I checked all the (26) objects that are classified as galaxies by color but stars by morphology in the mag range 18-19, which is where there's a bend in the mu_max/mag_auto space. Only one of these lies within R200 in projection of a group *and* has a photoz that is plausibly near the group z.
+ACS ID      zphot                 
+ 93553     0.730000   group.id=231, z=0.675
+gal has good specz at 0.698, Chandra AGN, SM=10.8
+It sits right near the MMGG_SCALE, but there are several galaxies with stellar masses greater than this object.
+
+Thus, I wouldn't be worried about missing any members (or centers) due to the s-g morphology cut.
+
+What about other members that might be on the borderline of the morphological cut?
+Select objects with MU_MAX < MAG_AUTO * 0.75 + 2   (an eyeball for a different s-g separation)
+
+       149.57037       2.0071999       10.337798       11868.000 - probably a star
+       149.54848       2.0219950       10.290856       11733.000 - probably a star
+       149.60546       2.1626534       7.6476827       23144.000 - probably a star
+       149.62459       2.8526623       9.7793541       24158.000 - gal
+       149.77410       1.6252968       10.324375       48432.000 - gal
+       149.85266       1.9030507       10.591765       57117.000 - gal
+       149.89336       2.6166871       10.048037       60519.000 - gal
+       149.91609       1.8303336       10.686755       63060.000 - gal
+       149.97221       2.2217101       11.138371       74701.000 - star
+       149.94249       1.6671988       10.249626       75689.000 - double star
+       150.06062       2.6479659       10.499303       86926.000 - probably gal
+       150.09566       2.2201537       9.9495783       92163.000 - probably gal
+       150.09437       2.4782015       10.835036       99167.000 - probably a star
+       150.41246       2.4355003       10.143304       151149.00 - gal?
+       150.58397       2.1899891       10.748143       180528.00 - gal
+
+
+
+So what to do about it?
+-> I propose we get rid of the stars and probably stars above by hand, before the membership assignment code
+
+
+###################################################################### 
+Wed Jul 27 13:33:12 PDT 2011
+
+Re: double star mentioned above (ACS ID = 75689), based on the optical colors and comparing with a star-AGN separation histograms in Casey 2008, it looks like this object is a star.
+
+###################################################################### 
+Mon Aug  1 13:09:06 PDT 2011
+
+Created file /Users/mgeorge/data/cosmos/auxfiles/stars_by_hand.dat
+copying the entries above from Jul 26 that are stars or probably stars. These were objects that were on the morphological borderlin (MU_MAX vs MAG_AUTO) and had been counted as group members. AL will add this file to the pipeline to eliminate them from the galaxy catalog "by hand".
+
+
+Digging into the (dis)agreement betweens FORS2 redshifts and zCOSMOS. In submitted version of catalog paper, we said there was a 210 km/s rms scatter between the two sets of speczs, and the referee pointed out that this was large and asked if there was any mean offset. This comparison was based on some numbers in an email I sent on May 27, 2010 with the Subject: comparison of FORS2 with zCOSMOS. I've tried making the comparison with zCOSMOS 10k and different versions of the zCOSMOS catalogs (FORS2-10k has ~80-90 repeat spectra, while FORS2-20k has ~150-160). The distribution of offsets looks roughly gaussian, so I don't think that outliers are pulling up the scatter too much. The scatter with newer files is ~120-180 km/s (and I'm not sure whether we should be using dz/1+z or just dz). More problematically, there seems to be an offset between the two of ~70 km/s (again, not sure if it should be dz/1+z or just dz; this number is dz/1+z in the comparison with a recent 20k catalog).
+
+KB suggested vacuum corrections and heliocentric rest frame as possible culprits. From the SDSS website, vacuum corrections are ~1-2 Angstroms at visible wavelengths, which I think converts to dLambda/Lambda=z, cz~80 km/s. Earth rotation, heliocentric rest frame (or barycentric?) could be up to ~30 km/s each, so these would explain the offset. I'll contact JP and Peter Capak to see if they know what rest-frame the zCOSMOS spectra are in.
+-Peter replied that Olivier LeFevre says the zCOSMOS redshifts are vacuum heliocentric.
+ - Now checking whether the reference wavelengths in the arc lamp line catalog are vacuum or air. Waiting to hear back from ESO QC.
+--ESO QC says that the arc lamp line files that come with ESOREX are air wavelenghts, so vaccuum corrections are needed.
+---zspec actually does these corrections, so the FORS2 redshifts should have them included
+
+Cecile Faure asked about getting spectra for a few of the strong lenses that were in the FORS2 sample. Those files are scattered around in archives, but for the 1d spectra, the final versions of the reductions are on beast in /indirect/big_scr1/mgeorge/cosmos/vlt/data/redux
+v1_3_1.tar.gz should be the one that has everything in it, but unfortunately the file appears corrupted and not all of the masks are accessible. It does have the directory "efficiency" which has the reconciled catalog reconciled_targcat_v1_3_1.fits (NOTE: I noticed that some of the redshifts Cecile gave were not the same as ones in this catalog - AL has moved on to using zcat_v2_1.fits for the ACS catalog, which I think must be from Kevin's reductions.) For the 1d spectra, I was able to find them in v1_3_1_lite.tar.gz, which appears complete and uncorrupted. Note that the file allmasks.tar.gz is older than v1_3_1 so 1_3_1 is preferred.
+
+
+
+###################################################################### 
+Wed Aug  3 14:12:07 PDT 2011
+
+Addressing more of referee comments:
+-field density estimation. These tests are back in ~/data/cosmos/mocks/jeremy_v1 (I haven't done them with the 2nd iteration of mocks which slightly changed the satellite SMF, but that shouldn't change things). I had run these tests on mock 0 on 20110203 (see files with fd_annulus and fd_circle). To see  how much the local density estimate changed things, I compared the objects that were members (Pmem>0.5) in acs_mock4.0.fits but not members in acs_mock4.0.fd_annulus.fits, and vice versa. Looks like 8% of members in first one became non-members in fd_annulus, and 2% went the other way, net membership different of 6 or 7%. This could be updated to run on all mocks and new versions (and also on real data), but for now I've just quoted that <10% of membership changes.
+
+-added some options to plot_quenchz to make Fig. 10 using a different membership threshold or to just weight each object by its membership probability (the latter one isn't implemented thoroughly; it only changes the mean binned quenched fraction, not the error bars or individual group fractions, etc.). These tests show that the red fractions change by no more than a few percent in any case, so the arbitrary choice of membership threshold is unimportant.
+
+###################################################################### 
+Fri Aug  5 16:14:41 PDT 2011
+
+More digging into Kevin's zcat_v2_1. Nearly half of the objects with zquality=3 or 4 have different redshifts in v2_1 than in v1_3_1, with mean shift = 24 km/s and scatter of 150 km/s between the two versions. Looking at the matching done in AL's catalog, there are several objects in zcat_v2_1 with ident < 0 (no matches apparently) and several cases where multiple objects have the same indx_galcat, indicating that they are close pairs not separate in the ACS catalog. A bunch of these have one of the pair at the end of the catalog, and AL's matching method prioritizes them.
+
+It also looks like reduce1d and zspec_fors (the DEEP2 reduction software used to get redshifts) converts wavelengths to vacuum before computing redshifts. So now I have no idea where the offset between FORS2 and zCOSMOS is coming from.
+---Argh!! the zCOSMOS file that AL is now using for the catalog only reports redshifts to 3 decimal places.
+
+Also wrote specz_comparison.pro to generate a latex table showing how different specz subsamples contribute to the (dis)agreement with FORS2. IMACS sample has large scatter (and is probably mostly AGN), so we can try excluding that, etc.
+
+
+###################################################################### 
+Mon Aug  8 15:57:30 PDT 2011
+
+Met with JT
+-satellite concentrations
+Try to figure out why there are large discrepancies between the abundance of low mass galaxies near the centers of groups in the data and the mocks. It seems likely that the magnitude assignment could be responsible for the problem, so try putting in magnitude shifts based on proximity to groups. May need to iterate on how this is implemented; try limiting cases where we only shift galaxies in massive groups, or do it in all groups with some mass dependence. Probably doesn't need to hold up the initial group paper. Make log-log plots.
+
+-morphology/color gradients
+Ok to say there's a difference between color and morphology transitions, but can't yet say whether it is the location or timescale of change that differs, or whether there is "downsizing" in the "transition mass." Keep up with what he and AL are doing with splitting their HOD fits by red/blue, they may be seeing some different conclusions wrt satellite evolution, but he will make a plot of quenched fraction in massive halos for comparison.
+
+-lensing centers
+See Gao et al paper 08 or 09 about mass profiles of different types of halos. Lore is ~20% of halos of a given mass are merging (1:3ish??) at a given time, but try to find a reference for this. He may try to project the mass in simulations to see what the lensing profile would look like. Concentrations differ in relaxed groups vs. all groups by ~20%.
+
+
+Updated region files for view_group.pro using make_regions.pro
+Set up mrg_center_notes_20110808.txt to record comments from another visual inspection of groups. I have columns for whether different center definitions agree and will try to find trends in cases with unclear centers. Are these groups more likely to have another one nearby? Weird X-ray morphologies? What center looks best visually?
+
+
+###################################################################### 
+Thu Aug 11 15:47:06 PDT 2011
+
+Finished visual inspections and distilled comments into a few categories - see mrg_center_notes_20110808_distilled.txt on zanzibar under View_groups and now on macbeth under groups_lensing/code. There were 
+44 groups with weird galaxy centers that I looked at
+19 showed some visual evidence of merging (disturbed X-ray morph, or multiple clumps of members)
+22 showed some visual projection concern where another group's X-ray contours overlapped
+12 were flagged as possibly bad groups where there were not many members (still >= 4) or there weren't members near the X-ray center (some groups fell into more than one of the above categories.) 
+2 groups had a massive galaxy that wasn't any of the saved centers which looked like the best visual central
+2 groups had massive galaxies near the X-ray peak which were excluded from group membership because of their photozs (1 has a specz in the group and the other was 0.037 away from a specz-determined group-z but dominant and centered).
+
+28 groups had the visual center match MMGG_SCALE (14 of these have MMGG_R200 disagree, 15 have MLGG_R200 disagree, 24 have MLGG_R200 disagree)
+5 had the visual center match MMGG_R200 (all of these disagree with MMGG_SCALE and MLGG_SCALE, 1 disagrees with MLGG_R200)
+7 had the visual center match MLGG_SCALE (all of these disagree with MMGG_SCALE and MMGG_R200, 2 disagree with MLGG_R200)
+0 had the visual center match MLGG_R200 (when it disagreed with everything else)
+2 had it match a different member (mass consistent with MMGGs but slightly lower and still near the center)
+2 had a non-member that probably should be a member due to photoz error
+
+Added these visual center IDs to weird_stack.pro in groups_lensing/code to see if any stacks of these populations produce different lensing signals. Is it just a redefinition of centers that is needed (i.e. does stacking all on visual center which is a combination of other centers produce a good signal?), or do certain groups really not contribute any lensing signal (i.e. does the signal improve when excluding "bad/questionable" groups or merging or projected groups?).
+
+
+Also looked back at fossil groups from Pierini's paper after Chung-Pei asked about them. I do think that the two they've identified are good fossils (once we get rid of the star that was masquerading as a galaxy), but I also think they're missing some fossils that would fit their definition (mag diff > 1.5 in i-band). Some of these ones had nearby projected groups but it looked like all of the bright galaxies were well-separated in redshift by photoz (and usually had a specz too), and a few of these fossil candidates showed some galaxy merging activity in the central, or the brightest was star-forming. The old fossil model wouldn't predict star-forming centrals (I think) showing that the mag cut is somewhat arbitrary, and the central merger cases might be seen differently if these objects weren't deblended.
+
+
+###################################################################### 
+Mon Aug 15 14:24:10 PDT 2011
+
+Alexie updated the galaxy and group catalogs. For new versions use 
+
+acs=mrdfits("/Users/alexie/Work/Cosmos0509/ACS_catalogues/lensing19.fits",1)
+group=mrdfits("/Users/alexie/Work/Weak_Lensing/Group_cat_june_2010/group7.fits",1)
+
+Roughly 0.5% (~30 objects out of ~4600) move up or down across the Pmem=0.5 threshold. Only one MMGG_scale changes, and it appears from its specz that it didn't belong in the group to begin with, so that's a good one to catch. The number of groups included is unchanged, and nothing else appears dramatically different. AL changed the matching algorithm from one Kevin wrote to close_match_radec which is faster. So some objects have different photozs and stellar masses, but it's <1%. The bigger change is that more objects have speczs with the new catalog. There are ~2% changes in specz membership, and ~5% disagreement between MMGG_scale and MMGG_scale_specz, which is reasonable.
+-AL will tag new dated versions of these files
+
+
+Playing with weird_stack.pro to see the lensing signal from different stacks and find out what happens when certain types of groups are excluded. The visual selection of centers on groups where galaxy centers disagreed does seem to improve the lensing signal (though the best fit mass is still on the low size ~13.01). But I've been puzzled by the stack on groups which have no disagreement between galaxy centers - this should be a clean sample but the central point turns down a little (2 sigma below the fit). Excluding cases where the central has M<11 or a SM gap < 0.3 doesn't improve things. AL pointed out that the source density is lower in the middle due to the small area and masking from lens galaxies, so check whether increasing the bin size or inner exclusion radius changes any results. Even without that, the fit on the non-weird groups is generally acceptable and gives M~13.5, so I don't think we're in bad shape.
+--Binning can move the inner point around without changing the best fit value but does also change the chi-squared value a bit. So we should be honest about the impact of binning but use it to demonstrate that the inner point shouldn't be a primary discriminator for centering tests.
+
+###################################################################### 
+Tue Aug 16 11:11:22 PDT 2011
+
+Revisiting the specz comparison issues to discuss with KB, there is a significant outlier fraction (15% with dz>0.001 between FORS2 and VIMOS). All of the offsets are <0.002 though, so it's not a case of catastrophic misidentifications. VIMOS redshifts tend to be higher than FORS2 (and nearly all of the outliers are). Removing the outliers does reduce the mean offset and scatter, though the mean offset is still somewhat high (~75 km/s). 
+-to do: compare FORS2 catalog versions 1 and 2 to see if offsets are different.
+
+###################################################################### 
+Thu Aug 18 08:52:10 PDT 2011
+
+Jean-Paul sent a new zCOSMOS spectroscopic catalog (with redshifts reported to 4 decimal places), see zcosmos_spectroscopy_one_v4.12.fits in ~/data/cosmos/catalogs on macbeth. Modified specz_comparison.pro to compare these redshifts with overlaps in FORS2 (zcat_v2_1.fits) and SDSS (sdss_redshifts.fits). For the SDSS catalog, I used this CAS query:
+SELECT
+g.objID,
+g.ra,
+g.dec,
+z.z,
+z.zwarning,
+z.objType,
+z.bestObjID into mydb.MyTable_4 from Galaxy AS g, SpecObj AS z
+WHERE z.bestObjID = g.objID
+   AND z.objType = 'GALAXY'
+   AND g.ra > 149
+   AND g.ra < 151
+   AND g.dec > 1.5
+   AND g.dec < 3.0
+
+I then used close_match_radec to find matches, and it looks like zCOSMOS has a ~100 km/s offset with respect to SDSS and FORS2 (FORS2 and SDSS are in reasonable agreement). Put together a figure and table of offsets on zanzibar in ~/data/cosmos/tex/svn/catalog/specz_comparison.tex and .pdf; waiting the hear back from Jean-Paul on what to do about it.
+-TO DO: try separating in to red and blue samples, or see if there is a flag in one of the specz catalogs that indicates whether a redshift was obtained by absorption or emission lines, since maybe one there's a specific problem with absorption line redshifts. Also, improve the matching scheme because it looks like doubles are being repeated.
+
+
+Made some small changes to full_stack and plot_full_stacks.pro to rearrange order of centers in plot and x-axis range. New binning in full_stack.batch now excludes within 20kpc, first bin is 20-60 kpc, outer bin ends at 1000 kpc. This seemed to improve the inner points when I tested it with weird_stacks, so maybe it will make some of the weirdness in the centers of lensing profiles go away, or at least illustrate that those points aren't significant if they move around a lot with binning. 
+
+
+Met with Andrew Wetzel and discussed group catalogs briefly. He argues that our advantage with COSMOS is in redshift evolution, and would be interested in seeing evol. separate by centrals and satellites. Regarding mass segregation, he doesn't see any in SDSS groups, and argues that there are competing effects that cause simple arguments for or against evolution to seem naive (yes, dynamical friction will cause things to sink, but more massive halos have fallen in more recently and so may preferentially be further out.)
+-try to make his style of plots for mass segregation. they showed median stellar mass in radial bins (with upper and lower quartiles drawn in), and a 2nd one showed median radius for different stellar mass bins. neither showed very significant trends with SDSS. 
+
+
+Met with Eli Rykoff about fossil groups. His general view is that they are not a special class of group as some others seem to suggest. They have done X-ray followup of optical groups and some Brazilians have gotten velocity dispersions, selecting fossils as objects with a luminosity cut on BCGs and a magnitude gap between 1 and 2. I think the general picture was that X-ray and vdisp masses seem to agree, but richness is low. If satellites populate a Schechter function and you lower the number of them, you are likely to miss bright satellites. They interpret this as showing that the "fossil" population is simply due to scatter in richness at a given mass, and don't see evidence that fossils are necessarily old (still looking at X-ray metallicity measurements to age the gas).
+
+###################################################################### 
+Fri Aug 19 17:05:50 PDT 2011
+
+Talked with Chung-Pei again about gap statistics. I updated test_gap.pro to plot histograms of magnitude and SM gaps in addition to the earlier scatter plots of gap vs. z, Mh, etc. When restricting to groups above a fixed Mh and plotting histograms for different redshift bins, there appears to be some redshift evolution in the magnitude gaps (and somewhat less in the SM gap). Lower z groups have a larger range of gaps (and higher mean gap) than higher z groups, where gaps are typically small.
+
+C-P sees potential for studying z trends in properties of the two or three top ranked galaxies in groups.
+TO DO: 
+-look into the distribution of offsets, colors and color differences, morphologies of high ranked galaxies. Do massive satellites tend to fall inward over time, or are more massive galaxies being accreted more recently (and so more likely to be in the outskirts)? Are second ranked galaxies consistent with mag-color separation that would put them on the same red sequence? Are centrals at higher z clumpier than low z?
+-how much could ICL affect the measured magnitudes of BCGs in our sample?
+-read literature on this - DEEP2, any others looking at z-evolution of gaps or of top 2/3 members?
+
+
+###################################################################### 
+Thu Aug 25 01:16:38 PDT 2011
+
+Added to gap plots incl. distance gap between top two ranked galaxies.
+
+Continued responses to ref comments. Still waiting to hear back from zCOSMOS (now Lilly) about offsets. -Still need to address Cooper's comments on Peng discussion.
+
+Wrote mrg_delcol as a complement to mrg_addcol, can now remove columns from structs (these two can help with renaming tags if desired.) Downloaded write_ipac_table from IRSA website and wrote convert_to_irsa.pro to write IRSA-formatted tables.
+-check outputs and send to IRSA for testing, see ~/data/cosmos/catalogs on macbeth
+
+-sort out lensing signal, low chi-sq value, which centers to use
+
+
+###################################################################### 
+Tue Sep  6 11:50:36 PDT 2011
+
+See paper by Lemaux et al on one of Lubin's superclusters: http://arxiv.org/abs/1108.5799
+decent overview of literature on transformations, and will be relevant for color/mass/morph vs environment comparisons at z~1.
+
+ 
+-Simon Lilly responded about zCOSMOS redshifts. They haven't put them into heliocentric frame (or any other frame like galactocentric), so they are geocentric which should mean they have offsets of ~30km/s * sin(phase). This doesn't explain the mean offset. He also said that they use the VIPGI software to get redshifts, and that the spectra are calibrated in vacuum wavelengths, so that doesn't seem to be the solution either.
+
+
+###################################################################### 
+Wed Sep  7 18:17:38 PDT 2011
+
+Read Cooper 2006 and 2007 papers. See notes in Mendeley for summary of results. Neither uses stellar mass selected samples, but they are important early papers on environmental dependence in a field survey at z~1. There is also some discussion about the discrepancies between DEEP2 and VVDS results in the 2007 paper, as Cooper suggested, though it is limited to a discussion of the early papers which had smaller samples and simpler analyses. Still refer to this in the section of Paper 1 that tries to get to the bottom of the differences. I am not convinced that "the picture is clear at z~1" as Cooper claims, and plan to leave in the mention of controversy in the introduction, though I can suggest that the picture is becoming clear that there is an environmental dependence. I can also rephrase the discussion of Peng's paper as he suggests, though I still think he gives it a short shrift.
+
+
+Spoke with Eli about centering. He is testing algorithms on CS82 data and wants to make a similar comparison between the different lensing signals.
+TO DO - clean up the nfw_ds_offset code and supporting scripts for him to use
+-write draft of lensing paper to show him and discuss
+
+
+
+Spoke with Teppei about his work on redshift-space distortions. We went over his INPA talk which I missed last week - see the slides he sent me. His work should be on the arxiv tomorrow along with more papers from Uros & McDonald et al explaining the distribution function formalism. The different terms are starting to make sense, in that each term is a combination of moments like density, momentum, energy, and higher orders. And the intent is to combine a handful of orders computed in real space to get the redshift space power spectrum as a function of mu and k. There are some nonlinear high order terms which contribute more than lower order terms, and the later part of the talk explains how to decompose terms into scalars, vectors, and tensors. As in the CMB power spectra, scalars contribute more than the others, so the large contribution from the nonlinear term mentioned earlier can be seen by decomposing into uniform component and anisotropic (mu^2) term, and seeing where the scalars lie since they contribute more. It's still mainly a formalism, but I can start to understand how different terms contribute and hopefully connect with physical notions like energies and velocity dispersions. With the direct measurement of the momentum field, we could potentially measure different aspects of the curves in his plots, i.e. P_01, 11, and higher orders (since higher orders are just powers of the velocity field times the density field); something which can't be done directly with a measurement of the redshift space power spectrum from BOSS.
+
+######################################################################
+Fri Sep  9 16:47:49 PDT 2011
+
+Sent Eli a bunch of files that should allow him to fit NFW and offset NFW to the Delta Sigma profiles he has around ~150 clusters in CS82. He sees qualitatively similar results - centroid of members looks miscentered, while bright galaxy centers do better.
+
+
+Updating Paper I with zCOSMOS specz comparison, Cooper comments, zCOSMOS 20k sample. Hope to send to co-authors today and resubmit next week, maybe Wednesday?
+
+######################################################################
+Tue Sep 13 10:44:33 PDT 2011
+
+Sent co-authors the paper draft and referee responses. Not many comments so far, so we should be about ready to go. Still need to update specz figures with removal of IMACS spectra and adding 20k back in. Want to remove IMACS because it was causing a large outlier fraction in table 1 for the faint red sample (13% outliers with IMACS included, 7% after dropping IMACS). 
+
+Updated find_bcg_wrapper to first remove IMACS spectra (set all objects with specz_origin=4 (IMACS) to have good_specz=0. This is propagated downstream, so be aware in case any other applications might want to use it, but I think it's fine to completely drop it for now.
+-these finished running, see group4_20110913.fits and lensing18_20110913.fits in ~/data/cosmos/code on macbeth
+TO DO: use these files to re-generate figures 4,5,6 showing specz purity and completeness, and get numbers (from print_paper_numbers?) for total P&C from specz sample. Add to paper and be done!
+
+Also need to update IRSA catalogs with comments from AL and AF - add in X-ray fluxes and describe luminosities appropriately.
+-updated with their comments, added some header info (null values and units) to IRSA preamble, and some comments to describe various tags. Hopefully these comments are sufficient and can be used in lieu of a separate README file.
+
+
+See Power et al. on arxiv today arXiv:1109.2671
+cosmological simulations measuring halo mass/centering offsets and correlating with recent merger history and formation redshift. Also has a number of references to previous relevant work.
+
+Also Oguri et al. arXiv:1109.2594 (but not Takada?) have another lensing paper out. This time combining WL with SL in 28 SDSS giant arc survey clusters. They have a section with some discussion of centering, and measure mass-concentration. It's not directly what we've been going after, but relevant.
+
+
+
+TO DO: set group_id and group_flag values to a negative null value. group_id=0 for a non-member could be confusing.
+-updated find_bcg to do this, currently running to produce outfiles 20110914. update convert_to_irsa and rerun on these catalogs when finished. this will update both the null values and the _zbest values since the previous .tbl files were not run on the +20k-IMACS sample.
+
+######################################################################
+Wed Sep 14 12:18:47 PDT 2011
+
+Updated memstat_spec and plot_memstat all/color/threshold to remake Paper I figs 4,5,6 with zCOSMOS 20k sample and IMACS removed. Also reran print_paper_numbers with the new catalogs and updated tex file to have new figures and numbers. There is some randomness in the field density estimation, so some other numbers changed, but nothing by more than a percent or two, even the numbers that were updated by the 20k sample.
+
+All that's left to be done is finish running convert_to_irsa to produce cosmos_xgroups_20110914.tbl and cosmos_xgroup_galaxies_20110914.tbl and send them off to IRSA. I sent earlier partial copies to Patrick Shopbell this morning to test them out.
+
+######################################################################
+Thu Sep 15 13:08:40 PDT 2011
+
+resubmitted the paper this morning. first switched aastex format, removed commented text from .tex file, removed * and [htb] from all figures and tables, rescaled some to fit onto a page (following first submit), and renamed figures to f1a.eps etc. ~/data/cosmos/tex/svn/catalog/apj on zanzibar is the first submitted version, apj/resub is the resubmitted version. 
+-put these into svn repository!! so that they are mirrored across machines
+
+######################################################################
+Fri Sep 16 13:42:11 PDT 2011
+
+In checking catalogs for James's paper, I noticed that two of the FLAG_INCLUDE=1 centers have changed since 20110209. One is where a z~0.1 that had a specz but no photo-z and is clearly the most massive object in the group. It is now dropped because it was an IMACS specz, so the specz is marked as bad and the photoz isn't replaced. Oh well. In the other case, the new center is slightly less massive than the old one (by less than 0.1 dex, so consistent), and both have speczs; the old one is no longer a photoz member since it fell just below Pmem=0.5. The old one's specz is inconsistent with membership, so I think this is an improvement, but it's still a weird group since it has a more massive MMGG_R200. No flag_include, group z, mass, or r200 values changed in the new vs. old catalog, so 2/129 centers seems fairly stable and I'm not worried about the change.
+
+######################################################################
+Tue Sep 27 09:24:13 PDT 2011
+
+Paper has been accepted! Now I'm double-checking all of the figures to make sure they are up to date with the latest catalogs (or if older versions, that they at least aren't much different). Ideally I should be able to replicate these at will or have text files giving the values of the points plotted. Try putting all the "final" (i.e. paper version) files in a single directory.
+
+-Fig. 1 - group and galaxy sensitivity curves and mass bins: hadn't been updated to latest catalogs, but no real changes. Had to dig out the X-ray sensitivity file since I had linked to one in AL's directory that she has deleted; was able to get it on backup disk. plot generated by plot_sensitivity.pro
+-Fig. 2 - photoz uncertainties vs mag, z, color: hadn't been updated, but no real changes. plot generated by plot_zerr.pro
+-Tab. 1 - photoz tests; hadn't been updated to latest table (but only difference was the Imacs spectra were excluded in latest catalog, and code is run with the noImacs option set either way, so no changes. table generated by photoz_tests.pro
+-Fig. 3 - field density vs z, mag. This plot is done in veusz and would take some work to look back at. Nothing has changed with the photo-zs, so I'll leave this as is. see plot_fd.vsz (?)
+-Fig. 4 - purity vs completeness. uses outputs from memstat_spec.pro which was run (by hand) with latest catalogs. No update needed. (Note, memstat_spec.pro is the one used for plots, memstat.pro is outdated, and the mock outputs are generated by code in the mocks subdir. plot generated by plot_memstat_threshold.pro
+-Fig. 5 - completeness and purity vs. z, mag, SM, R, Mh from speczs and mocks. uses same outputs as Fig. 4. plot generated by plot_memstat_all.pro
+-Fig. 6 - completeness and purity vs. color, morph. for speczs only. uses same outputs as Fig. 4. plot generated by plot_memstat_color.pro
+-Fig. 7 - completeness and purity vs. "all" for mock photoz errors. uses same outputs as Fig. 4 (no speczs, so older mock stuff). plot generated by plot_memstat_mock_surveys.pro with /zerr option
+-Fig. 8 - completeness and purity vs. "all" for mock centering errors. uses same outputs as Fig. 4 (no speczs, so older mock stuff). plot generated by plot_memstat_mock_surveys.pro with /xerr option
+-Tab. 2 - basic catalog properties. This was previously done by hand with an old catalog. now the info is generated by print_catalog_properties.pro and copied into the tex file for some formatting. This has minor updates from "accepted version" which should be updated in proofs.
+-Fig. 9 - color vs. sm for group members and field distributions; hadn't been updated to latest catalogs, but no real changes. plot generated by plot_group_cm.pro with /zMatch option.
+-Fig. 10 - red fraction vs sm, z for group and field members; hadn't been updated to latest catalogs, noticed only one gray point changed. plot generated by plot_quenchz.pro with no options set (zmatch and memthresh were for testing and showed no large changes).
+
+So from this review, I have only modified Table 2 which should be updated in the proofs. I have not updated the figures since no significant changes were found, though we could possibly do this in the proofs.
+
+######################################################################
+Fri Sep 30 11:16:20 PDT 2011
+
+Viola Allevato and Alexis have been looking at AGN in groups and asked about some objects that they think look like specz members and my membership catalogs assign as nonmembers. It sounds like they have 40 AGN that they think are in groups, and after looking at P_MEM_BEST_SPECZ there are 8 which I don't assign as members. Looked at these objects and sent this response to Viola:
+
+I took a look at your list of objects and comment below on why they weren't selected as group members, with objects ordered the same as in your file. In sum:
+-2 are at z>1
+-2 look like catalog matching issues which I think I've treated properly
+-2 have redshifts significantly offset from the group redshift, and are unlikely to be members
+-2 are likely members if we believe the IMACS speczs, but have been excluded from photoz selection because of a photometry issue or discrepant photoz.
+
+1. This is an interesting-looking dual core object. Catalog matching algorithms often mess these up, and in this case, one of the cores is assigned a good photoz and stellar mass and is considered a member, while the other has a photoz and stellar mass of zero, and is excluded from consideration. Both were assigned a specz of 0.360, though I suspect that was unintentional since it is unlikely that VIMOS recorded speczs for the two cores independently. Because the cores are so close together, I think it's fair to treat them as one object since we can't really measure independent photometry for them.
+
+2. Photoz and your specz are both >1 and I have only considered groups at z<1. I also do not have a specz for this object in the catalog I'm using.
+
+3. Kevin's stellar mass is -1 even though it has a K band detection, so his code probably failed to fit it; may suggest that more templates are needed. The photoz is 0.4 and the group z is 0.704, so this would not be a member based on photoz. If we believe the IMACS specz of 0.703, it would likely be a member.
+
+4. photoz is 0.597, IMACS specz is 0.698, putative group z is 0.729. groupz-specz is ~0.03, which is significantly larger than the group velocity dispersions or (normal) spectroscopic redshift errors, so I don't think this is a member.
+
+5. Photoz is 1.11, the specz from IMACS that I have is 0.5370, and the specz you list is 0.9460. Putative group z is 0.9840. Even taking your specz which is closer to the group z, the difference in groupz - specz is ~0.04, again much larger than the group velocity dispersion or redshift errors ought to be, so I don't think this is a member.
+
+6. The photoz of 0.700 is quite different from the putative group z is 0.5560 and IMACS specz of 0.5540. If we believe the IMACS redshift and give it a sizeable uncertainty, it's likely a member.
+
+7. Photoz, specz, and group z are all >1
+
+8. This object has an unassociated galaxy 1.7 arcsec away. The specz I have for the featureless-looking object at the coordinates you mention is at z=2.1920 from VIMOS, and that object has no photoz or stellar mass so it isn't considered. The nearby object looks like a spiral with DEIMOS specz = 0.8760 and photoz 0.89. With the group z at 0.885, I would say that this nearby object is a member, and indeed, it has been assigned as one.
+
+
+So I don't think there are any real problems to worry about here, one just needs to be careful with the catalogs.
+
+######################################################################
+Mon Oct  3 10:53:30 PDT 2011
+
+Updated department website with new catalogs. 
+
+Problems that will need to be addressed for catalog release:
+-MMGG_SCALE_ZBEST is not currently included
+-include MMGG_R200 to let people test robustness for centering uncertainties?
+-groups with XFLAG>3 are excluded from group catalog, but galaxies have probably been assigned as members to them.
+
+
+A stack of relevant papers has piled up in the last few weeks. Here's an overview:
+
+Muldrew++ 1109.6328 - Measures of Galaxy Environment I - What is "Environment"?
+	  -compares different measures of gal. density field, annuli vs nearest neighbor etc. Says that the properties probed depend on the indicator. Doesn't say much about halo mass based environment measures. Not terribly interesting, but in the same vein as our findings.
+
+Wojtak++ (DARK) 1109.6571 - Grav redshift of galaxies in clusters (Nature)
+	 - claims to measure a shift in mean velocity with project group-centric radius using Gaussian Mixture SDSS group catalog (Hao?). Seems interesting, but susceptible to centering offsets, etc.
+
+Eckmiller++ 1109.6498 - Testing the low-mass end of x-ray scaling relations with a sample of Chandra Galaxy Groups.
+	    -112 X-ray groups, 26 with Chandra. Most relations consistent with those in clusters, drop in gas mass fraction below T=1 keV. 
+
+Smargon++ 1109.6020 - Detection of intrinsic cluster alignments to 100 Mpc/h in the SDSS.
+	  -alignments measured around maxBCG and Dong AMF catalogs. MNRAS letter so it's brief, some comparison with theory, some mention that centroiding errors weaken the signal but not much discussion.
+
+Cooper++ 1109.5698 - DEEP3: Impact of Environment on the size evolution of massive early-type galaxies at intermediate-redshift
+	 -significant relationship between galaxy size and local density at z=0.75 with fixed SM, z, sersic index, color. Environment plays a role in blowing up the sizes of red nuggets between z~2 and 0.
+
+Oguri++ 1109.2594 - Combined strong and weak lensing analysis of 28 clusters from the Sloan Giant Arcs Survey
+	-mass concentration relation, halo ellipticities are main results. Also look at galaxy distribution w.r.t. lensing profile, as measured by ellipticity, for different luminosity ranges. Galaxies generally follow DM, may be less concentrated esp. fainter galaxies, though they don't show any tests of how well their member association works and what the contamination could be.
+
+Power++ 1109.2671 - Dynamical state of dark matter haloes in comsological simulations I: Correlations with mass assembly history
+	-measure virial ratios and offsets between CM and peak density in simulated DM haloes. correlate with time since recent mergers, merger ratio, and halo mass. suggest that centroid offsets could be used to infer time since latest merger, refer to Poole 2006 who has done this in hydro sims.
+
+######################################################################
+Wed Oct  5 18:07:41 PDT 2011
+
+More work on centering. Added to weird_stack.pro options to stack on groups where XFLAG=1 and the MMGG_scale disagrees with X-ray center by more than 50 kpc and more where the X-ray uncertainty is less than 50 kpc. The lensing signal clearly prefers the galaxy center in these cases - so is this showing that the galaxy is better tracing the center of mass, or are the X-ray positions just bad for some reason? Alexis is looking into these systems and the possibility that there are local X-ray peaks near the galaxies.
+
+
+Tried looking at particle files that Peter Behroozi sent a week ago. He sent some C code that reads the files but I'm having trouble getting started with it, and the ASCII file is formatted stragely (halos on top, particles on bottom? file is huge so difficult to scan).
+
+Since that looks like a headache, I turned to the literature.
+
+Neto++ 2007 measured concentrations in relaxed and unrelaxed halos and found significantly lower concentrations in the latter. Look through that paper more carefully to see if they quantify what fraction are unrelaxed and what the density profiles really look like (Fig 1 gives a few examples). JT previously mentioned a recent paper by Gao (2nd author on the Neto paper), which apparently came to similar conclusions.
+
+
+redo diff_stack plot so that order of centers is similar to that for full_stack. Currently using bin parameters min rad=10 kpc, 2nd rad=70 kpc, outer=1000, nbins=7. Check the plots for unambiguous centers - all binning gives similar mass, but inner pts looked crappy for some schemes and good in this one.
+
+
+######################################################################
+Thu Oct  6 11:48:26 PDT 2011
+
+spoke with Risa Wechsler who is visiting today. She was interested in all the projects - 
+-suggested testing flow project by putting noisy distance estimates into simulations to see how well cosmological parameters could be reconstructed
+-says there hasn't been much work on density profiles of disturbed groups/clusters in simulations because there hasn't previously been an observational motivation for it, but it would be pretty interesting to do and we could select disturbed halos by running our group finder/associator on a sim and selecting disturbed groups in the same way, or by finding objects in a merger tree that have recently merged or are about to
+-existing gap statistic papers have been difficult to interpret esp. for redshift evolution when comparing across different surveys, but COSMOS would be well-suited for it. also should be easy to make predictions from sims for comparison.
+-for X-ray centers that are offset from MMGGscale's, are there any galaxies at the X-ray center (i.e. were they just missed b/c lower mass, or really nothing there?)
+
+
+######################################################################
+Fri Oct  7 10:00:59 PDT 2011
+
+Previous choices for group/cluster centers:
+
+Hoekstra 2001 (first(?) stacked lensing on groups w/ CNOC2) - refers to centers from Carlberg 2001
+Carlberg 2001 - FOF-like finder on CNOC2 speczs, center = mean position of group members
+Parker 2005 - M/L from larger CNOC2 sample, doesn't explicitly say which centers used but refers to Carlberg 2001 for catalog
+
+Yang 2005 - group finder and application to 2dF, candidate centrals are brightest galaxy within 1Mpc cylinder of depth 500 km/s
+Hao 2010 - GMBCG - center is BCG with some gaussian red sequence color requirement
+Miller 2005 - C4 algorithm - catalog reports 3 centers; peak in density field, luminosity-weighted mean, and BCG
+Gladders & Yee 2005 - RCS catalog - nominal centers are iterative density centroids using 3-d Gaussian kernel, also reports offset to BCG where BCG is chosen with some distance and color cuts
+Milkeraitis - 3D-Matched Filter method - some discussion of difficulty centering and they say they may change in future, but the "choose the centre of a galaxy cluster to be based on the luminosity and radial distribution of cluster galaxies"
+
+Koester 2007 - MaxBCG algorithm and catalog - red-sequence BCGs used as centers
+
+Jee 2011 - 22 Massive z~1 clusters from SN/cluster survey - some clusters have 2d mass maps, for others they used centroid of galaxies for lensing center, they discuss each cluster individually w/ comments on X-ray-galaxy-DM offsets, most qualitatively agree.
+
+
+Hao lists some other algorithms in Table 1, any other weird center choices I'm missing? Different X-ray choices? Check Skibba, Johnston...
+
+######################################################################
+Mon Oct 10 13:57:34 PDT 2011
+
+Planning to add offset parameter to delta sigma model. This will allow us to fit for a mean offset and determine how significant the miscentering is for a given stack. We can also compare the goodness of fit of an offset model to the fit for a regular NFW. How to implement these changes to the code?
+
+-add an extra parameter to fit_type array
+-change ds_model to handle this parameter, calling nfw_ds_offset
+-check that nfw_ds_offset can handle single-valued offsets efficiently, rather than full distributions
+-other cleanup?
+
+the first three steps above have been coded today and committed to svn. still need to update plot_lensing_results to handle two models at once, or write new script, and update weird_stacks to test it out (and diff_stacks and full_stacks will need to be updated for fit_type)
+
+
+######################################################################
+Tue Oct 11 15:33:26 PDT 2011
+
+Updated code to fit delta sigma model with offset as a free parameter. It runs very slowly, so I copied AL's code to tabulate ds offset. This runs faster, but still takes >1 hr (at least) to fit. See if it can be sped up with fewer for loops, and check the mcmc convergence criteria to make sure the extra free parameter hasn't introduced an open loop.
+-no convergence, just number of steps. if run_ds_mcmc is run in /fast mode (12.5 times fewer steps than regular), it takes several minutes to finish (so it shouldn't take days to run the full mode, just hour(s)).
+
+In the first fast test of fitting a stack, I tried this selection of groups with flag_include=1 (AL had been asking about this for sending a sample to Jes Ford):
+hiMClean=where(group.zphot GT 0.2 $
+               AND group.zphot LT 1. $
+               AND group.lensing_m200 GT 13.55 $
+               AND group.id_mmgg_scale EQ group.id_mlgg_scale)
+
+With the offset fixed to zero, the mass is 13.8527 +/- 0.0757 (log Msun units)
+With the offset free,               the mass is 13.8723 +/- 0.0764
+                       and the offset is 0.0235 +/- 0.0226 Mpc, i.e. 24 +/- 23 kpc, or consistent with zero. Cool!
+(Repeat /fast runs give similar results)
+
+Again, this is for a small number of steps in the MCMC and takes several minutes (~8 min), so I'll want to speed up the code and run the full version on all the centers.
+
+Cleaned up a bunch more of the code, removing for loops wherever possible. There's a bit of a speed up, but it's not even a factor of 2 so far. Could try digging further with benchmarks to find where the slow culprit is.
+
+Still need to fix plot_lensing_results to handle multiple models; problem is that parameter array only contains fit parameters, so array is different lengths for different models.
+
+
+Temporarily modified full_stack and dependent files to try fitting and plotting ds values with 10% larger error bars in full stack plot. Tested with bin=10, 70,1000,7, see files with name *bigerr*. The best fit masses did not change by more than 0.01 dex, and all that really changed was the chi^2 values. This indicates that the shape of the profile isn't strongly constrained by the size of the error bars; AL had raised the possibility that the emp_var option produced lower masses because error bars of a different size allowed the profile to become more or less concentrated and thus favor lower or higher masses. But this isn't borne out, so the weird emp_var results are still unresolved.
+
+######################################################################
+Wed Oct 12 14:00:28 PDT 2011
+
+Talked with Ramin Skibba about centering and various environmental trends.
+-see his work with Maccio on prinicipal components of DM halos. They discuss how centering offsets (DM centroid vs. most bound particle, relaxedness, etc.) correlate with how well a profile fits NFW and what the concentration is.
+-was interested in how simulated unrelaxed halos would compare to lensing profiles we measure
+-is now looking at environmental dependence of bars in spirals. Current literature is inconclusive; very recent papers suggest that there is a bar trend with environment at fixed stellar mass, but that the trend disappears after controlling for color (among disks, redder and more massive galaxies are more likely to host bars). Also looking into gas content for a subsample of these.
+-from his "Are Brightest Galaxies Centrals?" paper, his claim is that 20-40% of brightest galaxies are satellites, and that this fraction is on top of the fraction where brightest is misidentified due to scatter, because they're comparing to mocks which have that effect built in. I'm not certain the last part is completely correct.
+-He thinks our mock value of 17% of "most massive members" being satellites is reasonable, but subject to parametrization of HOD. They've looked at this with CLF and similarly have a hard time constraining this value.
+-Interested in trying to make mocks with morphologies using marked correlations, but hasn't started yet.
+-He's looked at different "relaxedness" properties in small cluster samples with people from Arizona, e.g. skew in velocity dispersion, galaxy/centroid offsets, etc. but doesn't see much correlation between these properties in the unrelaxed sample. Messy problem and it looked like a scatter plot, so no clear results.
+
+
+updated plot_lensing_results and weird_stack to be able to take a single set of delta sigma points and model with NFW(+galaxy) and/or offset NFW(+galaxy), with comparison of masses, offset (0 vs >0), and chi^2 values. Extend this to work for full_stack (and diff_stack?), reconsider presentation of plots, will probably want a table with these columns: centered model mass+err and chisq, offset model mass+err and offset+err and chisq.
+
+######################################################################
+Fri Oct 14 14:24:23 PDT 2011
+
+Major updates to the modeling and plotting code for centering tests over the last week. Modeling is now able to include a single mean offset value as a free parameter to be fit (else fixed to zero). Modeling code now saves fit parameters and uncertainties to the same fits files as the lensing delta sigma vs r values. This better separates the modeling layer from the analysis layer, since previously I had to rerun the models every time I wanted to update a plot, etc. Adding the offset parameter to the model slows down the MCMC fitting, so I'm currently using the /fast option when fitting the offset model. This shortens the chain and burn-in lenghts by a lot, but the results do not appear to change on repeat runs. Still, probably want to run full length chains to give precise uncertainties in the paper.
+
+Today I cleaned up plot_diff_stacks and diff_stack.pro to incorporate the new changes to the underlying code, the earlier work was focused on full_stack since that will show the offset models and no new offset fitting has been included in the diff_stack plot (it is constrained by the distribution of offsets).
+
+Updated full_stack for plot aesthetics and it now generates a table with fit parameters for the paper.
+
+We see strong evidence that the galaxy centers do better than the centroids and X-ray centers. Could we be underestimating the stellar mass in the central galaxies? i.e. consider if all of the center definitions are offset by some amount but the galaxy centers look peaked in the middle not because the NFW profile really peaks there but because we've shifted mass that belongs in the galaxy component to the NFW component. Test fits with galaxy masses that are twice as high and see how that affects the constraints on centering.
+
+Update the paper with the model components and fit values. Consider reorganizing structure to show full stack first, then distribution of offsets as segway into diff_stack?
+
+######################################################################
+Thu Oct 20 15:39:06 PDT 2011
+
+Alexis sent Chandra mosaics, background maps, and exposure maps. Full Chandra coverage is in ~/data/cosmos/chandra/c/ and "high-resolution" (i.e., excluding regions beyond a certain distance from the center of each pointing where the PSF starts to get bad) is in ~/data/cosmos/chandra/chr/ both on macbeth and fiji.
+
+It looks like the mosaic itself is not exposure corrected, and probably no background-subtracted, so apply those basic corrections, then overlay a region file with all the ellipses, or the contour map used in View_groups, and see how the groups we've been working with appear in the Chandra data. May need to play with smoothing before or after the background subtraction and exposure correction.
+
+######################################################################
+Tue Oct 25 16:48:27 PDT 2011
+
+reading lensing papers to write section in centering paper.
+
+-offset formalism (derived for using satellites as lenses)
+Yang 2003 Appendix B gives (first?) formula for offset NFW delta_sigma profile with plots (rest of paper is mostly about sims)
+Yang 2006 gives more formal detail on satellite and central theoretical lensing predictions (note: though title is labeled I, there appear to be no further papers in this series)
+
+-earlier papers that showed that satellites produce different lensing signals than centrals
+Hudson 1998 shows shear profile with offsets (SIS, but still has similar turnover shape)
+Guzik and Seljak 2002
+
+-papers that measure miscentering
+Johnston 2007a - theory
+Johnston 2007b - applied to maxBCG and generally more useful
+both write down the general form for sigma_nfw offset, and also suggest a gaussian distribution of offsets.
+
+Note that all the Johnston and Yang papers have a sign convention that looks like an error (cf. law of cosines). But if you draw a picture with a halo center, a nominal lens center, and a circle around the nominal lens center (where tangential shear will be measured), you can decide how to define the angle theta (they don't specify), so their sign difference amounts to drawing the angle theta as 180 degrees + the angle I'd draw. As long as the integral is over 0-2pi the convention doesn't matter, and since they don't specify the convention it's not really an error, just somewhat confusing.
+
+-subhalos - could we be miscentered on a satellite and wrongly think it's the center because there's a massive subhalo?
+Yang 2006 discusses contribution from subhalos assuming some model, but acknowledges uncertainties.
+  cites some simulation literature on subhalo mass loss etc in simulations and one paper measuring mass in data
+Natarajan & Springel 2004
+Natarajan, De Lucia, & Springel 2007 - these papers use WL+SL to measure subhalo mass function and compare with sims
+De Lucia et al 2004 - sims only
+
+
