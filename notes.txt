@@ -1420,3 +1420,8 @@ Natarajan, De Lucia, & Springel 2007 - these papers use WL+SL to measure subhalo
 De Lucia et al 2004 - sims only
 
 
+######################################################################
+Wed Oct 26 17:27:32 PDT 2011
+
+Continued filling out lensing modeling section in centering paper. While doing so, tested offset code, because it wasn't initially clear that AL's tabulated version was doing the radial average right to get \Sigma(<R|R_off). The integral is \propto \int \Sigma(R|Roff) * R dr - where the factor of R comes in because it is an average over the area in polar coordinates. This had been done correctly in the function called by the integrator QROMB, so the code is fine. In fact it does a bit better than the old version, which was sampling radii somewhat sparsely for speed (a convergence test showed that higher sampling produced a similar curve as the tabulated version).
+
