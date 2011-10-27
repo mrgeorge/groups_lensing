@@ -286,4 +286,19 @@ hiMClean=where(group.zphot GT 0.2 $
                AND group.id_mmgg_scale EQ group.id_mlgg_scale)
 do_weird_stack,group[hiMClean],'mmgg_scale','hiMClean_mmgg_scale',/compare
 
+hiMloZClean=where(group.zphot GT 0.2 $
+                  AND group.zphot LT 0.6 $
+                  AND group.lensing_m200 GT 13.5 $
+                  AND group.id_mmgg_scale EQ group.id_mmgg_r200 $
+                  AND group.id_mmgg_scale EQ group.id_mlgg_r200)
+do_weird_stack,group[hiMloZClean],'mmgg_scale','hiMloZClean_mmgg_scale',/compare
+
+hiMhiZClean=where(group.zphot GT 0.6 $
+                  AND group.zphot LT 1.0 $
+                  AND group.lensing_m200 GT 13.55 $
+                  AND group.id_mmgg_scale EQ group.id_mmgg_r200)
+;                  AND group.id_mmgg_scale EQ group.id_mlgg_r200
+do_weird_stack,group[hiMhiZClean],'mmgg_scale','hiMhiZClean_mmgg_scale',/compare
+
+
 end
