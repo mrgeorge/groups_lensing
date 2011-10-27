@@ -56,27 +56,9 @@ sigmaR=dblarr(n_elements(r),ngroups)
 sigmaMean=dblarr(n_elements(r),ngroups)
 deltaSigma=dblarr(n_elements(r))
 for g=0,ngroups-1 do begin
-
-   ; \Sigma(R|R_{off})
-;   sigmaR[*,g] = groupWeight[g] * nfw_sigma_offset(r,roff[g],p,zl,r200=keyword_set(r200),r180=keyword_set(r180))
-
-   ; \bar{\Sigma}(<R|R_{off})
-;   for i=0,n_elements(r)-1 do begin
-;      npts=300 ; slow, but needed for decent convergence at small r
-;      dr=double(r[i])/npts
-;      rInterior = dindgen(npts)*dr
-;      sigmaInterior = nfw_sigma_offset(rInterior,roff[g],p,zl,r200=keyword_set(r200),r180=keyword_set(r180))
-;      integrand=rInterior*sigmaInterior ; sigmaInterior goes to infinity at r=0, so remove
-;      sigmaMean[i,g] = groupWeight[g] * 2./r[i]^2 * total(integrand[where(finite(integrand))]*dr)
-;   endfor
-;stop
+   ; call AL's version
    deltaSigma+=groupWeight[g]*nfw_ds_offset_sat(r,p,zl,roff[g],r200=r200,r180=r180)
 endfor
-
-; \Delta\Sigma(R|R_{off})
-;if(ngroups GT 1) then $
-;   deltaSigma = total((sigmaMean-sigmaR),2) $
-;else deltaSigma = (sigmaMean-sigmaR)
 
 return, deltaSigma
 end
