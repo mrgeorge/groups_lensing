@@ -1,7 +1,7 @@
 pro model_full_stack,cenNames,ptSrc,infile_source,infile_lens,lensOutFileArr,$
                      innerRadiusKpc,secondRadiusKpc,maxRadiusKpc,nRadiusBins,$
                      minLensZ,maxLensZ,minLensMass,maxLensMass,$
-                     stackx=stackx,emp_var=emp_var
+                     stackx=stackx,emp_var=emp_var,conc=conc
 
 ;-------------------------------------------------------------------------
 ; Fitting parameters
@@ -18,6 +18,8 @@ fit_t = [$
 0,$             ; 4  bias
 0,$             ; 5  m_sigma
 0]              ; 6  offset
+
+if(n_elements(conc) GT 0) then fit_t[2]=1
 ;----------------------------------------------------------------------
 ; Various tests 
 ; zscheme 0 -> 68 % cut + sigma cut=0.1
@@ -58,7 +60,7 @@ endfor
 
 end
 
-pro table_full_stack,cenTitles,lensFileArr,tableFile,stackx=stackx
+pro table_full_stack,cenTitles,lensFileArr,tableFile,stackx=stackx,conc=conc
   
 ; reorder center arrays so that table order corresponds with plot from
 ; top to bottom
@@ -67,7 +69,8 @@ cenTitles=cenTitles[reorder]
 lensFileArr=lensFileArr[reorder]
 
 openw,u,tableFile,/get_lun,width=1000
-printf,u,'# Center  Mcen  Mnfw  dMnfw  chisq  Mnfw_off  dMnfw_off  Roff  dRoff  chisq_off'
+if(n_elements(conc) EQ 0) then printf,u,'# Center  Mcen  Mnfw  dMnfw  chisq  Mnfw_off  dMnfw_off  Roff  dRoff  chisq_off' $
+else printf,u,'# Center  Mcen  Mnfw  dMnfw  Conc  dConc  chisq  Mnfw_off  dMnfw_off  Conc_off  dConc_ff  Roff  dRoff  chisq_off'
 
 for ii=0,n_elements(cenTitles)-1 do begin
    str=mrdfits(lensFileArr[ii],1)
@@ -92,15 +95,17 @@ for ii=0,n_elements(cenTitles)-1 do begin
       
    if(ii EQ 0) then printf,u,'# dof (centered, offset): ',dof,dof2
 
-   printf,u,cenTitles[ii],mcen,str.p_mean,str.p_sigma,chisq,str.p_mean2[0],str.p_sigma2[0],1000.*str.p_mean2[1],1000.*str.p_sigma2[1],chisq2, $
-          FORMAT='(A15," &",A5," &",F6.2," $\pm$",F6.2," &",F5.1," &",F6.2," $\pm$",F6.2," &",F6.1," $\pm$",F6.1," &",F5.1," \\")'
+   if(n_elements(conc) EQ 0) then printf,u,cenTitles[ii],mcen,str.p_mean,str.p_sigma,chisq,str.p_mean2[0],str.p_sigma2[0],1000.*str.p_mean2[1],1000.*str.p_sigma2[1],chisq2, $
+          FORMAT='(A15," &",A5," &",F6.2," $\pm$",F6.2," &",F5.1," &",F6.2," $\pm$",F6.2," &",F6.1," $\pm$",F6.1," &",F5.1," \\")' $
+   else printf,u,cenTitles[ii],mcen,str.p_mean[0],str.p_sigma[0],str.p_mean[1],str.p_sigma[1],chisq,str.p_mean2[0],str.p_sigma2[0],str.p_mean2[1],str.p_sigma2[1],1000.*str.p_mean2[2],1000.*str.p_sigma2[2],chisq2, $
+          FORMAT='(A15," &",A5," &",F6.2," $\pm$",F6.2," &",F6.2," $\pm$",F6.2," &",F5.1," &",F6.2," $\pm$",F6.2," &",F6.2," $\pm$",F6.2," &",F6.1," $\pm$",F6.1," &",F5.1," \\")'
 endfor
 
 close,u
 free_lun,u
 end
 
-pro full_stack,innerRadiusKpc,secondRadiusKpc,maxRadiusKpc,nRadiusBins,stackx=stackx,emp_var=emp_var,loz=loz,hiz=hiz,loM=loM,hiM=hiM
+pro full_stack,innerRadiusKpc,secondRadiusKpc,maxRadiusKpc,nRadiusBins,stackx=stackx,emp_var=emp_var,loz=loz,hiz=hiz,loM=loM,hiM=hiM,conc=conc
 
 ; measure lensing signal for the full stack of groups around different centers
 ; plot results in one big figure for paper
@@ -140,13 +145,14 @@ endif else begin
 endelse
 if(keyword_set(stackx)) then sxExt='_sx' else sxExt=''
 if(keyword_set(emp_var)) then empExt='_emp' else empExt=''
+if(keyword_set(conc)) then concExt='_conc' else concExt=''
 
 ; Set paths for input files
 infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7.fits' ; Using the new catalog (photoz version 1.7)
 infile_lens = '/Users/alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits' ; group catalog with centers
 
 ; Set paths for output files
-dirName='bin_'+string(innerRadiusKpc,format='(I0)')+'_'+string(secondRadiusKpc,format='(I0)')+'_'+string(maxRadiusKpc,format='(I0)')+'_'+string(nRadiusBins,format='(I0)')+sxExt+empExt+zExt+mExt
+dirName='bin_'+string(innerRadiusKpc,format='(I0)')+'_'+string(secondRadiusKpc,format='(I0)')+'_'+string(maxRadiusKpc,format='(I0)')+'_'+string(nRadiusBins,format='(I0)')+sxExt+empExt+concExt+zExt+mExt
 fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'/'
 plotDir='~/data/cosmos/groups_lensing/plots/'+dirName+'/'
 if(NOT(file_test(fileDir))) then file_mkdir,fileDir
@@ -164,15 +170,15 @@ fullPlotFile=plotDir+'full_stacks.eps'
 tableFile=plotDir+'full_stack_fit_pars.tex'
 
 ; Measure and Model the lensing signal
-;model_full_stack,cenNames,ptSrc,infile_source,infile_lens,lensOutFileArr,$
-;                     innerRadiusKpc,secondRadiusKpc,maxRadiusKpc,nRadiusBins,$
-;                     minLensZ,maxLensZ,minLensMass,maxLensMass,$
-;                     stackx=stackx,emp_var=emp_var
+model_full_stack,cenNames,ptSrc,infile_source,infile_lens,lensOutFileArr,$
+                     innerRadiusKpc,secondRadiusKpc,maxRadiusKpc,nRadiusBins,$
+                     minLensZ,maxLensZ,minLensMass,maxLensMass,$
+                     stackx=stackx,emp_var=emp_var,conc=conc
 
 ; Make multi-panel plot to compare full stacks
 plot_full_stacks,cenTitles,lensOutFileArr,fullPlotFile,stackx=keyword_set(stackx),/use_m200
 
 ; Print latex formatted table with fit parameters
-table_full_stack,cenTitlesTex,lensOutFileArr,tableFile,stackx=stackx
+table_full_stack,cenTitlesTex,lensOutFileArr,tableFile,stackx=stackx,conc=conc
 
 end
