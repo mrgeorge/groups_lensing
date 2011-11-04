@@ -115,7 +115,7 @@ endif
 
 ; Concentration
 if(fit_type[2] eq 1) then begin
-    Conc = 10.0^(P[i])      ; LOG
+    Conc=P[i]
     i = i+1
 endif 
 

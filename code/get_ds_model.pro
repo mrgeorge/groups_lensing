@@ -49,7 +49,7 @@ endif
 
 ; Concentration
 if(fit_type[2] eq 1) then begin
-   Conc = 10.0^(p_mean[i])           ; LOG
+   Conc=p_mean[i]
    i = i+1
 endif else begin
    if(fit_type[2] EQ 2) then begin
