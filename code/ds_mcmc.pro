@@ -84,24 +84,38 @@ common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, 
 
    ; Enforce a reasonable value for the mass for the noisy groups:
    ; (this is imp: prevents runaway results)
-
-   if (fit_type[0] eq 1) then mass=res[1] else mass=res[0]
-
-   ;if (use_group eq 1 AND mass le 11.0) then begin
-   if (use_group eq 1 and mass le 10.0) then begin
-       if (fit_type[0] eq 1) then res[1]=10.0 else res[0]=10.0
-   endif
-   if (use_group eq 1 and mass ge 16.0) then begin
-       if (fit_type[0] eq 1) then res[1]=16.0 else res[0]=16.0
-   endif
-
    ; NOTE :
    ; This is where you can put a prior on a variable to be more than 0 for example !!!
    ; e.g : NOTE : I MAY NEED TO CHECK THAT m_sigma remains positive
 
-   ; require offset to be positive - this code assumes offset is the *last* parameter in pars
-   if(fit_type[6] EQ 1 AND res[npars-1] LT 0) then res[npars-1]=0.
-
+   ii=0
+   if(fit_type[0] EQ 1) then begin ; Mcen - require Mcen>0
+      if(res[ii] LT 0) then res[ii]=0. 
+      ii+=1
+   endif
+   if(fit_type[1] EQ 1) then begin ; Halo mass - require 10<Mhalo<16
+      if(use_group EQ 1 AND res[ii] LE 10.) then res[ii]=10. $
+      else if(use_group EQ 1 AND res[ii] GE 16.) then res[ii]=16.
+      ii+=1
+   endif
+   if(fit_type[2] EQ 1) then begin ; concentration - require conc>2.
+      if(res[ii] LT 2.) then res[ii]=2.
+      ii+=1
+   endif
+   if(fit_type[3] EQ 1) then begin ; alpha
+      ii+=1
+   endif
+   if(fit_type[4] EQ 1) then begin ; bias
+      ii+=1
+   endif
+   if(fit_type[5] EQ 1) then begin ; sigma_Mh
+      ii+=1
+   endif
+   if(fit_type[6] EQ 1) then begin ; offset - require Roff>0.
+      if(res[ii] LT 0.) then res[ii]=0.
+      ii+=1
+   endif
+   
 return,res
 end 
 
