@@ -69,7 +69,7 @@ cenTitles=cenTitles[reorder]
 lensFileArr=lensFileArr[reorder]
 
 openw,u,tableFile,/get_lun,width=1000
-if(n_elements(conc) EQ 0) then printf,u,'# Center  Mcen  Mnfw  dMnfw  chisq  Mnfw_off  dMnfw_off  Roff  dRoff  chisq_off' $
+if(n_elements(conc) EQ 0) then printf,u,'# Center  Mcen  Mnfw  dMnfw  Conc  chisq  Mnfw_off  dMnfw_off  Conc_off  Roff  dRoff  chisq_off' $
 else printf,u,'# Center  Mcen  Mnfw  dMnfw  Conc  dConc  chisq  Mnfw_off  dMnfw_off  Conc_off  dConc_ff  Roff  dRoff  chisq_off'
 
 for ii=0,n_elements(cenTitles)-1 do begin
@@ -88,6 +88,13 @@ for ii=0,n_elements(cenTitles)-1 do begin
       yerr = str.we1_error[sel]
    endelse
    
+   ; get Zhao concentrations if conc was not free
+   if(n_elements(conc) EQ 0) then begin
+      get_ds_model,str.fit_type,str.p_mean,str,x,/use_m200,conc=concVal
+      get_ds_model,str.fit_type2,str.p_mean2,str,x,/use_m200,conc=concVal2
+   endif
+
+   ; get chi^2 for each model
    chisq=get_ds_chisq(str.fit_type,str.p_mean,str,x,y,yerr,dof=dof,/use_m200)
    chisq2=get_ds_chisq(str.fit_type2,str.p_mean2,str,x,y,yerr,dof=dof2,/use_m200)
 
@@ -95,10 +102,10 @@ for ii=0,n_elements(cenTitles)-1 do begin
       
    if(ii EQ 0) then printf,u,'# dof (centered, offset): ',dof,dof2
 
-   if(n_elements(conc) EQ 0) then printf,u,cenTitles[ii],mcen,str.p_mean,str.p_sigma,chisq,str.p_mean2[0],str.p_sigma2[0],1000.*str.p_mean2[1],1000.*str.p_sigma2[1],chisq2, $
-          FORMAT='(A15," &",A5," &",F6.2," $\pm$",F6.2," &",F5.1," &",F6.2," $\pm$",F6.2," &",F6.1," $\pm$",F6.1," &",F5.1," \\")' $
+   if(n_elements(conc) EQ 0) then printf,u,cenTitles[ii],mcen,str.p_mean,str.p_sigma,concVal,chisq,str.p_mean2[0],str.p_sigma2[0],concVal2,1000.*str.p_mean2[1],1000.*str.p_sigma2[1],chisq2, $
+          FORMAT='(A15," &",A5," &",F6.2," $\pm$",F6.2," &",F5.1," &",F5.1," & & ",F6.2," $\pm$",F6.2," &",F5.1," &",F6.1," $\pm$",F6.1," &",F5.1," \\")' $
    else printf,u,cenTitles[ii],mcen,str.p_mean[0],str.p_sigma[0],str.p_mean[1],str.p_sigma[1],chisq,str.p_mean2[0],str.p_sigma2[0],str.p_mean2[1],str.p_sigma2[1],1000.*str.p_mean2[2],1000.*str.p_sigma2[2],chisq2, $
-          FORMAT='(A15," &",A5," &",F6.2," $\pm$",F6.2," &",F6.2," $\pm$",F6.2," &",F5.1," &",F6.2," $\pm$",F6.2," &",F6.2," $\pm$",F6.2," &",F6.1," $\pm$",F6.1," &",F5.1," \\")'
+          FORMAT='(A15," &",A5," &",F6.2," $\pm$",F6.2," &",F5.1," $\pm$",F5.1," &",F5.1," & & ",F6.2," $\pm$",F6.2," &",F5.1," $\pm$",F5.1," &",F6.1," $\pm$",F6.1," &",F5.1," \\")'
 endfor
 
 close,u
