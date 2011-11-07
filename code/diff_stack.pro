@@ -76,9 +76,9 @@ zscheme=2 ; from ALs code
 box_factor=20 ; from ALs code
 
 ; ordered bottom to top on plot
-cenNames=['mmgg_r200','mlgg_r200','mlgg_scale','cm','cl','cn','xray']
-cenText=textoidl(['MMGG_{R200}','MLGG_{R200}','MLGG_{scale}','CM','CL','CN','X-ray'])
-ptSrcCen=[2,2,2,0,0,0,0] ; for fit_t
+cenNames=['xray','cf','cm','cn','bgg_r200','bgg_scale','mmgg_r200']
+cenText=textoidl(['X-ray','CF','CM','CN','BGG_{R200}','BGG_{scale}','MMGG_{R200}'])
+ptSrcCen=[0,0,0,0,1,1,1] ; for fit_t
 refNames=replicate('mmgg_scale',n_elements(cenNames)) ; the "good center" to compare with the ones above
 refText=replicate(textoidl('MMGG_{scale}'),n_elements(cenNames))
 ptSrcRef=replicate(2,n_elements(cenNames))
