@@ -61,12 +61,12 @@ yst=1
 xlog=1
 ylog=0
 yloghist=1
-if(keyword_set(xlog)) then xr=[0.02,2] else xr=[0,1.5]
+if(keyword_set(xlog)) then xr=[0.03,1.3] else xr=[0,1.5]
 if(keyword_set(ylog)) then begin
    yr=[0.5,3000] 
 endif else begin 
-   yr=[-120,400]
-   ytickv=[0,200,400]
+   yr=[-100,300]
+   ytickv=[0,100,200]
 endelse
 if(keyword_set(yloghist)) then yrhist=[0.5,150] else yrhist=[0,110]
 ;if(keyword_set(ylog)) then ytickf='loglabels' else ytickf=''
