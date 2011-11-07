@@ -11,7 +11,9 @@ case center of
    'mmgg_r200': mass=group.mmgg_r200_mstar
    'mmgg2_r200': mass=group.mmgg2_r200_mstar
    'mlgg_scale': mass=group.mlgg_scale_mstar
+   'bgg_scale': mass=group.mlgg_scale_mstar
    'mlgg_r200': mass=group.mlgg_r200_mstar
+   'bgg_r200': mass=group.mlgg_r200_mstar
    'bcg1': mass=group.bcg_sm ; AL's old center
    'visual': mass=group.visual_mstar ; see mrg_center_notes_20110808_distilled.txt and weird_stack.pro
    else: mass[*]=0.              ; center is not a galaxy

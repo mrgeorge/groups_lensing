@@ -17,6 +17,10 @@ case name of
       ra=group.alpha_cl
       dec=group.delta_cl
    end
+   'cf': begin
+      ra=group.alpha_cl
+      dec=group.delta_cl
+   end
    'cn_red': begin
       ra=group.alpha_cn_red
       dec=group.delta_cn_red
@@ -41,6 +45,10 @@ case name of
       ra=group.alpha_mlgg_scale
       dec=group.delta_mlgg_scale
    end
+   'bgg_scale': begin
+      ra=group.alpha_mlgg_scale
+      dec=group.delta_mlgg_scale
+   end
    'mmgg_r200': begin
       ra=group.alpha_mmgg_r200
       dec=group.delta_mmgg_r200
@@ -50,6 +58,10 @@ case name of
       dec=group.delta_mmgg2_r200
    end
    'mlgg_r200': begin
+      ra=group.alpha_mlgg_r200
+      dec=group.delta_mlgg_r200
+   end
+   'bgg_r200': begin
       ra=group.alpha_mlgg_r200
       dec=group.delta_mlgg_r200
    end
