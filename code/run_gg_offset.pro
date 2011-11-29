@@ -5,7 +5,8 @@ pro run_gg_offset, infile_source, infile_lens, outfile, innerRadiusKpc, secondRa
             center=center,$
             refcen=refcen,$
             stackx=stackx, $               ; Stack the X axis according to r/R200
-            emp_var=emp_var
+            emp_var=emp_var, $
+            subhalo=subhalo                ; set msun_lens to be a fixed multiple of the stellar mass to test contribution of subhalo
 
 ;----------------------------------------------------------------------
 ; Various tests 
@@ -261,7 +262,10 @@ endif else begin
    str_lens.lx_scale     = struct_lens.lx_scale
    str_lens.lensing_r200_mpc = struct_lens.lensing_r200_mpc
    str_lens.id           = struct_lens.id
-   str_lens.msun_lens    = get_msun_lens(struct_lens,center)
+   if(n_elements(subhalo) EQ 0) then $
+      str_lens.msun_lens    = get_msun_lens(struct_lens,center) $
+   else $
+      str_lens.msun_lens    = 10. * get_msun_lens(struct_lens,center) ; for miscentering tests, in case candidate central is actually a satellite with a massive subhalo, to see how it affects the halo fit.
 endelse
 
 str_source.ident_source             = ident_source
