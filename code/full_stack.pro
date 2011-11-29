@@ -20,7 +20,6 @@ fit_t = [$
 0]              ; 6  offset
 
 if(n_elements(conc) GT 0) then fit_t[2]=1
-if(n_elements(cenFree) GT 0) then fit_t[0]=1
 ;----------------------------------------------------------------------
 ; Various tests 
 ; zscheme 0 -> 68 % cut + sigma cut=0.1
@@ -33,7 +32,9 @@ box_factor=20 ; from ALs code
 
 ; create 2d array to save fit types, 1 row for each center
 fitTypeAll=rebin(fit_t,n_elements(fit_t),n_elements(cenNames))
-fitTypeAll[0,*]=ptSrc
+if(n_elements(cenFree) GT 0) then fitTypeAll[0,*]=1 $
+else fitTypeAll[0,*]=ptSrc
+
 
 ; repeat for offset model
 fitTypeAll2=fitTypeAll
@@ -72,7 +73,7 @@ lensFileArr=lensFileArr[reorder]
 openw,u,tableFile,/get_lun,width=1000
 if(n_elements(conc) EQ 0 AND n_elements(cenFree) EQ 0) then printf,u,'# Center  Mcen  Mnfw  dMnfw  Conc  chisq  Mnfw_off  dMnfw_off  Conc_off  Roff  dRoff  chisq_off' $
 else if(n_elements(conc) EQ 0 AND n_elements(cenFree) GT 0) then printf,u,'# Center  Mcen  dMCen  Mnfw  dMnfw  Conc  chisq  Mcen_off  dMcen_off  Mnfw_off  dMnfw_off  Conc_off  Roff  dRoff  chisq_off' $
-else if(n_elements(conc) GT 0 AND n_elements(cenFree EQ 0) then printf,u,'# Center  Mcen  Mnfw  dMnfw  Conc  dConc  chisq  Mnfw_off  dMnfw_off  Conc_off  dConc_ff  Roff  dRoff  chisq_off'
+else if(n_elements(conc) GT 0 AND n_elements(cenFree EQ 0)) then printf,u,'# Center  Mcen  Mnfw  dMnfw  Conc  dConc  chisq  Mnfw_off  dMnfw_off  Conc_off  dConc_ff  Roff  dRoff  chisq_off' $
 else printf,u,'# Center  Mcen  dMcen  Mnfw  dMnfw  Conc  dConc  chisq  Mcen_off  dMcen_off  Mnfw_off  dMnfw_off  Conc_off  dConc_ff  Roff  dRoff  chisq_off'
 
 for ii=0,n_elements(cenTitles)-1 do begin
@@ -115,7 +116,6 @@ for ii=0,n_elements(cenTitles)-1 do begin
 
    else if(n_elements(conc) EQ 0 AND n_elements(cenFree) GT 0) then printf,u,cenTitles[ii],mcen,str.p_sigma[0],str.p_mean[1],str.p_sigma[1],concVal,chisq,str.p_mean2[0],str.p_sigma2[0],str.p_mean2[1],str.p_sigma2[1],concVal2,1000.*str.p_mean2[2],1000.*str.p_sigma2[2],chisq2, $
           FORMAT='(A15," &",A5," $\pm$",F4.1," &",F6.2," $\pm$",F6.2," &",F5.1," &",F5.1," & & ",F4.1," $\pm$",F4.1," &",F6.2," $\pm$",F6.2," &",F5.1," &",F6.1," $\pm$",F6.1," &",F5.1," \\")' $
-endfor
 
    else if(n_elements(conc) GT 0 AND n_elements(cenFree) GT 0) then printf,u,cenTitles[ii],mcen,str.p_sigma[0],str.p_mean[1],str.p_sigma[1],str.p_mean[2],str.p_sigma[2],chisq,str.p_mean2[0],str.p_sigma2[0],str.p_mean2[1],str.p_sigma2[1],str.p_mean2[2],str.p_sigma2[2],1000.*str.p_mean2[3],1000.*str.p_sigma2[3],chisq2, $
           FORMAT='(A15," &",A5," $\pm$",F4.1," &",F6.2," $\pm$",F6.2," &",F5.1," $\pm$",F5.1," &",F5.1," & & ",F4.1," $\pm$",F4.1," &",F6.2," $\pm$",F6.2," &",F5.1," $\pm$",F5.1," &",F6.1," $\pm$",F6.1," &",F5.1," \\")'
