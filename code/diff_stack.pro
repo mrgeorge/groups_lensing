@@ -82,6 +82,12 @@ ptSrcCen=[0,0,0,0,1,1,1] ; for fit_t
 refNames=replicate('mmgg_scale',n_elements(cenNames)) ; the "good center" to compare with the ones above
 refText=replicate(textoidl('MMGG_{scale}'),n_elements(cenNames))
 ptSrcRef=replicate(2,n_elements(cenNames))
+;cenNames=['xray','cf','cm','cn','bgg_r200','mmgg_r200','mmgg_scale']
+;cenText=textoidl(['X-ray','CF','CM','CN','BGG_{R200}','MMGG_{R200}','MMGG_{scale}'])
+;ptSrcCen=[0,0,0,0,1,1,1] ; for fit_t
+;refNames=replicate('bgg_scale',n_elements(cenNames)) ; the "good center" to compare with the ones above
+;refText=replicate(textoidl('BGG_{scale}'),n_elements(cenNames))
+;ptSrcRef=replicate(2,n_elements(cenNames))
 
 ; filenames convention - first name is the center used for lensing,
 ;                        2nd is the one used for comparison (needed
