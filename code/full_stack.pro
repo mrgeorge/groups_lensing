@@ -167,7 +167,7 @@ if(keyword_set(stackx)) then sxExt='_sx' else sxExt=''
 if(keyword_set(emp_var)) then empExt='_emp' else empExt=''
 if(keyword_set(conc)) then concExt='_conc' else concExt=''
 if(keyword_set(cenFree)) then cenExt='_cen' else cenExt=''
-if(keyword_set(subhalo)) then subExt='_sub' else subExt=''
+if(keyword_set(subhalo)) then subExt='_sub'+string(subhalo,format='(F04.1)') else subExt=''
 
 ; Set paths for input files
 infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7.fits' ; Using the new catalog (photoz version 1.7)
