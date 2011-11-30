@@ -265,7 +265,7 @@ endif else begin
    if(n_elements(subhalo) EQ 0) then $
       str_lens.msun_lens    = get_msun_lens(struct_lens,center) $
    else $
-      str_lens.msun_lens    = subhalo * get_msun_lens(struct_lens,center) ; for miscentering tests, in case candidate central is actually a satellite with a massive subhalo, to see how it affects the halo fit.
+      str_lens.msun_lens    = alog10(subhalo) + get_msun_lens(struct_lens,center) ; for miscentering tests, in case candidate central is actually a satellite with a massive subhalo, to see how it affects the halo fit.
 endelse
 
 str_source.ident_source             = ident_source
