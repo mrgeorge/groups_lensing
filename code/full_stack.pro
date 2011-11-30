@@ -181,8 +181,8 @@ if(NOT(file_test(fileDir))) then file_mkdir,fileDir
 if(NOT(file_test(plotDir))) then file_mkdir,plotDir
 
 ; Centers ordered bottom left to top right on plot
-cenNames=['cl','xray','cn','cm','mlgg_scale','mlgg_r200','mmgg_scale','mmgg_r200']
-cenTitlesTex=['CL','X-ray','CN','CM','MLGG_{scale}','MLGG_{R200}','MMGG_{scale}','MMGG_{R200}']
+cenNames=['cf','xray','cn','cm','bgg_scale','bgg_r200','mmgg_scale','mmgg_r200']
+cenTitlesTex=['CF','X-ray','CN','CM','BGG_{scale}','BGG_{R200}','MMGG_{scale}','MMGG_{R200}']
 cenTitles=textoidl(cenTitlesTex)
 ptSrc=[0,0,0,0,2,2,2,2] ; for fit_t
 
