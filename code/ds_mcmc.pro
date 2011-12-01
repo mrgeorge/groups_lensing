@@ -75,8 +75,8 @@ function mcmc_check_limits, res
 common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx
 
    ii=0
-   if(fit_type[0] EQ 1) then begin ; Mcen - require Mcen>0
-      if(res[ii] LE 0) then return, 1
+   if(fit_type[0] EQ 1) then begin ; Mcen - require Mcen>10
+      if(res[ii] LE 10) then return, 1
       ii+=1
    endif
    if(fit_type[1] EQ 1) then begin ; Halo mass - require 10<Mhalo<16
@@ -84,8 +84,8 @@ common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, 
       else if(use_group EQ 1 AND res[ii] GE 16.) then return, 1
       ii+=1
    endif
-   if(fit_type[2] EQ 1) then begin ; concentration - require conc>2.
-      if(res[ii] LE 2.) then return, 1
+   if(fit_type[2] EQ 1) then begin ; concentration - require conc>1.
+      if(res[ii] LE 1.) then return, 1
       ii+=1
    endif
    if(fit_type[3] EQ 1) then begin ; alpha
@@ -189,7 +189,8 @@ pro ds_mcmc,s, pars, p_mean=p_mean, p_sigma=p_sigma, rob_p_mean=p_mean_rob,$
             zoom=zoom,$
             nstep=nstep,$
             burnin=burnin,$
-            rand_start=rand_start
+            rand_start=rand_start,$
+            chainFile=chainFile
 
 if n_params() eq 0 then begin
     print,'-syntax mcmc_nfw_conc,s,pars,p_mean=p_mean,p_sigma=p_sigma,plot=plot,lum=lum'
@@ -257,7 +258,8 @@ psigma   = p_sigma_rob
 ;-- Second Run
 print,'>> Second MCMC run'
 pars = mcmc->run('mcmc_step', 'mcmc_like', $
-                 nstep, parguess, printstep=10000,/log)
+                 nstep, parguess, printstep=10000,/log,file=chainFile)
+if(n_elements(chainFile) GT 0) then pars=mcmc->read_trials(chainFile)
 
 ; ??? what is k ??
 count_trans,pars,new,k
