@@ -38,30 +38,26 @@ if(n_elements(levels) GT 1) then $
 ; else plot no contours
 end
 
-pro ds_cov_plots, pars, plotFile, hist=hist
+pro ds_cov_plots, chainFile, fit_type, p_mean, p_sigma, plotFile, hist=hist, burnin=burnin
 
 ; copied from /Users/alexie/idl/MCMC/dsmodel/ds_cov_plots.pro with changes
-
 ;-----------------------------------------------------------------------------
 ; Adapted from Dave : /Users/alexie/idl/dave_idl/inversion/mcmc_cov_plots3.pro
 ;-----------------------------------------------------------------------------
 
-common mcmc_block, x, y, ivar, psigma, npars, Prior_mean, Prior_sigma
-common fit_options, q_c, lens_redshift, fit_type, lens_m_sun
+mcmc=obj_new('mcmc')
+pars=mcmc->read_trials(chainFile)
+if(n_elements(burnin) EQ 0) then burnin=500
+pars=pars[*,burnin:*]
+
+;common mcmc_block, x, y, ivar, psigma, npars, Prior_mean, Prior_sigma
+;common fit_options, q_c, lens_redshift, fit_type, lens_m_sun
 
 ;-- Get robust measures
-mcmc_stats,pars,p_mean,p_sigma,p_mean_rob,p_sigma_rob,nsig=nsig,niter=niter
+;mcmc_stats,pars,p_mean,p_sigma,p_mean_rob,p_sigma_rob
 
 sz=size(pars,/dim)   ; pars = chain
 npars=sz[0]              ; n=number of pars
-
-;!p.charsize=2
-
-;!x.omargin=[4,2]
-;!y.omargin=[3,2]
-
-;!x.margin=[7,3]
-;!y.margin=[3,2]
 
 ; -- Set up plot Labels -------------------------------------------------
 ; 0  baryonic mass
@@ -72,43 +68,43 @@ npars=sz[0]              ; n=number of pars
 ; 5  m_sigma : dispersion in central mass
 ;-------------------------------------------------------------------------
 
-p_lab = strarr(npars)
+titles = strarr(npars)
 
 k = 0
 
 ; Baryonic term
 if (fit_type[0] eq 1) then begin
-    p_lab[k] = 'Mcen'
+    titles[k] = 'Mcen'
     k=k+1  
 endif
 ; Rvir
 if (fit_type[1] eq 1) then begin 
-    p_lab[k] = 'Mnfw'
+    titles[k] = 'Mnfw'
     k=k+1  
 endif
 ; Conc
 if ((fit_type[2] eq 1)) then begin
-    p_lab[k] = 'Conc'
+    titles[k] = 'Conc'
     k=k+1  
 endif
 ; Alpha
 if (fit_type[3] eq 1) then begin 
-    p_lab[k] = 'Alpha'
+    titles[k] = 'Alpha'
     k=k+1  
 endif
 ; Bias
 if (fit_type[4] eq 1) then begin 
-    p_lab[k] = 'Bias'
+    titles[k] = 'Bias'
     k=k+1  
 endif
 ; Dispersion in central mass
 if (fit_type[5] eq 1) then begin 
-    p_lab[k] = 'Dispersion'
+    titles[k] = 'Dispersion'
     k=k+1  
 endif
 ; Offset radius
 if (fit_type[6] eq 1) then begin 
-    p_lab[k] = 'Roff'
+    titles[k] = 'Roff'
 endif
 
 ;-------------------------------------------------------------------------
@@ -131,13 +127,13 @@ if keyword_set(hist) then begin
     ; Go through the parameters
     for i=0, npars-1 do begin
 
-        bin = p_sigma_rob[i]/5.0
+        bin = p_sigma[i]/5.0
         xr  = long(100*p_mean[i])/100.0+long(10.0*p_sigma[i]*[-4,4])/10.0
         
         plothist,reform(pars[i,*]),bin=bin,hx,hy,/noplot  ; Histogram
         ymax=1000*ceil(max(hy)*1.1/1000.0)
 
-        plothist,reform(pars[i,*]),bin=bin,_extra=ex,hx,hy,xr=xr,xticks=2,yticks=2,xtit=p_lab[i],/xst,yr=[0,ymax],/yst
+        plothist,reform(pars[i,*]),bin=bin,_extra=ex,hx,hy,xr=xr,xticks=2,yticks=2,xtit=titles[i],/xst,yr=[0,ymax],/yst
         max_p=max(pars[i,*])  ;max of chain
         min_p=min(pars[i,*])  ;min of chain
         xr=(max_p-min_p)
@@ -176,6 +172,7 @@ endif else begin
     ywidth=(1.-bmarg-tmarg-yspace*(npars-2))/(npars-1)
 
     set_plot,'ps'
+    simpctable
     device,filename=plotFile,/encapsul,/color,/helvetica,xsize=8,ysize=8,/inches
 
     for ii=0, npars-1 do begin         ; Go through params
@@ -185,14 +182,14 @@ endif else begin
            blank=replicate(' ',30)
            fill=replicate('',30)
            if(jj EQ npars-1) then begin
-              xtit=p_lab[ii]
+              xtit=titles[ii]
               xtickn=fill
            endif else begin
               xtit=''
               xtickn=blank
            endelse
            if(ii EQ 0) then begin
-              ytit=p_lab[jj]
+              ytit=titles[jj]
               ytickn=fill
            endif else begin
               ytit=''
