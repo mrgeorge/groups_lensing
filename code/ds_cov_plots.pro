@@ -34,7 +34,7 @@ xs=findgen(dims[0])*xBin+min(xRange)
 ys=findgen(dims[1])*yBin+min(yRange)
 levels=find_contour_levels(res)
 if(n_elements(levels) GT 1) then $ 
-   contour,res,xs,ys,color=color,/over,levels=levels[1:2],/fill,c_color=[!red,!blue]
+   contour,res,xs,ys,color=color,/over,levels=levels[1:2],/fill,c_color=[!medblue,!darkblue]
 ; else plot no contours
 end
 
@@ -68,23 +68,36 @@ npars=sz[0]              ; n=number of pars
 ; 5  m_sigma : dispersion in central mass
 ;-------------------------------------------------------------------------
 
+sun=sunsymbol()
 titles = strarr(npars)
+ranges=fltarr(2,npars)
+tickv=fltarr(3,npars)
+nticks=n_elements(tickv[*,0])-1
+minor=intarr(npars)
 
 k = 0
-
 ; Baryonic term
 if (fit_type[0] eq 1) then begin
-    titles[k] = 'Mcen'
+    titles[k] = 'log(M_{cen}/M'+sun+')'
+    ranges[*,k]=[10,13]
+    tickv[*,k]=[10.5,11.5,12.5]
+    minor[k]=10
     k=k+1  
 endif
-; Rvir
+; Mnfw
 if (fit_type[1] eq 1) then begin 
-    titles[k] = 'Mnfw'
+    titles[k] = 'log(M_{200c}/M'+sun+')'
+    ranges[*,k]=[13.,13.8]
+    tickv[*,k]=[13.1,13.4,13.7]
+    minor[k]=3
     k=k+1  
 endif
 ; Conc
 if ((fit_type[2] eq 1)) then begin
-    titles[k] = 'Conc'
+    titles[k] = 'c_{200c}'
+    ranges[*,k]=[1,12]
+    tickv[*,k]=[2.,6.,10.]
+    minor[k]=4
     k=k+1  
 endif
 ; Alpha
@@ -104,8 +117,14 @@ if (fit_type[5] eq 1) then begin
 endif
 ; Offset radius
 if (fit_type[6] eq 1) then begin 
-    titles[k] = 'Roff'
+    titles[k] = 'R_{off} (kpc)'
+    ranges[*,k]=[0,100]
+    tickv[*,k]=[0.,50.,100.]
+    minor[k]=5
+    pars[k,*]*=1000. ; convert from Mpc to kpc
 endif
+
+titles=textoidl(titles)
 
 ;-------------------------------------------------------------------------
 ; Make a histogram of marginal posteriors versus the Priors
@@ -157,7 +176,7 @@ endif else begin
     !p.thick=3
     !x.thick=3
     !y.thick=3
-    !p.charsize=1.2
+    !p.charsize=2
     !p.charthick=1.2
     !p.font=0
 
@@ -179,8 +198,8 @@ endif else begin
         for jj=ii+1, npars-1 do begin     ; Go through params
 
 
-           blank=replicate(' ',30)
-           fill=replicate('',30)
+           blank=replicate(' ',nticks+1)
+           fill=replicate('',nticks+1)
            if(jj EQ npars-1) then begin
               xtit=titles[ii]
               xtickn=fill
@@ -231,14 +250,21 @@ endif else begin
 ;                   yticks=2,levels=lev,/fill,c_color=[!red,!blue],xr=xr,yr=yr,/xst,/yst,position=[x1,y1,x2,y2]
 ;           print,nn
 
-           rangeFactor=3.
-           xr=p_mean[ii]+rangeFactor*p_sigma[ii]*[-1,1]
-           yr=p_mean[jj]+rangeFactor*p_sigma[jj]*[-1,1]
+;           rangeFactor=3.
+;           xr=p_mean[ii]+rangeFactor*p_sigma[ii]*[-1,1]
+;           yr=p_mean[jj]+rangeFactor*p_sigma[jj]*[-1,1]
+           xr=ranges[*,ii]
+           yr=ranges[*,jj]
            nBins=50.
            xbin=(xr[1]-xr[0])/nBins
            ybin=(yr[1]-yr[0])/nBins
-           plot,/nodata,xr,yr,xst=1,yst=1,xtit=xtit,ytit=ytit,position=[x1,y1,x2,y2],xtickn=xtickn,ytickn=ytickn
+
+           plot,/nodata,xr,yr,xst=1+4,yst=1+4,position=[x1,y1,x2,y2]
            oplot_contours,xp,yp,xbin,ybin,xr,yr,!black;,g_smooth=sm
+           axis,xaxis=0,xst=1,xtickn=xtickn,xtickv=tickv[*,ii],xticks=nticks,xminor=minor[ii],xtit=xtit
+           axis,xaxis=1,xst=1,xtickn=blank,xtickv=tickv[*,ii],xticks=nticks,xminor=minor[ii]
+           axis,yaxis=0,yst=1,ytickn=ytickn,ytickv=tickv[*,jj],yticks=nticks,yminor=minor[jj],ytit=ytit
+           axis,yaxis=1,yst=1,ytickn=blank,ytickv=tickv[*,jj],yticks=nticks,yminor=minor[jj]
         endfor
     endfor
     
