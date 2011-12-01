@@ -69,37 +69,23 @@ psigma = Prior_sigma*shrink
 return
 end
 
-;-------------------------------------------------------------------------
-; *** STEP ***
-;-------------------------------------------------------------------------
+function mcmc_check_limits, res
+; return 0 if pars are within bounds, 1 if it hits any limits
 
-function mcmc_step, seed, pars
-
-common mcmc_block, x, y, ivar, psigma, npars, Prior_mean, Prior_sigma
 common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx
-   ;Gaussian steps, two choices
-   ;step away from previous set of pars
-
-   res=psigma*randomn(seed,npars)+pars   ; ! Note : this is where psigma comes into play !
-
-   ; Enforce a reasonable value for the mass for the noisy groups:
-   ; (this is imp: prevents runaway results)
-   ; NOTE :
-   ; This is where you can put a prior on a variable to be more than 0 for example !!!
-   ; e.g : NOTE : I MAY NEED TO CHECK THAT m_sigma remains positive
 
    ii=0
    if(fit_type[0] EQ 1) then begin ; Mcen - require Mcen>0
-      if(res[ii] LT 0) then res[ii]=0. 
+      if(res[ii] LE 0) then return, 1
       ii+=1
    endif
    if(fit_type[1] EQ 1) then begin ; Halo mass - require 10<Mhalo<16
-      if(use_group EQ 1 AND res[ii] LE 10.) then res[ii]=10. $
-      else if(use_group EQ 1 AND res[ii] GE 16.) then res[ii]=16.
+      if(use_group EQ 1 AND res[ii] LE 10.) then return, 1 $
+      else if(use_group EQ 1 AND res[ii] GE 16.) then return, 1
       ii+=1
    endif
    if(fit_type[2] EQ 1) then begin ; concentration - require conc>2.
-      if(res[ii] LT 2.) then res[ii]=2.
+      if(res[ii] LE 2.) then return, 1
       ii+=1
    endif
    if(fit_type[3] EQ 1) then begin ; alpha
@@ -112,12 +98,31 @@ common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, 
       ii+=1
    endif
    if(fit_type[6] EQ 1) then begin ; offset - require Roff>0.
-      if(res[ii] LT 0.) then res[ii]=0.
+      if(res[ii] LE 0.) then return, 1
       ii+=1
    endif
+
+return, 0
+end
+
+;-------------------------------------------------------------------------
+; *** STEP ***
+;-------------------------------------------------------------------------
+
+function mcmc_step, seed, pars
+
+common mcmc_block, x, y, ivar, psigma, npars, Prior_mean, Prior_sigma
+common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx
+   ;Gaussian steps, two choices
+   ;step away from previous set of pars
+
+   repeat begin
+      res=psigma*randomn(seed,npars)+pars ; ! Note : this is where psigma comes into play !
+   endrep until (mcmc_check_limits(res) EQ 0)
    
 return,res
 end 
+
 
 ;-------------------------------------------------------------------------
 ; *** LIKELIHOOD ***
@@ -127,6 +132,10 @@ function mcmc_like, p
 
 common mcmc_block, x, y, ivar, psigma, npars, Prior_mean, Prior_sigma
 common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx
+
+  ; reject point if it is out of bounds by returning -Inf likelihood
+  if(mcmc_check_limits(p)) then return, -!values.f_infinity
+
 
   ; Inverse variance (ivar=1.0/yerr^2)
   ; Basically, this is the number of data points
