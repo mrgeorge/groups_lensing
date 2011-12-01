@@ -202,7 +202,7 @@ common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, 
 
 ; Number of steps
 if n_elements(nstep) eq 0 then nstep = 10000
-nstep_quick=long(nstep/3.0)  ; this is for first run
+nstep_quick=min([long(nstep/3.0),10000L]  ; this is for first run
 if n_elements(burnin) eq 0 then burnin = 500
 
 if nstep lt burnin*1.5 then begin
