@@ -3,6 +3,7 @@ pro run_ds_mcmc, lens_infile, $
                  rob_p_mean, $
                  rob_p_sigma, $
                  fast=fast, $
+                 medium=medium, $
                  stackx=stackx
 
 ; Partial replacement of plot_halofit - only does the modeling, plotting is done elsewhere
@@ -55,7 +56,10 @@ sx = keyword_set(stackx)        ; /stackx
 if keyword_set(fast) then begin  ;for quick debugging
     nstep=4000
     burnin=100
-endif else begin
+endif else if(n_elements(medium) GT 0) then begin
+    nstep=15000L
+    burnin=200L
+ endif else begin
     nstep=50000L
     burnin=500L
 endelse
