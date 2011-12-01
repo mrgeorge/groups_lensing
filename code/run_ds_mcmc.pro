@@ -4,7 +4,11 @@ pro run_ds_mcmc, lens_infile, $
                  rob_p_sigma, $
                  fast=fast, $
                  medium=medium, $
-                 stackx=stackx
+                 slow=slow, $
+                 stackx=stackx, $
+                 chainFile=chainFile,$
+                 burnin=burnin, $
+                 noSave=noSave
 
 ; Partial replacement of plot_halofit - only does the modeling, plotting is done elsewhere
 
@@ -59,7 +63,10 @@ if keyword_set(fast) then begin  ;for quick debugging
 endif else if(n_elements(medium) GT 0) then begin
     nstep=15000L
     burnin=200L
- endif else begin
+endif else if(n_elements(slow) GT 0) then begin
+    nstep=1000000L
+    burnin=1000L
+endif else begin
     nstep=50000L
     burnin=500L
 endelse
@@ -70,7 +77,7 @@ print,'MCMC burn-in ',burnin
 nch = nstep-burnin  ; Number of elements in the chain
 
 ; Call the MCMC procedure. NOTE : 'pars' is the MCMC chain
-ds_mcmc, str, pars, p_mean=p_mean, p_sigma=p_sigma, rob_p_mean=rob_p_mean, rob_p_sigma=rob_p_sigma, nstep=nstep, burnin=burnin
+ds_mcmc, str, pars, p_mean=p_mean, p_sigma=p_sigma, rob_p_mean=rob_p_mean, rob_p_sigma=rob_p_sigma, nstep=nstep, burnin=burnin, chainFile=chainFile
 
 ; Robust estimation versus regular estimation
 print,'----------'
@@ -79,17 +86,19 @@ print,p_mean,rob_p_mean
 print,p_sigma,rob_p_sigma
 print,'----------'
 
-; Write fit type and parameters to struct/file
-if(NOT(tag_exist(full_str,'FIT_TYPE'))) then $
-   full_str=create_struct(full_str,'FIT_TYPE',fit_type,'P_MEAN',rob_p_mean,'P_SIGMA',rob_p_sigma) $
-else if(NOT(tag_exist(full_str,'FIT_TYPE2'))) then $
-   full_str=create_struct(full_str,'FIT_TYPE2',fit_type,'P_MEAN2',rob_p_mean,'P_SIGMA2',rob_p_sigma) $
-else begin
-   print,'run_ds_mcmc: tags FIT_TYPE and FIT_TYPE2 already exist in this struct' ; it's already been modeled twice, if you want more than two models rethink the data structure and code
-   stop
-endelse
+if(n_elements(noSave) EQ 0) then begin
+   ; Write fit type and parameters to struct/file
+   if(NOT(tag_exist(full_str,'FIT_TYPE'))) then $
+      full_str=create_struct(full_str,'FIT_TYPE',fit_type,'P_MEAN',rob_p_mean,'P_SIGMA',rob_p_sigma) $
+   else if(NOT(tag_exist(full_str,'FIT_TYPE2'))) then $
+      full_str=create_struct(full_str,'FIT_TYPE2',fit_type,'P_MEAN2',rob_p_mean,'P_SIGMA2',rob_p_sigma) $
+   else begin
+      print,'run_ds_mcmc: tags FIT_TYPE and FIT_TYPE2 already exist in this struct' ; it's already been modeled twice, if you want more than two models rethink the data structure and code
+      stop
+   endelse
 
-mwrfits,full_str,lens_infile,/create
+   mwrfits,full_str,lens_infile,/create
+endif
 
 print,'END OF DS_MCMC ROUTINE'
 
