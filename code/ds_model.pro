@@ -7,8 +7,6 @@ function ds_model, X, P,$
                    ds_z0=ds_z0,$
                    return_all=return_all,$
                    skip_dslin=skip_dslin,$
-                   center=center,$
-                   refcen=refcen,$
                    zl=zl
 
 
