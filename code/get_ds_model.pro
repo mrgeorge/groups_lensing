@@ -1,4 +1,4 @@
-pro get_ds_model, fit_type, p_mean, lens_str, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
+pro get_ds_model, fit_type, p_mean, lens_str, x_mpc, ps_term=ps_term, nfw_term=nfw_term, tot=tot,$
                   center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,use_m200=use_m200,$
                   mnfw=mnfw,conc=conc,rnfw=rnfw
 ; determine model components for a given set of parameters
@@ -140,6 +140,8 @@ rnfw     = 10.0^(r_log)
 ps_term=10^(M0)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
 
 nfw_term=nfw_ds_offset(x_mpc,[rnfw,conc],zl,r200=keyword_set(use_m200),roff=offset)
+
+tot=nfw_term + ps_term
 
 if(keyword_set(center) AND keyword_set(refcen) AND keyword_set(groupFile)) then $
    nfw_off=nfw_ds_offset(x_mpc,[rnfw,conc],zl,groupFile,r200=keyword_set(use_m200),center=center,refcen=refcen)
