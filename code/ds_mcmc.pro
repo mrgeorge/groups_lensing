@@ -49,8 +49,11 @@ ivar  = 1.0/yerr^2
 ;-------------------------------------------
 ; Run ds_model once just to set up xi_lin
 ;-------------------------------------------
-
-fake_model = ds_model(x,Prior_mean)
+; MRG - this line commented in order to switch to using get_ds_model
+;       ONLY, replacing ds_model. This will cause modeling of the
+;       two-halo term to fail, since it's currently not
+;       supported by get_ds_model.
+;fake_model = ds_model(x,Prior_mean)
 
 ;-------------------------------------------
 ; Sample from the prior
@@ -145,7 +148,8 @@ common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, 
   ; THIS IS THE DELTA SIGMA MODEL : model=delta sigma
   ;--------------------------------------------------
 
-  model = ds_model(x,p,/skip_dslin)
+;  model = ds_model(x,p,/skip_dslin)
+  get_ds_model,x,p,tot=model
   
   ; check dave's version which is : nfw_delta_sigma_mcmc(x,p)
 
