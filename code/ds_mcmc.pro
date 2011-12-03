@@ -75,7 +75,7 @@ end
 function mcmc_check_limits, res
 ; return 0 if pars are within bounds, 1 if it hits any limits
 
-common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx
+common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx,sis
 
    ii=0
    if(fit_type[0] EQ 1) then begin ; Mcen - require Mcen>10
@@ -115,7 +115,7 @@ end
 function mcmc_step, seed, pars
 
 common mcmc_block, x, y, ivar, psigma, npars, Prior_mean, Prior_sigma
-common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx
+common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx,sis
    ;Gaussian steps, two choices
    ;step away from previous set of pars
 
@@ -134,7 +134,7 @@ end
 function mcmc_like, p
 
 common mcmc_block, x, y, ivar, psigma, npars, Prior_mean, Prior_sigma
-common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx
+common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx,sis
 
   ; reject point if it is out of bounds by returning -Inf likelihood
   if(mcmc_check_limits(p)) then return, -!values.f_infinity
@@ -149,7 +149,7 @@ common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, 
   ;--------------------------------------------------
 
 ;  model = ds_model(x,p,/skip_dslin)
-  get_ds_model,x,p,tot=model
+  get_ds_model,x,p,tot=model,sis=sis
   
   ; check dave's version which is : nfw_delta_sigma_mcmc(x,p)
 
@@ -202,7 +202,7 @@ if n_params() eq 0 then begin
 endif
 
 common mcmc_block, x, y, ivar, psigma, npars, Prior_mean, Prior_sigma
-common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx
+common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx,sis
 
 ; Number of steps
 if n_elements(nstep) eq 0 then nstep = 10000
