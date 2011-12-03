@@ -1,4 +1,4 @@
-pro get_ds_model, fit_type, p_mean, lens_str, x_mpc, $                             ; inputs
+pro get_ds_model, fit_type, p_mean, zl, msun, x_mpc, $                             ; inputs
                   sis=sis, use_m200=use_m200,$                                     ; switches
                   center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,$; options for diff_stack
                   ps_term=ps_term, nfw_term=nfw_term, tot=tot,$                    ; output profiles
@@ -10,14 +10,12 @@ pro get_ds_model, fit_type, p_mean, lens_str, x_mpc, $                          
 
 ; fit_type is array telling which parameters are included in fit
 ; p_mean gives mean fit parameters
-; lens_str is struct containing mean z and point source mass
+; zl and msun are the lens redshift and central stellar mass
 ; ps_term, nfw_term return model values at radii x_mpc
 ; if center, refcen, and groupFile are set, nfw_off will contain the
 ;   model NFW (assumed to be fit around refcen) convolved with the offset distribution between center
 ;   and refcen, to give the predicted signal around center
 ; note that nfw_term may include a centering offset if fit_type[6]>0
-
-zl=lens_str.z_lens
 
 ;-------------------------------------------------------------------------
 ; VARIABLES
@@ -41,7 +39,7 @@ if(fit_type[0] eq 1) then begin
    i = i+1
 endif else begin
 ; Fix from the data
-   M0 = lens_str.msun_lens      ; alog10 units
+   M0 = msun      ; alog10 units
 endelse
 
 ; M_vir
