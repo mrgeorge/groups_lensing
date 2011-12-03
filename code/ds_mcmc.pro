@@ -149,7 +149,7 @@ common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, 
   ;--------------------------------------------------
 
 ;  model = ds_model(x,p,/skip_dslin)
-  get_ds_model,x,p,tot=model,sis=sis
+  get_ds_model,fit_type,p,lens_redshift,log_sm,tot=model,sis=sis
   
   ; check dave's version which is : nfw_delta_sigma_mcmc(x,p)
 
@@ -206,7 +206,7 @@ common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, 
 
 ; Number of steps
 if n_elements(nstep) eq 0 then nstep = 10000
-nstep_quick=min([long(nstep/3.0),10000L]  ; this is for first run
+nstep_quick=min([long(nstep/3.0),10000L])  ; this is for first run
 if n_elements(burnin) eq 0 then burnin = 500
 
 if nstep lt burnin*1.5 then begin
