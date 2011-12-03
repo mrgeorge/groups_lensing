@@ -149,7 +149,7 @@ common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, 
   ;--------------------------------------------------
 
 ;  model = ds_model(x,p,/skip_dslin)
-  get_ds_model,fit_type,p,lens_redshift,log_sm,tot=model,sis=sis
+  get_ds_model,fit_type,p,lens_redshift,log_sm,x,tot=model,sis=sis,/use_m200
   
   ; check dave's version which is : nfw_delta_sigma_mcmc(x,p)
 
