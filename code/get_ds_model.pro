@@ -1,6 +1,9 @@
-pro get_ds_model, fit_type, p_mean, lens_str, x_mpc, ps_term=ps_term, nfw_term=nfw_term, tot=tot,$
-                  center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,use_m200=use_m200,$
-                  mnfw=mnfw,conc=conc,rnfw=rnfw
+pro get_ds_model, fit_type, p_mean, lens_str, x_mpc, $                             ; inputs
+                  sis=sis, use_m200=use_m200,$                                     ; switches
+                  center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,$; options for diff_stack
+                  ps_term=ps_term, nfw_term=nfw_term, tot=tot,$                    ; output profiles
+                  mnfw=mnfw,conc=conc,rnfw=rnfw                                    ; output NFW params
+
 ; determine model components for a given set of parameters
 ; this duplicates what ds_model.pro is supposed to do, but avoids the
 ; common block dependency for clarity
@@ -137,7 +140,17 @@ rnfw     = 10.0^(r_log)
 
 
 ; Calculate model curves
-ps_term=10^(M0)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
+if(n_elements(sis) EQ 0) then $ ; point source
+   ps_term=10^(M0)/1.e12/(!pi*x_mpc^2) $; h^-1 Msun, factor of 1e12 to convert to pc^2
+else begin ; replace point source with SIS
+   r_eff=0.005 ; 5 kpc in Mpc
+   meff_smeff_ratio=2. ; ratio of stellar mass within effective radius to total mass (DM+SM) within effective radius
+   smeff_smtot_ratio=0.5 ; ratio of stellar mass within r_eff to "total" stellar mass 
+   ; M0 ~ total stellar mass 
+   ; M_eff = smtot * smeff/smtot * m_eff/smeff = DM+SM within r_eff
+   m_eff=10.^(M0) * smeff_smtot_ratio * meff_smeff_ratio
+   ps_term=m_eff/(2.*!pi*r_eff) / x_mpc / 1.e12 ; Msun/pc^2
+endelse
 
 nfw_term=nfw_ds_offset(x_mpc,[rnfw,conc],zl,r200=keyword_set(use_m200),roff=offset)
 
