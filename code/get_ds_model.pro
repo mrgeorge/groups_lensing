@@ -1,5 +1,5 @@
 pro get_ds_model, fit_type, p_mean, zl, msun, x_mpc, $                             ; inputs
-                  sis=sis, tsis=tsis, use_m200=use_m200,$                          ; switches
+                  sis=sis, tis=tis, use_m200=use_m200,$                          ; switches
                   center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,$; options for diff_stack
                   ps_term=ps_term, nfw_term=nfw_term, tot=tot,$                    ; output profiles
                   mnfw=mnfw,conc=conc,rnfw=rnfw                                    ; output NFW params
@@ -138,7 +138,7 @@ rnfw     = 10.0^(r_log)
 
 
 ; Calculate model curves
-if(n_elements(sis) GT 0 or n_elements(tsis) GT 0) then begin                  ; replace point source with SIS
+if(n_elements(sis) GT 0) then begin                  ; replace point source with SIS
    r_eff=0.005 ; 5 kpc in Mpc
    meff_smeff_ratio=2. ; ratio of stellar mass within effective radius to total mass (DM+SM) within effective radius
    smeff_smtot_ratio=0.5 ; ratio of stellar mass within r_eff to "total" stellar mass 
@@ -147,11 +147,20 @@ if(n_elements(sis) GT 0 or n_elements(tsis) GT 0) then begin                  ; 
    m_eff=10.^(M0) * smeff_smtot_ratio * meff_smeff_ratio
    ps_term=m_eff/(2.*!pi*r_eff) / x_mpc / 1.e12 ; Msun/pc^2
 
-   if(n_elements(tsis) GT 0) then begin ; truncated SIS
-      r_trunc=0.05 ; 50 kpc
-      rhi=where(x_mpc GT r_trunc, nhi)
-      if(nhi GT 0) then ps_term[rhi]=0. ; hard truncation for now
-   endif
+endif else if(n_elements(tis) GT 0) then begin ; truncated isothermal PIEMD - see Kassiola & Kovner 1993 and Mira 2011
+   r_eff=0.005 ; 5 kpc in Mpc
+   r_cut=0.05 ; 50 kpc
+   meff_smeff_ratio=2. ; ratio of stellar mass within effective radius to total mass (DM+SM) within effective radius
+   smeff_smtot_ratio=0.5 ; ratio of stellar mass within r_eff to "total" stellar mass 
+   ; M0 ~ total stellar mass 
+   ; M_eff = smtot * smeff/smtot * m_eff/smeff = DM+SM within r_eff
+   m_eff=10.^(M0) * smeff_smtot_ratio * meff_smeff_ratio ; Msun
+   rho0=m_eff * (r_eff^2-r_cut^2) / (!pi * r_eff^2 * r_cut^2 * (!pi*r_eff - 4.*r_cut*atan(r_eff/r_cut))) ; Msun/Mpc^3
+
+   ps_sigma_R=(rho0 * r_eff^2 * r_cut^2 * !pi)/(r_cut^2-r_eff^2) * (1./sqrt(r_eff^2 + x_mpc^2) - 1./sqrt(r_cut^2 + x_mpc^2)) ; Msun/Mpc^2 , Mira eq. 23.
+   ps_sigmabar_R=(2.*rho0*r_eff^2*r_cut^2*!pi)/(x_mpc^2*(r_cut+r_eff)) * (1.-(sqrt(r_cut^2+x_mpc^2)-sqrt(r_eff^2+x_mpc^2))/(r_cut-r_eff)) ; Msun/Mpc^2 , Mira eq. 24.
+   ps_term=(ps_sigmabar_R - ps_sigma_R) / 1.e12 ; Msun/pc^2
+   
 endif else $                             ; point source
    ps_term=10^(M0)/1.e12/(!pi*x_mpc^2); h^-1 Msun, factor of 1e12 to convert to pc^2
 
