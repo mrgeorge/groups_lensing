@@ -7,7 +7,7 @@ function nfw_ds_offset, r, p, zl, groupFile, $
 
 ; center is the string name of the center under consideration
 ; refcen is the best halo center, default 'mmgg_scale'
-; roff is the mean offset in Mpc - this option can be set to specify
+; roff is the projected offset in Mpc - this option can be set to specify
 ;                                  the offset explicitly. If not set,
 ;                                  the offset distribution is taken to be the
 ;                                  distribution between center and refcen
