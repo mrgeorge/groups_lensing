@@ -138,27 +138,26 @@ rnfw     = 10.0^(r_log)
 
 
 ; Calculate model curves
+
+; normalization radius and mass for SIS and TIS
+r_eff=0.005                     ; 5 kpc in Mpc
+meff_smeff_ratio=2.             ; ratio of stellar mass within effective radius to total mass (DM+SM) within effective radius
+smeff_smtot_ratio=0.5           ; ratio of stellar mass within r_eff to "total" stellar mass 
+                                ; M0 ~ total stellar mass 
+                                ; M_eff = smtot * smeff/smtot * m_eff/smeff = DM+SM within r_eff
+m_eff=10.^(M0) * smeff_smtot_ratio * meff_smeff_ratio ; Msun
+
 if(n_elements(sis) GT 0) then begin                  ; replace point source with SIS
-   r_eff=0.005 ; 5 kpc in Mpc
-   meff_smeff_ratio=2. ; ratio of stellar mass within effective radius to total mass (DM+SM) within effective radius
-   smeff_smtot_ratio=0.5 ; ratio of stellar mass within r_eff to "total" stellar mass 
-   ; M0 ~ total stellar mass 
-   ; M_eff = smtot * smeff/smtot * m_eff/smeff = DM+SM within r_eff
-   m_eff=10.^(M0) * smeff_smtot_ratio * meff_smeff_ratio
    ps_term=m_eff/(4.*r_eff) / x_mpc / 1.e12 ; Msun/pc^2
 
 endif else if(n_elements(tis) GT 0) then begin ; truncated isothermal PIEMD - see Kassiola & Kovner 1993 and Mira 2011
-   r_eff=0.005 ; 5 kpc in Mpc
+   ; core and truncation params
+   r_core=0.0001 ; 0.1 kpc
    r_cut=0.05 ; 50 kpc
-   meff_smeff_ratio=2. ; ratio of stellar mass within effective radius to total mass (DM+SM) within effective radius
-   smeff_smtot_ratio=0.5 ; ratio of stellar mass within r_eff to "total" stellar mass 
-   ; M0 ~ total stellar mass 
-   ; M_eff = smtot * smeff/smtot * m_eff/smeff = DM+SM within r_eff
-   m_eff=10.^(M0) * smeff_smtot_ratio * meff_smeff_ratio ; Msun
-   rho0=m_eff * (r_eff^2-r_cut^2) / (!pi * r_eff^2 * r_cut^2 * (!pi*r_eff - 4.*r_cut*atan(r_eff/r_cut))) ; Msun/Mpc^3
+   rho0=10.^(M0) * (r_core^2-r_cut^2) / (4.*!pi*r_core^2*r_cut^2 * (r_core*atan(r_eff/r_core)-r_cut*atan(r_eff/r_cut)))
 
-   ps_sigma_R=(rho0 * r_eff^2 * r_cut^2 * !pi)/(r_cut^2-r_eff^2) * (1./sqrt(r_eff^2 + x_mpc^2) - 1./sqrt(r_cut^2 + x_mpc^2)) ; Msun/Mpc^2 , Mira eq. 23.
-   ps_sigmabar_R=(2.*rho0*r_eff^2*r_cut^2*!pi)/(x_mpc^2*(r_cut+r_eff)) * (1.-(sqrt(r_cut^2+x_mpc^2)-sqrt(r_eff^2+x_mpc^2))/(r_cut-r_eff)) ; Msun/Mpc^2 , Mira eq. 24.
+   ps_sigma_R=(rho0 * r_core^2 * r_cut^2 * !pi)/(r_cut^2-r_core^2) * (1./sqrt(r_core^2 + x_mpc^2) - 1./sqrt(r_cut^2 + x_mpc^2)) ; Msun/Mpc^2 , Mira eq. 23.
+   ps_sigmabar_R=(2.*rho0*r_core^2*r_cut^2*!pi)/(x_mpc^2*(r_cut+r_core)) * (1.-(sqrt(r_cut^2+x_mpc^2)-sqrt(r_core^2+x_mpc^2))/(r_cut-r_core)) ; Msun/Mpc^2 , Mira eq. 24.
    ps_term=(ps_sigmabar_R - ps_sigma_R) / 1.e12 ; Msun/pc^2
    
 endif else $                             ; point source
@@ -166,8 +165,10 @@ endif else $                             ; point source
 
 if(M0 EQ 0.) then ps_term[*]=0.
 
+; NFW
 nfw_term=nfw_ds_offset(x_mpc,[rnfw,conc],zl,r200=keyword_set(use_m200),roff=offset)
 
+; TOTAL
 tot=nfw_term + ps_term
 
 if(keyword_set(center) AND keyword_set(refcen) AND keyword_set(groupFile)) then $
