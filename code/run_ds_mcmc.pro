@@ -1,15 +1,12 @@
 pro run_ds_mcmc, lens_infile, $
                  fit_t, $
-                 rob_p_mean, $
-                 rob_p_sigma, $
-                 fast=fast, $
-                 medium=medium, $
-                 slow=slow, $
+                 rob_p_mean, rob_p_sigma, $
+                 fast=fast, medium=medium, slow=slow, $
                  stackx=stackx, $
                  chainFile=chainFile,$
                  burnin=burnin, $
                  noSave=noSave, $
-                 sis=sis
+                 sis=sis, tsis=tsis
 
 ; Partial replacement of plot_halofit - only does the modeling, plotting is done elsewhere
 
@@ -18,7 +15,7 @@ pro run_ds_mcmc, lens_infile, $
 ; Note: Mass is virial.
 ;-------------------------------------------------------------------------
 
-common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx,sis_opt
+common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx,sis_opt,tsis_opt
 
 
 ; Read structure for measured lensing signal
@@ -54,6 +51,7 @@ use_maccio = 0                  ; /use_maccio
 
 sx = keyword_set(stackx)        ; /stackx
 sis_opt=keyword_set(sis)        ; /sis option
+tsis_opt=keyword_set(tsis)      ; /tsis option
 
 ;-------------------------------------------------------------------------
 ; MCMC METHOD
