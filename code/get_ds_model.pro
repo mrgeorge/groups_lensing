@@ -145,7 +145,7 @@ if(n_elements(sis) GT 0) then begin                  ; replace point source with
    ; M0 ~ total stellar mass 
    ; M_eff = smtot * smeff/smtot * m_eff/smeff = DM+SM within r_eff
    m_eff=10.^(M0) * smeff_smtot_ratio * meff_smeff_ratio
-   ps_term=m_eff/(2.*!pi*r_eff) / x_mpc / 1.e12 ; Msun/pc^2
+   ps_term=m_eff/(4.*r_eff) / x_mpc / 1.e12 ; Msun/pc^2
 
 endif else if(n_elements(tis) GT 0) then begin ; truncated isothermal PIEMD - see Kassiola & Kovner 1993 and Mira 2011
    r_eff=0.005 ; 5 kpc in Mpc
