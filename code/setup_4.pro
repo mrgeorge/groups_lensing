@@ -51,7 +51,7 @@ alpha = 0.1
 
 sigma_M0      = 1.0   ; Small : not too constrained
 sigma_Mnfw    = 0.8   ; Covers 12.7 -> 14.3 at 1 sigma
-sigma_conc    = 3.0   ; ~1 -> 8
+sigma_conc    = 3.0   ; ~1 -> 7
 sigma_q       = 0.7 
 sigma_bias    = 0.3
 sigma_m_sigma = 0.1
