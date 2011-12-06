@@ -147,10 +147,10 @@ smeff_smtot_ratio=0.5           ; ratio of stellar mass within r_eff to "total" 
                                 ; M_eff = smtot * smeff/smtot * m_eff/smeff = DM+SM within r_eff
 m_eff=10.^(M0) * smeff_smtot_ratio * meff_smeff_ratio ; Msun
 
-if(n_elements(sis) GT 0) then begin                  ; replace point source with SIS
+if(keyword_set(sis)) then begin                  ; replace point source with SIS
    ps_term=m_eff/(4.*r_eff) / x_mpc / 1.e12 ; Msun/pc^2
 
-endif else if(n_elements(tis) GT 0) then begin ; truncated isothermal PIEMD - see Kassiola & Kovner 1993 and Mira 2011
+endif else if(keyword_set(tis)) then begin ; truncated isothermal PIEMD - see Kassiola & Kovner 1993 and Mira 2011
    ; core and truncation params
    r_core=0.0001 ; 0.1 kpc
    r_cut=0.05 ; 50 kpc
