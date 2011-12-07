@@ -12,14 +12,16 @@ return, proff
 end
 
 function sigma_proff_integrand, x
+; here x is a value for Roff, which is being integrated over
+; roff_f is the parameter which describes the distribution P(Roff)
 
 ; return P(Roff) * \Sigma(R|Roff) for qromo integral to get \Sigma(R|P(Roff))
 common common_integrand, p_f, zl_f, roff_f, mass_def_flag
 common common_tabulate, reset_tab, reset_tab_proff, r_tab, nfw_sig_offset_tab, nfw_sig_proff_tab, this_r, offset_type
 
-proff=get_proff(x,roff_f,offset_type)
-if (mass_def_flag eq 0) then integrand=proff*tabulate_nfw_sigma_offset(x, roff_f, p_f, zl_f,/r200)
-if (mass_def_flag eq 1) then integrand=proff*tabulate_nfw_sigma_offset(x, roff_f, p_f, zl_f,/r180)
+proff=get_proff(this_r,roff_f,offset_type)
+if (mass_def_flag eq 0) then integrand=proff*tabulate_nfw_sigma_offset(this_r, x, p_f, zl_f,/r200)
+if (mass_def_flag eq 1) then integrand=proff*tabulate_nfw_sigma_offset(this_r, x, p_f, zl_f,/r180)
 
 return, integrand
 end
@@ -48,15 +50,15 @@ if(sz[1] EQ 0 OR reset_tab_proff EQ 1) then begin ; Tabulate r in log space
    ; and we need to integrate over P(Roff) to get \Sigma(R|P(R_off))
    if(offset_type EQ 'delta2d') then begin
       nfw_sig_proff_tab=tabulate_nfw_sigma_offset(r,roff,p,zl,r200=r200,r180=r180)
-   else if(offset_type EQ 'delta3d') then begin ; roff is single 3d offset radius
+   endif else if(offset_type EQ 'delta3d') then begin ; roff is single 3d offset radius
       for ii=0,npts-1 do begin
          this_r=r_tab[ii]
          nfw_sig_proff_tab[ii]=qromo('sigma_proff_integrand',0.,roff,EPS=1.e-2)
       endfor
    endif else if(offset_type EQ 'max3d') then begin ; roff is 3d stddev in maxwellian
       for ii=0,npts-1 do begin
-         this_r=r_tab_proff[ii]
-         nfw_sig_proff_tab=qromo('sigma_proff_integrand',0.,/midexp,EPS=1.e-2)
+         this_r=r_tab[ii]
+         nfw_sig_proff_tab[ii]=qromo('sigma_proff_integrand',0.,/midexp,EPS=1.e-2)
       endfor
    endif else begin
       print,'TABULATE_NFW_SIGMA_PROFF: unknown offset_type'
