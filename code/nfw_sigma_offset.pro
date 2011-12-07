@@ -1,12 +1,11 @@
 function nfw_sigma_offset,r, roff, p, zl,$
-                 r200 = r200, $
-                 r180 = r180
+                 r200 = r200, r180 = r180
 
 ; Following Johnston et al 2007 eq 32
 ; calls nfw_sigma and returns sigma(R|Roffset)
 ; see nfw_ds_offset to get delta_sigma(<R|Roffset)
 ; r is distance from given center in Mpc
-; roff is distance in Mpc between given center and true center of halo
+; roff is projected 2d distance in Mpc between given center and true center of halo
 ; p[0] is virial radius in Mpc
 ; p[1] is c the concentration parameter
 ; zl is lens redshift
