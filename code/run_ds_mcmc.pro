@@ -47,7 +47,7 @@ sx = keyword_set(stackx)        ; /stackx
 ; model for central component
 if(fit_t[0] NE 0) then begin
    if(keyword_set(ps)) then $
-      cen_type='ps'
+      cen_type='ps' $
    else if(keyword_set(sis)) then $
       cen_type='sis' $
    else if(keyword_set(tis)) then $
