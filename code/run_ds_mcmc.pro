@@ -6,7 +6,8 @@ pro run_ds_mcmc, lens_infile, $
                  chainFile=chainFile,$
                  burnin=burnin, $
                  noSave=noSave, $
-                 sis=sis, tis=tis
+                 ps=ps, sis=sis, tis=tis, $
+                 off2dDelta=off2dDelta, off3dDelta=off3dDelta, off3dMax=off3dMax
 
 ; Partial replacement of plot_halofit - only does the modeling, plotting is done elsewhere
 
@@ -15,7 +16,7 @@ pro run_ds_mcmc, lens_infile, $
 ; Note: Mass is virial.
 ;-------------------------------------------------------------------------
 
-common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx,sis_opt,tis_opt
+common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, neg_points, pos_points,str2,str3, use_group, use_maccio, xmar, ymar, xchars, ychars, no_title, ws_corr, lz_mean, sx, cen_type, off_type
 
 
 ; Read structure for measured lensing signal
@@ -34,12 +35,36 @@ mean_lz: full_str.mean_lz                       ,$
 mean_lz_test: full_str.mean_lz_test             ,$
 msun_lens: full_str.msun_lens          }
 
-; Fill some common block variables
+; FILL COMMON BLOCK VARIABLES FOR DS_MCMC
 fit_type = fit_t
 lz_mean = full_str.mean_lz
 lens_redshift = full_str.z_lens
 log_sm = str.msun_lens
 lens_m_sun = (10^(log_sm))/1.e12 ; 10^12 h^1 Msun
+
+sx = keyword_set(stackx)        ; /stackx
+
+if(keyword_set(ps)) then $
+   cen_type='ps'
+else if(keyword_set(sis)) then $
+   cen_type='sis' $
+else if(keyword_set(tis)) then $
+   cen_type='tis' $
+else begin
+   print,'RUN_DS_MCMC: must choose a cen_type (ps|sis|tis)'
+   stop
+endelse
+
+if(keyword_set(off2dDelta)) then $
+   off_type='delta2d' $
+else if(keyword_set(off3dDelta)) then $
+   off_type='delta3d' $
+else if(keyword_set(off3dMax)) then $
+   off_type='max3d' $
+else begin
+   print,'RUN_DS_MCMC: must choose an off_type (off2dDelta|off3dDelta|off3dMax)'
+   stop
+endelse
 
 ; hardcoding options here for other program calls
 ; this is for stacking xray groups and studying centers
@@ -49,9 +74,6 @@ use_m200 = 1                    ; /use_200
 ws_corr = 0                     ; /weak_shear_corr
 use_maccio = 0                  ; /use_maccio
 
-sx = keyword_set(stackx)        ; /stackx
-sis_opt=keyword_set(sis)        ; /sis option
-tis_opt=keyword_set(tis)        ; /tis option
 
 ;-------------------------------------------------------------------------
 ; MCMC METHOD
