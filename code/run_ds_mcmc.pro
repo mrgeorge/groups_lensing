@@ -44,27 +44,33 @@ lens_m_sun = (10^(log_sm))/1.e12 ; 10^12 h^1 Msun
 
 sx = keyword_set(stackx)        ; /stackx
 
-if(keyword_set(ps)) then $
-   cen_type='ps'
-else if(keyword_set(sis)) then $
-   cen_type='sis' $
-else if(keyword_set(tis)) then $
-   cen_type='tis' $
-else begin
-   print,'RUN_DS_MCMC: must choose a cen_type (ps|sis|tis)'
-   stop
-endelse
+; model for central component
+if(fit_t[0] NE 0) then begin
+   if(keyword_set(ps)) then $
+      cen_type='ps'
+   else if(keyword_set(sis)) then $
+      cen_type='sis' $
+   else if(keyword_set(tis)) then $
+      cen_type='tis' $
+   else begin
+      print,'RUN_DS_MCMC: must choose a cen_type (ps|sis|tis)'
+      stop
+   endelse
+endif
 
-if(keyword_set(off2dDelta)) then $
-   off_type='delta2d' $
-else if(keyword_set(off3dDelta)) then $
-   off_type='delta3d' $
-else if(keyword_set(off3dMax)) then $
-   off_type='max3d' $
-else begin
-   print,'RUN_DS_MCMC: must choose an off_type (off2dDelta|off3dDelta|off3dMax)'
-   stop
-endelse
+; offset model
+if(fit_t[6] NE 0) then begin
+   if(keyword_set(off2dDelta)) then $
+      off_type='delta2d' $
+   else if(keyword_set(off3dDelta)) then $
+      off_type='delta3d' $
+   else if(keyword_set(off3dMax)) then $
+      off_type='max3d' $
+   else begin
+      print,'RUN_DS_MCMC: must choose an off_type (off2dDelta|off3dDelta|off3dMax)'
+      stop
+   endelse
+endif
 
 ; hardcoding options here for other program calls
 ; this is for stacking xray groups and studying centers
