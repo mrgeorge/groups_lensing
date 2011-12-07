@@ -1,23 +1,106 @@
-function nfw_sigma_offset_integrand, x
+function get_proff, r, roff, offset_type
 
-common common_nfw_sigma_offset_function, p_f, zl_f, roff_f, mass_def_flag
+if(offset_type EQ 'delta3d') then begin
+   proff=r/(roff^2 * sqrt(1.-r^2/roff^2))
+endif else if(offset_type EQ 'max3d') then begin
+   proff=(r/roff^2) * exp(-r^2/(2.*roff^2))
+endif else begin
+   print,'GET_PROFF: offset_type not recognized'
+endelse
 
-; return integrand = R*Sigma(R|Roff) for determining mean sigma(<R|roff) 
-if (mass_def_flag eq 0) then res=x*tabulate_nfw_sigma_offset(x, roff_f, p_f, zl_f,/r200)
-if (mass_def_flag eq 1) then res=x*tabulate_nfw_sigma_offset(x, roff_f, p_f, zl_f,/r180)
+return, proff
+end
+
+function sigma_proff_integrand, x
+
+; return P(Roff) * \Sigma(R|Roff) for qromo integral to get \Sigma(R|P(Roff))
+common common_integrand, p_f, zl_f, roff_f, mass_def_flag
+common common_tabulate, reset_tab, reset_tab_proff, r_tab, nfw_sig_offset_tab, nfw_sig_proff_tab, this_r, offset_type
+
+proff=get_proff(x,roff_f,offset_type)
+if (mass_def_flag eq 0) then integrand=proff*tabulate_nfw_sigma_offset(x, roff_f, p_f, zl_f,/r200)
+if (mass_def_flag eq 1) then integrand=proff*tabulate_nfw_sigma_offset(x, roff_f, p_f, zl_f,/r180)
+
+return, integrand
+end
+
+function tabulate_nfw_sigma_proff,r, roff, p, zl, $
+                                  r200=r200, r180=r180
+; Similar to tabulate_nfw_sigma_offset but                                  
+; Returns \Sigma(R|P(R_off))
+
+common common_tabulate, reset_tab, reset_tab_proff, r_tab, nfw_sig_offset_tab, nfw_sig_proff_tab, this_r, offset_type
+
+; Define variables if not previously defined
+sz=size(r_tab)
+
+if(sz[1] EQ 0 OR reset_tab_proff EQ 1) then begin ; Tabulate r in log space
+   minRad=1.e-4 ; Mpc
+   maxRad=4. ; Mpc
+   npts=500 ; in log r
+   step=(maxRad/minRad)^(1./(npts-1))
+   r_tab=minRad*step^indgen(npts)
+   nfw_sig_proff_tab = dindgen(npts) ; \Sigma(R|P(Roff))
+
+   ; if offset_type='delta2d' then roff is simply a single projected 2d offset radius
+   ; and \Sigma(R|P(Roff)) = \Sigma(R|Roff)
+   ; other offset_type denote models for P(Roff) where roff is just a parameter
+   ; and we need to integrate over P(Roff) to get \Sigma(R|P(R_off))
+   if(offset_type EQ 'delta2d') then begin
+      nfw_sig_proff_tab=tabulate_nfw_sigma_offset(r,roff,p,zl,r200=r200,r180=r180)
+   else if(offset_type EQ 'delta3d') then begin ; roff is single 3d offset radius
+      for ii=0,npts-1 do begin
+         this_r=r_tab[ii]
+         nfw_sig_proff_tab[ii]=qromo('sigma_proff_integrand',0.,roff,EPS=1.e-2)
+      endfor
+   endif else if(offset_type EQ 'max3d') then begin ; roff is 3d stddev in maxwellian
+      for ii=0,npts-1 do begin
+         this_r=r_tab_proff[ii]
+         nfw_sig_proff_tab=qromo('sigma_proff_integrand',0.,/midexp,EPS=1.e-2)
+      endfor
+   endif else begin
+      print,'TABULATE_NFW_SIGMA_PROFF: unknown offset_type'
+      stop
+   endelse
+
+   reset_tab_proff = 0
+endif
+
+; check limits on r
+if(max(r) gt max(r_tab)) then begin
+   print,'Stopped in tabulate_nfw_sigma_proff.pro, input r is out of limits'
+   stop
+endif
+
+; Calculate using tabulated values
+index=lonarr(n_elements(r))
+res=fltarr(n_elements(r))
+for ii=0,n_elements(r)-1 do index[ii]=min(where(r_tab GE r[ii]))
+
+if(min(index) LT 0) then begin
+   print,'Stopped in tabulate_nfw_sigma_proff.pro, invalid selection'
+   stop
+endif
+
+; for r<minRad, fill with lowest tabulated ds value, else interpolate in log R
+low=where(index EQ 0,nLow,complement=middle,ncomplement=nMiddle) ; low is where r<minRad, middle is where minRad<r<maxRad. r>maxRad has already been flagged
+if(nLow GT 0) then res[low]=nfw_sig_proff_tab[0]
+if(nMiddle GT 0) then res[middle]=interpol(nfw_sig_proff_tab,alog10(r_tab),alog10(r[middle]))
 
 return, res
 end
 
 function tabulate_nfw_sigma_offset,r, roff, p, zl,$
-                        r200 = r200, $
-                        r180 = r180
+                                  r200=r200, r180=r180
 
 ; Tabulate nfw_sigma_offset. Valid between 1e-4 and 4Mpc
 ; Could make smaller by using a smaller array
 ; Note: in this function input r can be a scalar or array
 
-common common_nfw_sig_offset, reset_tab, r_tab, nfw_sig_offset_tab 
+; Returns \Sigma(R|R_off)
+
+common common_tabulate, reset_tab, reset_tab_proff, r_tab, nfw_sig_offset_tab, nfw_sig_proff_tab, this_r, offset_type
+
 
 ; Define variables if not previously defined
 sz=size(r_tab)
@@ -28,9 +111,10 @@ if(sz[1] EQ 0 OR reset_tab EQ 1) then begin ; Tabulate r in log space
    npts=500 ; in log r
    step=(maxRad/minRad)^(1./(npts-1))
    r_tab=minRad*step^indgen(npts)
+   nfw_sig_offset_tab = dindgen(npts) ; \Sigma(R|Roff)
 
-   nfw_sig_offset_tab = dindgen(npts)
    nfw_sig_offset_tab=nfw_sigma_offset(r_tab,roff,p,zl,r200=r200,r180=r180)
+
    reset_tab = 0
 endif
 
@@ -58,48 +142,59 @@ if(nMiddle GT 0) then res[middle]=interpol(nfw_sig_offset_tab,alog10(r_tab),alog
 return, res
 end
 
+function nfw_rsigma_proff_integrand, x
+
+common common_integrand, p_f, zl_f, roff_f, mass_def_flag
+
+; return integrand = R*Sigma(R|P(Roff)) for determining mean Sigma(<R|P(Roff)) 
+if (mass_def_flag eq 0) then res=x*tabulate_nfw_sigma_proff(x, roff_f, p_f, zl_f,/r200)
+if (mass_def_flag eq 1) then res=x*tabulate_nfw_sigma_proff(x, roff_f, p_f, zl_f,/r180)
+
+return, res
+end
+
 function nfw_ds_offset_sat, r, p, zl, roff, $
-                        r200 = r200, $
-                        r180 = r180
+                            r200=r200, r180=r180, $
+                            off_type=off_type
 
 ; To analytically calculate the satellite term in mock catalogs
 ; Alexie's version of Matt's code for gg-lensing + clustering project
 
-; r is distance in MPC
+; r is projected 2d distance in MPC
 ; p[0] is r200 the virial (or 200) radius in MPC
 ; p[1] is c the concentration parameter
 ; r180   -> 180 x mean density
 ; r200   -> 200 x critical density
-; roff is offset distance in Mpc
+; roff is projected 2d offset distance in Mpc
 
 ; Common block for the tabulation of nfw_sigma_offset
-common common_nfw_sig_offset, reset_tab, r_tab, nfw_sig_offset_tab 
+common common_tabulate, reset_tab, reset_tab_proff, r_tab, nfw_sig_offset_tab, nfw_sig_proff_tab, this_r, offset_type
+
 reset_tab = 1
+reset_tab_proff = 1
+if(NOT(keyword_set(off_type))) then off_type='delta2d' ; unless specified, treat Roff as an explicit 2d radius
+offset_type=off_type
 
-; Common block for nfw_sig_function (for qromo)
-common common_nfw_sigma_offset_function, p_f, zl_f, roff_f, mass_def_flag
-
+; Common block for nfw_sigma_offset_integrand and nfw_sigma_proff_integrand (for qromo)
+common common_integrand, p_f, zl_f, roff_f, mass_def_flag
 p_f    = p
 zl_f   = zl
 roff_f = roff
-
 if(keyword_set(r200)) then mass_def_flag=0
 if(keyword_set(r180)) then mass_def_flag=1
 
-; \Sigma(R|R_{off})
-sigmaR    = dblarr(n_elements(r))
-sigmaMean = dblarr(n_elements(r))
+; \Sigma(R|P(R_{off}))
+sigmaR=dblarr(n_elements(r))
+sigmaR=tabulate_nfw_sigma_proff(r,roff,p,zl,r200=r200,r180=r180)
 
-; r is an array :
-sigmaR=tabulate_nfw_sigma_offset(r,roff,p,zl,r200=keyword_set(r200),r180=keyword_set(r180))
+; \bar{\Sigma}(<R|P(R_{off}))
+sigmaMean=dblarr(n_elements(r))
+sigmaMean=(2./r^2) * QROMO('nfw_rsigma_proff_integrand',replicate(1.e-4,n_elements(r)),r,EPS=1e-2) ; can increase precision here using EPS
 
-; \bar{\Sigma}(<R|R_{off})
-sigmaMean=(2./r^2) * QROMO('nfw_sigma_offset_integrand',replicate(1e-4,n_elements(r)),r,EPS=1e-2) ; can increase precision here using EPS
+; \Delta\Sigma(R|P(R_{off}))
+ds=sigmaMean-sigmaR
 
-; \Delta\Sigma(R|R_{off})
-res = sigmaMean-sigmaR
-
-return, res
+return, ds
 end
 
 
@@ -166,7 +261,7 @@ sigmaMean=dblarr(n_elements(r),ngroups)
 deltaSigma=dblarr(n_elements(r))
 for g=0,ngroups-1 do begin
    ; call AL's version
-   deltaSigma+=groupWeight[g]*nfw_ds_offset_sat(r,p,zl,roff[g],r200=r200,r180=r180)
+   deltaSigma+=groupWeight[g]*nfw_ds_offset_sat(r,p,zl,roff[g],off_type=off_type,r200=r200,r180=r180)
 endfor
 
 return, deltaSigma
