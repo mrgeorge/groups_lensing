@@ -233,7 +233,7 @@ endif
 ;--- The first time is with nstep_quick
 print,'>> First MCMC run'
 pars = mcmc->run('mcmc_step', 'mcmc_like', $
-                 nstep_quick, parguess, printstep=nstep_quick/20,/log)
+                 nstep_quick, parguess, printstep=min([5000L,nstep_quick/20]),/log)
 
 ;-- ????
 count_trans,pars,new,k
@@ -262,7 +262,7 @@ psigma   = p_sigma_rob
 ;-- Second Run
 print,'>> Second MCMC run'
 pars = mcmc->run('mcmc_step', 'mcmc_like', $
-                 nstep, parguess, printstep=nstep/20,/log,file=chainFile)
+                 nstep, parguess, printstep=min([10000L,nstep/20]),/log,file=chainFile)
 if(n_elements(chainFile) GT 0) then pars=mcmc->read_trials(chainFile)
 
 ; ??? what is k ??
