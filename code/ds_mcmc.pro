@@ -206,7 +206,7 @@ common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, 
 
 ; Number of steps
 if n_elements(nstep) eq 0 then nstep = 10000
-nstep_quick=min([long(nstep/3.0),10000L])  ; this is for first run
+nstep_quick=min([long(nstep/3.0),5000L])  ; this is for first run
 if n_elements(burnin) eq 0 then burnin = 500
 
 if nstep lt burnin*1.5 then begin
@@ -233,7 +233,7 @@ endif
 ;--- The first time is with nstep_quick
 print,'>> First MCMC run'
 pars = mcmc->run('mcmc_step', 'mcmc_like', $
-                 nstep_quick, parguess, printstep=10000,/log)
+                 nstep_quick, parguess, printstep=nstep_quick/20,/log)
 
 ;-- ????
 count_trans,pars,new,k
@@ -262,7 +262,7 @@ psigma   = p_sigma_rob
 ;-- Second Run
 print,'>> Second MCMC run'
 pars = mcmc->run('mcmc_step', 'mcmc_like', $
-                 nstep, parguess, printstep=10000,/log,file=chainFile)
+                 nstep, parguess, printstep=nstep/20,/log,file=chainFile)
 if(n_elements(chainFile) GT 0) then pars=mcmc->read_trials(chainFile)
 
 ; ??? what is k ??
