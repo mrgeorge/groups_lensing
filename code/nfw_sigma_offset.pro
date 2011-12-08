@@ -11,7 +11,7 @@ function nfw_sigma_offset,r, roff, p, zl,$
 ; zl is lens redshift
 
 ;npts=1000 ; doesn't matter much for small offsets, but important for precision when offsets are large
-npts=30.*roff/0.01 ; based on convergence tests, this should produce reliable profiles in the range of interest (~2% error at 50 kpc)
+npts=max([30,30.*roff/0.01]) ; based on convergence tests, this should produce reliable profiles in the range of interest (~2% error at 50 kpc)
 dtheta=2*!pi/npts
 theta=dindgen(npts)*dtheta
 
