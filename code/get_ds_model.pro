@@ -154,7 +154,8 @@ if(cen_type EQ 'sis') then begin                  ; replace point source with SI
 endif else if(cen_type EQ 'tis') then begin ; truncated isothermal PIEMD - see Kassiola & Kovner 1993 and Mira 2011
    ; core and truncation params
    r_core=0.0001 ; 0.1 kpc
-   r_cut=0.05 ; 50 kpc
+;   r_cut=0.05 ; 50 kpc
+   r_cut=0.02 ; 20 kpc
    rho0=10.^(M0) * (r_core^2-r_cut^2) / (4.*!pi*r_core^2*r_cut^2 * (r_core*atan(r_eff/r_core)-r_cut*atan(r_eff/r_cut)))
 
    ps_sigma_R=(rho0 * r_core^2 * r_cut^2 * !pi)/(r_cut^2-r_core^2) * (1./sqrt(r_core^2 + x_mpc^2) - 1./sqrt(r_cut^2 + x_mpc^2)) ; Msun/Mpc^2 , Mira eq. 23.
