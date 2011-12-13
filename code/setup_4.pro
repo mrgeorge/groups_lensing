@@ -55,7 +55,7 @@ sigma_conc    = 3.0   ; ~1 -> 7
 sigma_q       = 0.7 
 sigma_bias    = 0.3
 sigma_m_sigma = 0.1
-sigma_offset  = 0.02
+sigma_offset  = 0.05 ; Mpc
 
 ;-------------------------------------------------------------------------
 ; RETURN PRIORS
