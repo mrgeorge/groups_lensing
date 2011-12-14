@@ -175,15 +175,15 @@ endif else if(cen_type EQ 'rhotis') then begin; truncated isothermal PIEMD + ste
    ; the truncation radius will be set where the subhalo density equals
    ;  the halo density, along a line connecting their centers
 
+   r_core=0.0001   ; 0.1 kpc - to avoid singularity
+
    minx=0.001
    x_mpc_rho=minx*10.^(findgen(1000)/999.*3.3)
    xsel=where(x_mpc_rho LT offset, nSel)
    if(nSel GT 0) then begin
-
       ; define 3d densities for halo and subhalo
       halo_nfw_rho_off=nfw_rho(offset-x_mpc_rho[xsel],[rnfw,conc],zl) ; halo density along line connecting subhalo center with halo center, starting from the subhalo center
 
-      r_core=0.0001 ; 0.1 kpc
       rho0_pis=10.^(M0) / (4.*!pi*r_core^2 * (r_eff-r_core*atan(r_eff/r_core)))
       sub_pis_rho=rho0_pis / (1.+x_mpc_rho[xsel]^2/r_core^2)
 
@@ -196,24 +196,18 @@ endif else if(cen_type EQ 'rhotis') then begin; truncated isothermal PIEMD + ste
       endif else begin
          ; interpolate over x_mpc_rho to find where densities are equal
          r_cut=(10.^(interpol(alog10(x_mpc_rho[xsel]),alog10(sub_pis_rho)-alog10(halo_nfw_rho_off),0.,/spline)))[0]
-         
-         rho0=10.^(M0) * (r_core^2-r_cut^2) / (4.*!pi*r_core^2*r_cut^2 * (r_core*atan(r_eff/r_core)-r_cut*atan(r_eff/r_cut)))
-
-         ; define sigma and delta sigma at x_mpc
-         tis_sigma_R=(rho0 * r_core^2 * r_cut^2 * !pi)/(r_cut^2-r_core^2) * (1./sqrt(r_core^2 + x_mpc^2) - 1./sqrt(r_cut^2 + x_mpc^2)) ; Msun/Mpc^2 , Mira eq. 23.
-         tis_sigmabar_R=(2.*rho0*r_core^2*r_cut^2*!pi)/(x_mpc^2*(r_cut+r_core)) * (1.-(sqrt(r_cut^2+x_mpc^2)-sqrt(r_core^2+x_mpc^2))/(r_cut-r_core)) ; Msun/Mpc^2 , Mira eq. 24.
-         tis_term=(tis_sigmabar_R - tis_sigma_R) / 1.e12 ; Msun/pc^2
       endelse
    endif else begin
       print,'GET_DS_MODEL: offset < min x_mpc_rho, setting r_cut=',minx
       r_cut=minx
-      rho0=10.^(M0) * (r_core^2-r_cut^2) / (4.*!pi*r_core^2*r_cut^2 * (r_core*atan(r_eff/r_core)-r_cut*atan(r_eff/r_cut)))
-
-      ; define sigma and delta sigma at x_mpc
-      tis_sigma_R=(rho0 * r_core^2 * r_cut^2 * !pi)/(r_cut^2-r_core^2) * (1./sqrt(r_core^2 + x_mpc^2) - 1./sqrt(r_cut^2 + x_mpc^2)) ; Msun/Mpc^2 , Mira eq. 23.
-      tis_sigmabar_R=(2.*rho0*r_core^2*r_cut^2*!pi)/(x_mpc^2*(r_cut+r_core)) * (1.-(sqrt(r_cut^2+x_mpc^2)-sqrt(r_core^2+x_mpc^2))/(r_cut-r_core)) ; Msun/Mpc^2 , Mira eq. 24.
-      tis_term=(tis_sigmabar_R - tis_sigma_R) / 1.e12 ; Msun/pc^2
    endelse
+
+   rho0=10.^(M0) * (r_core^2-r_cut^2) / (4.*!pi*r_core^2*r_cut^2 * (r_core*atan(r_eff/r_core)-r_cut*atan(r_eff/r_cut)))
+
+   ; define sigma and delta sigma at x_mpc
+   tis_sigma_R=(rho0 * r_core^2 * r_cut^2 * !pi)/(r_cut^2-r_core^2) * (1./sqrt(r_core^2 + x_mpc^2) - 1./sqrt(r_cut^2 + x_mpc^2)) ; Msun/Mpc^2 , Mira eq. 23.
+   tis_sigmabar_R=(2.*rho0*r_core^2*r_cut^2*!pi)/(x_mpc^2*(r_cut+r_core)) * (1.-(sqrt(r_cut^2+x_mpc^2)-sqrt(r_core^2+x_mpc^2))/(r_cut-r_core)) ; Msun/Mpc^2 , Mira eq. 24.
+   tis_term=(tis_sigmabar_R - tis_sigma_R) / 1.e12 ; Msun/pc^2
 
    ps_term=stellar_term+tis_term
 
