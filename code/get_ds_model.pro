@@ -180,7 +180,7 @@ endif else if(cen_type EQ 'rhotis') then begin; truncated isothermal PIEMD + ste
    minx=0.001
    x_mpc_rho=minx*10.^(findgen(1000)/999.*3.3)
    xsel=where(x_mpc_rho LT offset, nSel)
-   if(nSel GT 0) then begin
+   if(nSel GT 1) then begin
       ; define 3d densities for halo and subhalo
       halo_nfw_rho_off=nfw_rho(offset-x_mpc_rho[xsel],[rnfw,conc],zl) ; halo density along line connecting subhalo center with halo center, starting from the subhalo center
 
@@ -193,6 +193,9 @@ endif else if(cen_type EQ 'rhotis') then begin; truncated isothermal PIEMD + ste
          print,'GET_DS_MODEL: subhalo dominates halo'
          stop
          ; set r_cut = offset ?
+      endif else if(trunc_ind EQ 0) then begin
+         ; halo dominates even at minx
+         r_cut=minx
       endif else begin
          ; interpolate over x_mpc_rho to find where densities are equal
          r_cut=(10.^(interpol(alog10(x_mpc_rho[xsel]),alog10(sub_pis_rho)-alog10(halo_nfw_rho_off),0.,/spline)))[0]
