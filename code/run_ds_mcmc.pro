@@ -6,7 +6,7 @@ pro run_ds_mcmc, lens_infile, $
                  chainFile=chainFile,$
                  burnin=burnin, $
                  noSave=noSave, $
-                 ps=ps, sis=sis, tis=tis, $
+                 ps=ps, sis=sis, tis=tis, rhotis=rhotis, $
                  off2dDelta=off2dDelta, off3dDelta=off3dDelta, off3dMax=off3dMax
 
 ; Partial replacement of plot_halofit - only does the modeling, plotting is done elsewhere
@@ -52,8 +52,10 @@ if(fit_t[0] NE 0) then begin
       cen_type='sis' $
    else if(keyword_set(tis)) then $
       cen_type='tis' $
+   else if(keyword_set(rhotis)) then $
+      cen_type='rhotis' $
    else begin
-      print,'RUN_DS_MCMC: must choose a cen_type (ps|sis|tis)'
+      print,'RUN_DS_MCMC: must choose a cen_type (ps|sis|tis|rhotis)'
       stop
    endelse
 endif
