@@ -1,6 +1,6 @@
 pro single_model, strFile, chainFile, covPlotFile, $
                   noModel=noModel, $
-                  ps=ps,sis=sis,tis=tis, $
+                  ps=ps,sis=sis,tis=tis,rhotis=rhotis, $
                   off2dDelta=off2dDelta,off3dDelta=off3dDelta,off3dMax=off3dMax
 fitType = [$
 1,$             ; 0  M0    : baryonic mass
@@ -12,7 +12,7 @@ fitType = [$
 1]               ; 6  offset
 
 if(n_elements(noModel) EQ 0) then begin
-   run_ds_mcmc, strFile, fitType, rob_p_mean, rob_p_sigma, /slow, stackx=stackx, chainFile=chainFile,burnin=burnin,/noSave,ps=ps,sis=sis,tis=tis,off2dDelta=off2dDelta,off3dDelta=off3dDelta,off3dMax=off3dMax
+   run_ds_mcmc, strFile, fitType, rob_p_mean, rob_p_sigma, /slow, stackx=stackx, chainFile=chainFile,burnin=burnin,/noSave,ps=ps,sis=sis,tis=tis,rhotis=rhotis,off2dDelta=off2dDelta,off3dDelta=off3dDelta,off3dMax=off3dMax
 endif else begin
    str=mrdfits(strFile,1)
    fitType=str.fit_type2
