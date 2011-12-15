@@ -48,7 +48,7 @@ if(fit_type[1] eq 1) then begin
    Mnfw = p_mean[i]             ; in LOG10
    i = i+1
 endif else if(fit_type[1] EQ 2) then begin
-   print, 'GET_DS_MODEL: fixing Mnfw to 13.4'
+;   print, 'GET_DS_MODEL: fixing Mnfw to 13.4'
    Mnfw=13.4
 endif
 
