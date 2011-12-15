@@ -190,9 +190,8 @@ endif else if(cen_type EQ 'rhotis') then begin; truncated isothermal PIEMD + ste
       ; find truncation radius
       trunc_ind=min(where(halo_nfw_rho_off GT sub_pis_rho,nTrunc)) ; find where the halo starts to dominate the density
       if(nTrunc EQ 0) then begin ; the subhalo dominates, don't truncate
-         print,'GET_DS_MODEL: subhalo dominates halo'
-         stop
-         ; set r_cut = offset ?
+         print,'GET_DS_MODEL: subhalo dominates halo, setting r_cut=rnfw'
+         r_cut=rnfw         ; set r_cut = offset instead ?
       endif else if(trunc_ind EQ 0) then begin
          ; halo dominates even at minx
          r_cut=minx
