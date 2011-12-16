@@ -44,13 +44,8 @@ endelse
 
 if(n_elements(noModel) EQ 0) then begin
    run_ds_mcmc, strFile, fitType, rob_p_mean, rob_p_sigma, /slow, stackx=stackx, chainFile=chainFile,burnin=burnin,/noSave,ps=ps,sis=sis,tis=tis,rhotis=rhotis,off2dDelta=off2dDelta,off3dDelta=off3dDelta,off3dMax=off3dMax
-endif else begin
-   str=mrdfits(strFile,1)
-   fitType=str.fit_type2
-   rob_p_mean=str.p_mean2
-   rob_p_sigma=str.p_sigma2
-endelse
+endif
 
-ds_cov_plots,chainFile,fitType,rob_p_mean,rob_p_sigma,covPlotFile,burnin=burnin
+ds_cov_plots,chainFile,fitType,covPlotFile,burnin=burnin
 
 end
