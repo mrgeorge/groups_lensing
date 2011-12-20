@@ -197,7 +197,7 @@ endif else if(cen_type EQ 'rhotis') then begin; truncated isothermal PIEMD + ste
          r_cut=minx
       endif else begin
          ; interpolate over x_mpc_rho to find where densities are equal
-         r_cut=(10.^(interpol(alog10(x_mpc_rho[xsel]),alog10(sub_pis_rho)-alog10(halo_nfw_rho_off),0.,/spline)))[0]
+         r_cut=(10.^(interpol(alog10(x_mpc_rho[xsel]),alog10(sub_pis_rho)-alog10(halo_nfw_rho_off),0.)))[0]
       endelse
    endif else begin
       print,'GET_DS_MODEL: offset < min x_mpc_rho, setting r_cut=',minx
