@@ -37,7 +37,8 @@ mnfw = 13.5
 conc = get_conc(mnfw,lens_redshift,/use200)
 
 ; estimated offset
-offset = 0.050 ; Mpc
+;offset = 0.050 ; Mpc
+offset = 0. ; Mpc
 
 ;-------------------------------------------------------------------------
 ; No Alpha for groups
@@ -55,7 +56,8 @@ sigma_conc    = 3.0   ; ~1 -> 7
 sigma_q       = 0.7 
 sigma_bias    = 0.3
 sigma_m_sigma = 0.1
-sigma_offset  = 0.05 ; Mpc
+;sigma_offset  = 0.05 ; Mpc
+sigma_offset  = 0.2 ; Mpc
 
 ;-------------------------------------------------------------------------
 ; RETURN PRIORS
