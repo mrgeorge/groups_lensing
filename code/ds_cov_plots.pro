@@ -73,9 +73,9 @@ k = 0
 ; Baryonic term
 if (fit_type[0] eq 1) then begin
     titles[k] = 'log(M_{cen}/M'+sun+')'
-    ranges[*,k]=[10,13]
-    tickv[*,k]=[10.5,11.5,12.5]
-    minor[k]=10
+    ranges[*,k]=[9.8,11.8]
+    tickv[*,k]=[10.0,10.8,11.6]
+    minor[k]=8
     k=k+1  
 endif
 ; Mnfw
