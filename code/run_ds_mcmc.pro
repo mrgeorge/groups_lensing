@@ -118,11 +118,27 @@ print,'----------'
 
 if(n_elements(noSave) EQ 0) then begin
    ; Write fit type and parameters to struct/file
-   if(NOT(tag_exist(full_str,'FIT_TYPE'))) then $
-      full_str=create_struct(full_str,'FIT_TYPE',fit_type,'P_MEAN',rob_p_mean,'P_SIGMA',rob_p_sigma) $
-   else if(NOT(tag_exist(full_str,'FIT_TYPE2'))) then $
-      full_str=create_struct(full_str,'FIT_TYPE2',fit_type,'P_MEAN2',rob_p_mean,'P_SIGMA2',rob_p_sigma) $
-   else begin
+   if(NOT(tag_exist(full_str,'FIT_TYPE'))) then begin
+      if(fit_type[0] EQ 0 AND fit_type[6] EQ 0) then begin
+         full_str=create_struct(full_str,'FIT_TYPE',fit_type,'P_MEAN',rob_p_mean,'P_SIGMA',rob_p_sigma)
+      endif else if(fit_type[0] GT 0 AND fit_type[6] EQ 0) then begin
+         full_str=create_struct(full_str,'FIT_TYPE',fit_type,'P_MEAN',rob_p_mean,'P_SIGMA',rob_p_sigma,'CEN_TYPE',cen_type)
+      endif else if(fit_type[0] EQ 0 AND fit_type[6] GT 0) then begin
+         full_str=create_struct(full_str,'FIT_TYPE',fit_type,'P_MEAN',rob_p_mean,'P_SIGMA',rob_p_sigma,'OFF_TYPE',off_type)
+      endif else begin
+         full_str=create_struct(full_str,'FIT_TYPE',fit_type,'P_MEAN',rob_p_mean,'P_SIGMA',rob_p_sigma,'CEN_TYPE',cen_type,'OFF_TYPE',off_type)
+      endelse
+   endif else if(NOT(tag_exist(full_str,'FIT_TYPE2'))) then begin
+      if(fit_type[0] EQ 0 AND fit_type[6] EQ 0) then begin
+         full_str=create_struct(full_str,'FIT_TYPE2',fit_type,'P_MEAN2',rob_p_mean,'P_SIGMA2',rob_p_sigma)
+      endif else if(fit_type[0] GT 0 AND fit_type[6] EQ 0) then begin
+         full_str=create_struct(full_str,'FIT_TYPE2',fit_type,'P_MEAN2',rob_p_mean,'P_SIGMA2',rob_p_sigma,'CEN_TYPE2',cen_type)
+      endif else if(fit_type[0] EQ 0 AND fit_type[6] GT 0) then begin
+         full_str=create_struct(full_str,'FIT_TYPE2',fit_type,'P_MEAN2',rob_p_mean,'P_SIGMA2',rob_p_sigma,'OFF_TYPE2',off_type)
+      endif else begin
+         full_str=create_struct(full_str,'FIT_TYPE2',fit_type,'P_MEAN2',rob_p_mean,'P_SIGMA2',rob_p_sigma,'CEN_TYPE2',cen_type,'OFF_TYPE2',off_type)
+      endelse
+   endif else begin
       print,'run_ds_mcmc: tags FIT_TYPE and FIT_TYPE2 already exist in this struct' ; it's already been modeled twice, if you want more than two models rethink the data structure and code
       stop
    endelse
