@@ -47,13 +47,13 @@ for i=0, n_elements(cenNames)-1 do begin
 
     run_gg_offset, infile_source, infile_lens, lensOutFileArr[i], innerRadiusKpc, secondRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=cenNames[i],stackx=keyword_set(stackx),emp_var=keyword_set(emp_var),subhalo=subhalo
 
-   ; Fit model to the lensing signal
+   ; Fit centered model to the lensing signal
     ; fit pars are returned as rob_p_mean and also written to lensOutFile
-   run_ds_mcmc, lensOutFileArr[i], fitTypeAll[*,i], rob_p_mean, rob_p_sigma, stackx=keyword_set(stackx)
+   run_ds_mcmc, lensOutFileArr[i], fitTypeAll[*,i], rob_p_mean, rob_p_sigma, stackx=keyword_set(stackx),/fast,/ps
 
    ; Fit offset model to the lensing signal
     ; fit pars are returned as rob_p_mean and also written to lensOutFile
-   run_ds_mcmc, lensOutFileArr[i], fitTypeAll2[*,i], rob_p_mean2, rob_p_sigma2, stackx=keyword_set(stackx),/fast
+   run_ds_mcmc, lensOutFileArr[i], fitTypeAll2[*,i], rob_p_mean2, rob_p_sigma2, stackx=keyword_set(stackx),/fast,/ps,/off3dMax
 
    ; Plot the results, with and without the models
 ;   plot_lensing_results,lensOutFileArr[i],plotFileArr[i],rob_p_mean,fitTypeAll[*,i],stackx=keyword_set(stackx),/use_m200
@@ -91,16 +91,21 @@ for ii=0,n_elements(cenTitles)-1 do begin
       y    = str.we1_mean[sel]
       yerr = str.we1_error[sel]
    endelse
+
+   if(fitType[0] GT 0) then cen_type=str.cen_type
+   if(fitType[6] GT 0) then off_type=str.off_type
+   if(fitType2[0] GT 0) then cen_type2=str.cen_type2
+   if(fitType2[6] GT 0) then off_type2=str.off_type2
    
    ; get Zhao concentrations if conc was not free
    if(n_elements(conc) EQ 0) then begin
-      get_ds_model,str.fit_type,str.p_mean,str,x,/use_m200,conc=concVal
-      get_ds_model,str.fit_type2,str.p_mean2,str,x,/use_m200,conc=concVal2
+      get_ds_model,str.fit_type,str.p_mean,str,x,/use_m200,conc=concVal,cen_type=cen_type,off_type=off_type
+      get_ds_model,str.fit_type2,str.p_mean2,str,x,/use_m200,conc=concVal2,cen_type=cen_type2,off_type=off_type2
    endif
 
    ; get chi^2 for each model
-   chisq=get_ds_chisq(str.fit_type,str.p_mean,str,x,y,yerr,dof=dof,/use_m200)
-   chisq2=get_ds_chisq(str.fit_type2,str.p_mean2,str,x,y,yerr,dof=dof2,/use_m200)
+   chisq=get_ds_chisq(str.fit_type,str.p_mean,str,x,y,yerr,dof=dof,/use_m200,cen_type=cen_type,off_type=off_type)
+   chisq2=get_ds_chisq(str.fit_type2,str.p_mean2,str,x,y,yerr,dof=dof2,/use_m200,cen_type=cen_type2,off_type=off_type2)
 
    if(n_elements(cenFree) EQ 0) then begin
       if(str.msun_lens EQ 0.) then mcen='-' else mcen=string(str.msun_lens,format='(F4.1)')
