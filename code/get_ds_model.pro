@@ -2,7 +2,7 @@ pro get_ds_model, fit_type, p_mean, zl, msun, x_mpc, $                          
                   use_m200=use_m200,$                                              ; switch
                   cen_type=cen_type,off_type=off_type, $                           ; model options
                   center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,$; options for diff_stack
-                  ps_term=ps_term, nfw_term=nfw_term, tot=tot,$                    ; output profiles
+                  ps_term=ps_term, nfw_term=nfw_term, nfw_ws_term=nfw_ws_term, tot=tot,$                    ; output profiles
                   mnfw=mnfw,conc=conc,rnfw=rnfw                                    ; output NFW params
 
 ; determine model components for a given set of parameters
@@ -146,81 +146,102 @@ rnfw     = 10.0^(r_log)
 ; NFW
 nfw_term=nfw_ds_offset(x_mpc,[rnfw,conc],zl,r200=keyword_set(use_m200),roff=offset,off_type=off_type)
 
-; normalization radius and mass for SIS and TIS
-r_eff=0.005                     ; 5 kpc in Mpc
-meff_smeff_ratio=2.             ; ratio of stellar mass within effective radius to total mass (DM+SM) within effective radius
-smeff_smtot_ratio=0.5           ; ratio of stellar mass within r_eff to "total" stellar mass 
+if(fit_type[0] GT 0) then begin
+   ; normalization radius and mass for SIS and TIS
+   r_eff=0.005                  ; 5 kpc in Mpc
+   meff_smeff_ratio=2. ; ratio of stellar mass within effective radius to total mass (DM+SM) within effective radius
+   smeff_smtot_ratio=0.5       ; ratio of stellar mass within r_eff to "total" stellar mass 
                                 ; M0 ~ total stellar mass 
                                 ; M_eff = smtot * smeff/smtot * m_eff/smeff = DM+SM within r_eff
-m_eff=10.^(M0) * smeff_smtot_ratio * meff_smeff_ratio ; Msun
+   m_eff=10.^(M0) * smeff_smtot_ratio * meff_smeff_ratio ; Msun
 
-if(cen_type EQ 'sis') then begin                  ; replace point source with SIS
-   ps_term=m_eff/(4.*r_eff) / x_mpc / 1.e12 ; Msun/pc^2
+   if(cen_type EQ 'sis') then begin         ; replace point source with SIS
+      ps_term=m_eff/(4.*r_eff) / x_mpc / 1.e12 ; Msun/pc^2
 
-endif else if(cen_type EQ 'tis') then begin ; truncated isothermal PIEMD - see Kassiola & Kovner 1993 and Mira 2011
-   ; core and truncation params
-   r_core=0.0001 ; 0.1 kpc
-;   r_cut=0.05 ; 50 kpc
-   r_cut=0.02 ; 20 kpc
-   rho0=10.^(M0) * (r_core^2-r_cut^2) / (4.*!pi*r_core^2*r_cut^2 * (r_core*atan(r_eff/r_core)-r_cut*atan(r_eff/r_cut)))
+   endif else if(cen_type EQ 'tis') then begin ; truncated isothermal PIEMD - see Kassiola & Kovner 1993 and Mira 2011
+      ; core and truncation params
+      r_core=0.0001             ; 0.1 kpc
+;      r_cut=0.05 ; 50 kpc
+      r_cut=0.02                ; 20 kpc
+      rho0=10.^(M0) * (r_core^2-r_cut^2) / (4.*!pi*r_core^2*r_cut^2 * (r_core*atan(r_eff/r_core)-r_cut*atan(r_eff/r_cut)))
 
-   ps_sigma_R=(rho0 * r_core^2 * r_cut^2 * !pi)/(r_cut^2-r_core^2) * (1./sqrt(r_core^2 + x_mpc^2) - 1./sqrt(r_cut^2 + x_mpc^2)) ; Msun/Mpc^2 , Mira eq. 23.
-   ps_sigmabar_R=(2.*rho0*r_core^2*r_cut^2*!pi)/(x_mpc^2*(r_cut+r_core)) * (1.-(sqrt(r_cut^2+x_mpc^2)-sqrt(r_core^2+x_mpc^2))/(r_cut-r_core)) ; Msun/Mpc^2 , Mira eq. 24.
-   ps_term=(ps_sigmabar_R - ps_sigma_R) / 1.e12 ; Msun/pc^2
+      ps_sigma_R=(rho0 * r_core^2 * r_cut^2 * !pi)/(r_cut^2-r_core^2) * (1./sqrt(r_core^2 + x_mpc^2) - 1./sqrt(r_cut^2 + x_mpc^2)) ; Msun/Mpc^2 , Mira eq. 23.
+      ps_sigmabar_R=(2.*rho0*r_core^2*r_cut^2*!pi)/(x_mpc^2*(r_cut+r_core)) * (1.-(sqrt(r_cut^2+x_mpc^2)-sqrt(r_core^2+x_mpc^2))/(r_cut-r_core)) ; Msun/Mpc^2 , Mira eq. 24.
+      ps_term=(ps_sigmabar_R - ps_sigma_R) / 1.e12 ; Msun/pc^2
    
-endif else if(cen_type EQ 'rhotis') then begin; truncated isothermal PIEMD + stellar mass point source
-   stellar_term=10.^(msun)/1.e12/(!pi*x_mpc^2); h^-1 Msun, factor of 1e12 to convert to pc^2
+   endif else if(cen_type EQ 'rhotis') then begin ; truncated isothermal PIEMD + stellar mass point source
+      stellar_term=10.^(msun)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
 
-   ; M0 will be the mass within r_eff for an untruncated pseudo-SIS (PIS)
-   ; the truncation radius will be set where the subhalo density equals
-   ;  the halo density, along a line connecting their centers
+      ; M0 will be the mass within r_eff for an untruncated pseudo-SIS (PIS)
+      ; the truncation radius will be set where the subhalo density equals
+      ;  the halo density, along a line connecting their centers
 
-   r_core=0.0001   ; 0.1 kpc - to avoid singularity
+      r_core=0.0001             ; 0.1 kpc - to avoid singularity
 
-   minx=0.001
-   x_mpc_rho=minx*10.^(findgen(1000)/999.*3.3)
-   xsel=where(x_mpc_rho LT offset, nSel)
-   if(nSel GT 1) then begin
-      ; define 3d densities for halo and subhalo
-      halo_nfw_rho_off=nfw_rho(offset-x_mpc_rho[xsel],[rnfw,conc],zl) ; halo density along line connecting subhalo center with halo center, starting from the subhalo center
+      minx=0.001
+      x_mpc_rho=minx*10.^(findgen(1000)/999.*3.3)
+      xsel=where(x_mpc_rho LT offset, nSel)
+      if(nSel GT 1) then begin
+         ; define 3d densities for halo and subhalo
+         halo_nfw_rho_off=nfw_rho(offset-x_mpc_rho[xsel],[rnfw,conc],zl) ; halo density along line connecting subhalo center with halo center, starting from the subhalo center
 
-      rho0_pis=10.^(M0) / (4.*!pi*r_core^2 * (r_eff-r_core*atan(r_eff/r_core)))
-      sub_pis_rho=rho0_pis / (1.+x_mpc_rho[xsel]^2/r_core^2)
+         rho0_pis=10.^(M0) / (4.*!pi*r_core^2 * (r_eff-r_core*atan(r_eff/r_core)))
+         sub_pis_rho=rho0_pis / (1.+x_mpc_rho[xsel]^2/r_core^2)
 
-      ; find truncation radius
-      trunc_ind=min(where(halo_nfw_rho_off GT sub_pis_rho,nTrunc)) ; find where the halo starts to dominate the density
-      if(nTrunc EQ 0) then begin ; the subhalo dominates, don't truncate
-         print,'GET_DS_MODEL: subhalo dominates halo, setting r_cut=rnfw'
-         r_cut=rnfw         ; set r_cut = offset instead ?
-      endif else if(trunc_ind EQ 0) then begin
-         ; halo dominates even at minx
-         r_cut=minx
+         ; find truncation radius
+         trunc_ind=min(where(halo_nfw_rho_off GT sub_pis_rho,nTrunc)) ; find where the halo starts to dominate the density
+         if(nTrunc EQ 0) then begin ; the subhalo dominates, don't truncate
+            print,'GET_DS_MODEL: subhalo dominates halo, setting r_cut=rnfw'
+            r_cut=rnfw          ; set r_cut = offset instead ?
+         endif else if(trunc_ind EQ 0) then begin
+            ; halo dominates even at minx
+            r_cut=minx
+         endif else begin
+            ; interpolate over x_mpc_rho to find where densities are equal
+            r_cut=(10.^(interpol(alog10(x_mpc_rho[xsel]),alog10(sub_pis_rho)-alog10(halo_nfw_rho_off),0.)))[0]
+         endelse
       endif else begin
-         ; interpolate over x_mpc_rho to find where densities are equal
-         r_cut=(10.^(interpol(alog10(x_mpc_rho[xsel]),alog10(sub_pis_rho)-alog10(halo_nfw_rho_off),0.)))[0]
+         print,'GET_DS_MODEL: offset < min x_mpc_rho, setting r_cut=',minx
+         r_cut=minx
       endelse
+
+      rho0=10.^(M0) * (r_core^2-r_cut^2) / (4.*!pi*r_core^2*r_cut^2 * (r_core*atan(r_eff/r_core)-r_cut*atan(r_eff/r_cut)))
+
+      ; define sigma and delta sigma at x_mpc
+      tis_sigma_R=(rho0 * r_core^2 * r_cut^2 * !pi)/(r_cut^2-r_core^2) * (1./sqrt(r_core^2 + x_mpc^2) - 1./sqrt(r_cut^2 + x_mpc^2)) ; Msun/Mpc^2 , Mira eq. 23.
+      tis_sigmabar_R=(2.*rho0*r_core^2*r_cut^2*!pi)/(x_mpc^2*(r_cut+r_core)) * (1.-(sqrt(r_cut^2+x_mpc^2)-sqrt(r_core^2+x_mpc^2))/(r_cut-r_core)) ; Msun/Mpc^2 , Mira eq. 24.
+      tis_term=(tis_sigmabar_R - tis_sigma_R) / 1.e12 ; Msun/pc^2
+
+      ps_term=stellar_term+tis_term
+
+   endif else if(cen_type EQ 'ps') then begin ; point source
+      ps_term=10^(M0)/1.e12/(!pi*x_mpc^2)     ; h^-1 Msun, factor of 1e12 to convert to pc^2
    endif else begin
-      print,'GET_DS_MODEL: offset < min x_mpc_rho, setting r_cut=',minx
-      r_cut=minx
+      print,'GET_DS_MODEL: cen_type not recognized'
+      stop
+   endelse
+   
+   if(M0 EQ 0.) then ps_term[*]=0.
+endif else ps_term=0.
+
+
+;ws_corr=1
+ws_corr=0
+if (ws_corr eq 1) then begin
+   print,'nfw_ws_term is just for testing. should calculate Lz first'
+
+   lz_mean=3.5e-4 ; pc^2 Msun^-2 rough number taken from AL's Lx-M paper
+
+   ; get sigma
+   if (keyword_set(use_m200)) then begin
+      sig=nfw_sig(x_mpc,[rnfw,conc],zl,/r200)
+   endif else begin
+      sig=nfw_sig(x_mpc,[rnfw,conc],zl)
    endelse
 
-   rho0=10.^(M0) * (r_core^2-r_cut^2) / (4.*!pi*r_core^2*r_cut^2 * (r_core*atan(r_eff/r_core)-r_cut*atan(r_eff/r_cut)))
-
-   ; define sigma and delta sigma at x_mpc
-   tis_sigma_R=(rho0 * r_core^2 * r_cut^2 * !pi)/(r_cut^2-r_core^2) * (1./sqrt(r_core^2 + x_mpc^2) - 1./sqrt(r_cut^2 + x_mpc^2)) ; Msun/Mpc^2 , Mira eq. 23.
-   tis_sigmabar_R=(2.*rho0*r_core^2*r_cut^2*!pi)/(x_mpc^2*(r_cut+r_core)) * (1.-(sqrt(r_cut^2+x_mpc^2)-sqrt(r_core^2+x_mpc^2))/(r_cut-r_core)) ; Msun/Mpc^2 , Mira eq. 24.
-   tis_term=(tis_sigmabar_R - tis_sigma_R) / 1.e12 ; Msun/pc^2
-
-   ps_term=stellar_term+tis_term
-
-endif else if(cen_type EQ 'ps') then begin                           ; point source
-   ps_term=10^(M0)/1.e12/(!pi*x_mpc^2); h^-1 Msun, factor of 1e12 to convert to pc^2
-endif else begin
-   print,'GET_DS_MODEL: cen_type not recognized'
-   stop
-endelse
-
-if(M0 EQ 0.) then ps_term[*]=0.
+   ; Calculate the ws term: Sigma * DeltaSigma * Lz
+   nfw_ws_term = sig*nfw_term*lz_mean
+endif
 
 ; TOTAL
 tot=nfw_term + ps_term
