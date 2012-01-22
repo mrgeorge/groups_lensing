@@ -38,6 +38,52 @@ if(n_elements(levels) GT 1) then $
 ; else plot no contours
 end
 
+function priorArr, xarr, title
+; return y-values for prior, normalized to peak=1
+
+sun=sunsymbol()
+
+; From setup_4.pro - other cuts taken from mcmc_check_limits in ds_mcmc.pro
+M0      = 11.3 ; should be log_sm
+mnfw = 13.5 ; update to mean best fit?
+lens_redshift = 0.5 ; update?
+conc = get_conc(mnfw,lens_redshift,/use200)
+alpha = 0.1
+beta   =  alpha/(1-alpha) 
+q      =  alog(beta)       ;q varies between -3 and 3
+bias    =  1.0           ; bias
+m_sigma =  0.3           ; dispersion in mass selection (log-normal)
+offset = 0.*1000 ; kpc
+
+sigma_M0      = 1.0   ; Small : not too constrained
+sigma_Mnfw    = 0.8   ; Covers 12.7 -> 14.3 at 1 sigma
+sigma_conc    = 3.0   ; ~1 -> 7
+sigma_q       = 0.7 
+sigma_bias    = 0.3
+sigma_m_sigma = 0.1
+sigma_offset  = 0.2*1000 ; kpc
+
+if(title EQ textoidl('log(M_{cen}/M'+sun+')')) then begin
+   yarr=exp(-(xarr-M0)^2/(2.*sigma_M0^2))
+   sel=where(xarr LE 10 OR xarr GE 13, nSel)
+   if(nSel GT 0) then yarr[sel]=0.
+endif else if(title EQ textoidl('log(M_{200c}/M'+sun+')')) then begin
+   yarr=exp(-(xarr-Mnfw)^2/(2.*sigma_Mnfw^2))
+   sel=where(xarr LE 10 OR xarr GE 16, nSel)
+   if(nSel GT 0) then yarr[sel]=0.
+endif else if(title EQ textoidl('c_{200c}')) then begin 
+   yarr=exp(-(xarr-conc)^2/(2.*sigma_conc^2))
+   sel=where(xarr LE 1 OR xarr GE 10, nSel)
+   if(nSel GT 0) then yarr[sel]=0.
+endif else if(title EQ textoidl('R_{off} (kpc)')) then begin
+   yarr=exp(-(xarr-offset)^2/(2.*sigma_offset^2))
+   sel=where(xarr LE 0 OR xarr GE 1000, nSel)
+   if(nSel GT 0) then yarr[sel]=0.
+endif
+
+return,yarr
+end
+
 pro ds_cov_plots, chainFile, fit_type, plotFile, hist=hist, burnin=burnin
 
 ; copied from /Users/alexie/idl/MCMC/dsmodel/ds_cov_plots.pro with changes
@@ -89,7 +135,7 @@ endif
 ; Conc
 if ((fit_type[2] eq 1)) then begin
     titles[k] = 'c_{200c}'
-    ranges[*,k]=[1,12]
+    ranges[*,k]=[1,11]
     tickv[*,k]=[2.,6.,10.]
     minor[k]=4
     k=k+1  
@@ -112,9 +158,9 @@ endif
 ; Offset radius
 if (fit_type[6] eq 1) then begin 
     titles[k] = 'R_{off} (kpc)'
-    ranges[*,k]=[0,100]
-    tickv[*,k]=[0.,50.,100.]
-    minor[k]=5
+    ranges[*,k]=[-10,150]
+    tickv[*,k]=[0.,75.,150.]
+    minor[k]=3
     pars[k,*]*=1000. ; convert from Mpc to kpc
 endif
 
@@ -135,19 +181,21 @@ titles=textoidl(titles)
 ; position setup
 lmarg=0.1
 rmarg=0.05
-bmarg=0.1
+bmarg=0.07
 tmarg=0.05
 xspace=0.0
 yspace=0.0
-xwidth=(1.-lmarg-rmarg-xspace*(npars-2))/(npars-1)
-ywidth=(1.-bmarg-tmarg-yspace*(npars-2))/(npars-1)
+xwidth=(1.-lmarg-rmarg-xspace*(npars-1))/(npars)
+ywidth=(1.-bmarg-tmarg-yspace*(npars-1))/(npars)
+
+nHistBins=100.
 
 set_plot,'ps'
 simpctable
 device,filename=plotFile,/encapsul,/color,/helvetica,xsize=8,ysize=8,/inches
 
 for ii=0, npars-1 do begin            ; Go through params
-   for jj=ii+1, npars-1 do begin      ; Go through params
+   for jj=ii, npars-1 do begin      ; Go through params
       
 
       blank=replicate(' ',nticks+1)
@@ -187,12 +235,19 @@ for ii=0, npars-1 do begin            ; Go through params
       xbin=(xr[1]-xr[0])/nBins
       ybin=(yr[1]-yr[0])/nBins
 
-      plot,/nodata,xr,yr,xst=1+4,yst=1+4,position=[x1,y1,x2,y2]
-      oplot_contours,xp,yp,xbin,ybin,xr,yr,!black ;,g_smooth=sm
-      axis,xaxis=0,xst=1,xtickn=xtickn,xtickv=tickv[*,ii],xticks=nticks,xminor=minor[ii],xtit=xtit
-      axis,xaxis=1,xst=1,xtickn=blank,xtickv=tickv[*,ii],xticks=nticks,xminor=minor[ii]
-      axis,yaxis=0,yst=1,ytickn=ytickn,ytickv=tickv[*,jj],yticks=nticks,yminor=minor[jj],ytit=ytit
-      axis,yaxis=1,yst=1,ytickn=blank,ytickv=tickv[*,jj],yticks=nticks,yminor=minor[jj]
+      if(jj EQ ii) then begin
+         plothist,xp,bin=(xr[1]-xr[0])/nHistBins,xr=xr,yr=[0,1.03],xst=1,yst=1,xtickn=xtickn,xtickv=tickv[*,ii],xticks=nticks,xminor=minor[ii],xtit=xtit,ytickn=replicate(' ',30),tit=titles[ii],position=[x1,y1,x2,y2],peak=1,thick=5
+         xarr=findgen(nHistBins)/(nHistBins-1)*(xr[1]-xr[0])+xr[0]
+         yarr=priorArr(xarr,titles[ii])
+         oplot,xarr,yarr,color=!darkgreen,thick=5,linestyle=2
+      endif else begin
+         plot,/nodata,xr,yr,xst=1+4,yst=1+4,position=[x1,y1,x2,y2]
+         oplot_contours,xp,yp,xbin,ybin,xr,yr,!black ;,g_smooth=sm
+         axis,xaxis=0,xst=1,xtickn=xtickn,xtickv=tickv[*,ii],xticks=nticks,xminor=minor[ii],xtit=xtit
+         axis,xaxis=1,xst=1,xtickn=blank,xtickv=tickv[*,ii],xticks=nticks,xminor=minor[ii]
+         axis,yaxis=0,yst=1,ytickn=ytickn,ytickv=tickv[*,jj],yticks=nticks,yminor=minor[jj],ytit=ytit
+         axis,yaxis=1,yst=1,ytickn=blank,ytickv=tickv[*,jj],yticks=nticks,yminor=minor[jj]
+      endelse
    endfor
 endfor
     
