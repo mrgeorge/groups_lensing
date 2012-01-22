@@ -1,11 +1,12 @@
-function get_ds_chisq,fit_type,p_mean,full_str,x,y,yerr,dof=dof,center=center,refcen=refcen,groupFile=groupFile,use_m200=use_m200
+function get_ds_chisq,fit_type,p_mean,full_str,x,y,yerr,dof=dof,center=center,refcen=refcen,groupFile=groupFile,use_m200=use_m200,cen_type=cen_type,off_type=off_type
 ; Calculate chi^2
 ; currently just NFW + point source if point source is included in model
 ; dof keyword will be filled and returned if provided
 
 ; calculate expected model values at locations of data points
 get_ds_model,fit_type,p_mean,full_str,x,ps_term=model_ps,nfw_term=model_nfw,$
-             center=center,refcen=refcen,groupFile=groupFile,nfw_off=model_nfw_off,use_m200=use_m200
+             center=center,refcen=refcen,groupFile=groupFile,nfw_off=model_nfw_off,use_m200=use_m200,$
+             cen_type=cen_type,off_type=off_type
 
 if(keyword_set(center) AND keyword_set(refcen)) then $
    model_tot=model_nfw_off $
