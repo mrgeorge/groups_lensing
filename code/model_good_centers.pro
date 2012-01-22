@@ -6,7 +6,7 @@ groupFile=dir+"group4_20110914.fits"
 group=mrdfits(groupFile,1)
 
 ; copy box numbers from previous version
-oldFile=dir+"group5_20110712.fits"
+oldFile='/Users/alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits' ; group catalog with centers
 old=mrdfits(oldFile,1)
 
 group.box=old.box
