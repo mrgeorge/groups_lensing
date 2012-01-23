@@ -40,11 +40,12 @@ if(keyword_set(emp_var)) then empExt='_emp' else empExt=''
 
 ; Set paths for input files
 infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7.fits' ; Using the new catalog (photoz version 1.7)
-infile_lens = '/Users/alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits' ; group catalog with centers
 ;infile_lens = '/Users/mgeorge/data/cosmos/code/group6_20110712.fits' ; group catalog with red centers
+;infile_lens = '/Users/alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits' ; group catalog with centers
+infile_lens = '~/data/cosmos/code/group5_20110914.fits' ; group catalog with centers
 
 ; Set paths for output files
-dirName='bin_'+string(innerRadiusKpc,format='(I0)')+'_'+string(secondRadiusKpc,format='(I0)')+'_'+string(maxRadiusKpc,format='(I0)')+'_'+string(nRadiusBins,format='(I0)')+sxExt+empExt+zExt+mExt
+dirName='bin_'+string(innerRadiusKpc,format='(I0)')+'_'+string(secondRadiusKpc,format='(I0)')+'_'+string(maxRadiusKpc,format='(I0)')+'_'+string(nRadiusBins,format='(I0)')+sxExt+empExt+zExt+mExt+"_20110914"
 fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'/'
 plotDir='~/data/cosmos/groups_lensing/plots/'+dirName+'/'
 if(NOT(file_test(fileDir))) then file_mkdir,fileDir
