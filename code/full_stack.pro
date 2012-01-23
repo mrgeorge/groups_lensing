@@ -92,20 +92,22 @@ for ii=0,n_elements(cenTitles)-1 do begin
       yerr = str.we1_error[sel]
    endelse
 
-   if(fitType[0] GT 0) then cen_type=str.cen_type
-   if(fitType[6] GT 0) then off_type=str.off_type
-   if(fitType2[0] GT 0) then cen_type2=str.cen_type2
-   if(fitType2[6] GT 0) then off_type2=str.off_type2
+   fit_type=str.fit_type
+   fit_type2=str.fit_type2
+   if(fit_type[0] GT 0) then cen_type=str.cen_type
+   if(fit_type[6] GT 0) then off_type=str.off_type
+   if(fit_type2[0] GT 0) then cen_type2=str.cen_type2
+   if(fit_type2[6] GT 0) then off_type2=str.off_type2
    
    ; get Zhao concentrations if conc was not free
    if(n_elements(conc) EQ 0) then begin
-      get_ds_model,str.fit_type,str.p_mean,str.z_lens,str.msun_lens,x,/use_m200,conc=concVal,cen_type=cen_type,off_type=off_type
-      get_ds_model,str.fit_type2,str.p_mean2,str.z_lens,str.msun_lens,x,/use_m200,conc=concVal2,cen_type=cen_type2,off_type=off_type2
+      get_ds_model,fit_type,str.p_mean,str.z_lens,str.msun_lens,x,/use_m200,conc=concVal,cen_type=cen_type,off_type=off_type
+      get_ds_model,fit_type2,str.p_mean2,str.z_lens,str.msun_lens,x,/use_m200,conc=concVal2,cen_type=cen_type2,off_type=off_type2
    endif
 
    ; get chi^2 for each model
-   chisq=get_ds_chisq(str.fit_type,str.p_mean,str.z_lens,str.msun_lens,x,y,yerr,dof=dof,/use_m200,cen_type=cen_type,off_type=off_type)
-   chisq2=get_ds_chisq(str.fit_type2,str.p_mean2,str.z_lens,str.msun_lens,x,y,yerr,dof=dof2,/use_m200,cen_type=cen_type2,off_type=off_type2)
+   chisq=get_ds_chisq(fit_type,str.p_mean,str.z_lens,str.msun_lens,x,y,yerr,dof=dof,/use_m200,cen_type=cen_type,off_type=off_type)
+   chisq2=get_ds_chisq(fit_type2,str.p_mean2,str.z_lens,str.msun_lens,x,y,yerr,dof=dof2,/use_m200,cen_type=cen_type2,off_type=off_type2)
 
    if(n_elements(cenFree) EQ 0) then begin
       if(str.msun_lens EQ 0.) then mcen='-' else mcen=string(str.msun_lens,format='(F4.1)')
