@@ -79,7 +79,10 @@ endif else if(title EQ textoidl('R_{off} (kpc)')) then begin
    yarr=exp(-(xarr-offset)^2/(2.*sigma_offset^2))
    sel=where(xarr LE 0 OR xarr GE 1000, nSel)
    if(nSel GT 0) then yarr[sel]=0.
-endif
+endif else begin
+   print,'No title matches. Try running again.' ; textoidl sometimes produces inconsistent strings
+   stop
+endelse
 
 return,yarr
 end
