@@ -236,7 +236,7 @@ for ii=0,nCen-1 do begin
                                 ; groupFile. PS term comes from
                                 ; stellar mass saved in str.
 
-   get_ds_model, fitTypeRef, pMeanRef, str, x_mpc, ps_term=ps_term,$
+   get_ds_model, fitTypeRef, pMeanRef, str.z_lens, str.msun_lens, x_mpc, ps_term=ps_term,$
                  center=cenNames[ii],refcen=refNames[ii],groupFile=groupFile,nfw_off=nfw_off, $
                  cen_type='ps',use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw
    
