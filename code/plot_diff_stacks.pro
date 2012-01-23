@@ -105,7 +105,7 @@ for ii=0,nCen-1 do begin
    pSigmaRef=str.p_sigma
 
    ; restrict to points with enough sources
-   sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 10)
+   sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 20)
    if(keyword_set(stackx)) then begin
       x    = str.plot_radius_kpc[sel]*rnfw
       y    = str.we1_mean[sel]
@@ -141,7 +141,7 @@ for ii=0,nCen-1 do begin
       x_mpc=10.^(findgen(nxMpc)/(nxMpc-1)*alog10((xr[1]*xbuffer)/(xr[0]/xbuffer)))*xr[0]/xbuffer
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
    
-   get_ds_model, fitTypeRef, pMeanRef, str, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
+   get_ds_model, fitTypeRef, pMeanRef, str.z_lens, str.msun_lens, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
                  use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw  
 
    ; Sum of terms
@@ -160,7 +160,7 @@ for ii=0,nCen-1 do begin
    oploterror,x,y,yerr,psym=8,color=!black
 
    ; CALCULATE CHI^2
-   chisq=get_ds_chisq(fitTypeRef,pMeanRef,str,x,y,yerr,dof=dof,use_m200=use_m200)
+   chisq=get_ds_chisq(fitTypeRef,pMeanRef,str.z_lens,str.msun_lens,x,y,yerr,dof=dof,use_m200=use_m200)
 
    ; LEGEND
    nstr=textoidl('N_{Lens}:')
@@ -200,7 +200,7 @@ for ii=0,nCen-1 do begin
    str=mrdfits(lensFileArrCen[ii],1)
    
    ; restrict to points with enough sources
-   sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 10)
+   sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 20)
    if(keyword_set(stackx)) then begin
       x    = str.plot_radius_kpc[sel]*rnfw
       y    = str.we1_mean[sel]
