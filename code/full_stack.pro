@@ -38,7 +38,7 @@ else fitTypeAll[0,*]=ptSrc
 
 ; repeat for offset model
 fitTypeAll2=fitTypeAll
-;fitTypeAll2[6,*]=1 ; this leaves the offset as a free parameter
+fitTypeAll2[6,*]=1 ; this leaves the offset as a free parameter
 
 ; For one center:
 for i=0, n_elements(cenNames)-1 do begin
