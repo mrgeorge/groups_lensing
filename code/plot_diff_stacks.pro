@@ -142,7 +142,7 @@ for ii=0,nCen-1 do begin
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
    
    get_ds_model, fitTypeRef, pMeanRef, str.z_lens, str.msun_lens, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
-                 use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw  
+                 cen_type='ps',use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw  
 
    ; Sum of terms
    if(fitTypeRef[0] NE 0) then tot=ps_term + nfw_term $
@@ -160,7 +160,7 @@ for ii=0,nCen-1 do begin
    oploterror,x,y,yerr,psym=8,color=!black
 
    ; CALCULATE CHI^2
-   chisq=get_ds_chisq(fitTypeRef,pMeanRef,str.z_lens,str.msun_lens,x,y,yerr,dof=dof,use_m200=use_m200)
+   chisq=get_ds_chisq(fitTypeRef,pMeanRef,str.z_lens,str.msun_lens,x,y,yerr,dof=dof,use_m200=use_m200,cen_type='ps')
 
    ; LEGEND
    nstr=textoidl('N_{Lens}:')
@@ -238,7 +238,7 @@ for ii=0,nCen-1 do begin
 
    get_ds_model, fitTypeRef, pMeanRef, str, x_mpc, ps_term=ps_term,$
                  center=cenNames[ii],refcen=refNames[ii],groupFile=groupFile,nfw_off=nfw_off, $
-                 use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw
+                 cen_type='ps',use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw
    
    ; Sum of terms
    if(str.msun_lens GT 0.) then tot=ps_term + nfw_off $
