@@ -119,7 +119,7 @@ for i=0,n_elements(cenNames)-1 do begin
    run_gg_offset, infile_source, infile_lens, lensOutFileArrRef[i], innerRadiusKpc, secondRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=refNames[i],refcen=cenNames[i],stackx=keyword_set(stackx),emp_var=keyword_set(emp_var)
 
    ; Fit model to the lensing signal around the good center
-   run_ds_mcmc, lensOutFileArrRef[i], fitTypeAllRef[*,i], rob_p_mean, rob_p_sigma, stackx=keyword_set(stackx)
+   run_ds_mcmc, lensOutFileArrRef[i], fitTypeAllRef[*,i], rob_p_mean, rob_p_sigma, /ps, stackx=keyword_set(stackx)
    massMeanRef[i]=rob_p_mean
    massErrRef[i]=rob_p_sigma
 
