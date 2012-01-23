@@ -38,7 +38,7 @@ else fitTypeAll[0,*]=ptSrc
 
 ; repeat for offset model
 fitTypeAll2=fitTypeAll
-fitTypeAll2[6,*]=1 ; this leaves the offset as a free parameter
+;fitTypeAll2[6,*]=1 ; this leaves the offset as a free parameter
 
 ; For one center:
 for i=0, n_elements(cenNames)-1 do begin
@@ -99,13 +99,13 @@ for ii=0,n_elements(cenTitles)-1 do begin
    
    ; get Zhao concentrations if conc was not free
    if(n_elements(conc) EQ 0) then begin
-      get_ds_model,str.fit_type,str.p_mean,str,x,/use_m200,conc=concVal,cen_type=cen_type,off_type=off_type
-      get_ds_model,str.fit_type2,str.p_mean2,str,x,/use_m200,conc=concVal2,cen_type=cen_type2,off_type=off_type2
+      get_ds_model,str.fit_type,str.p_mean,str.z_lens,str.msun_lens,x,/use_m200,conc=concVal,cen_type=cen_type,off_type=off_type
+      get_ds_model,str.fit_type2,str.p_mean2,str.z_lens,str.msun_lens,x,/use_m200,conc=concVal2,cen_type=cen_type2,off_type=off_type2
    endif
 
    ; get chi^2 for each model
-   chisq=get_ds_chisq(str.fit_type,str.p_mean,str,x,y,yerr,dof=dof,/use_m200,cen_type=cen_type,off_type=off_type)
-   chisq2=get_ds_chisq(str.fit_type2,str.p_mean2,str,x,y,yerr,dof=dof2,/use_m200,cen_type=cen_type2,off_type=off_type2)
+   chisq=get_ds_chisq(str.fit_type,str.p_mean,str.z_lens,str.msun_lens,x,y,yerr,dof=dof,/use_m200,cen_type=cen_type,off_type=off_type)
+   chisq2=get_ds_chisq(str.fit_type2,str.p_mean2,str.z_lens,str.msun_lens,x,y,yerr,dof=dof2,/use_m200,cen_type=cen_type2,off_type=off_type2)
 
    if(n_elements(cenFree) EQ 0) then begin
       if(str.msun_lens EQ 0.) then mcen='-' else mcen=string(str.msun_lens,format='(F4.1)')
