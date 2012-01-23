@@ -22,8 +22,8 @@ common fit_options, q_c, lens_redshift, fit_type, lens_m_sun, log_sm, use_m200, 
 ; Read structure for measured lensing signal
 full_str = mrdfits(lens_infile,1)
 
-; Only include bins with >=10 background sources
-sel_points = where(full_str.e1_num GE 10)
+; Only include bins with >=10 background sources and R>20
+sel_points = where(full_str.e1_num GE 10 AND full_str.plot_radius_kpc GT 20)
 
 str={                                            $
 meanr:full_str.plot_radius_kpc[sel_points]      ,$
