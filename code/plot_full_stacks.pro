@@ -78,7 +78,7 @@ for ii=0,nCen-1 do begin
    if(fitType[6] GT 0) then off_type=str.off_type
 
    ; restrict to points with enough sources
-   sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 10)
+   sel=where(str.e1_num GE 10 AND str.plot_radius_kpc GT 20)
    if(keyword_set(stackx)) then begin
       x    = str.plot_radius_kpc[sel]*rnfw
       y    = str.we1_mean[sel]
