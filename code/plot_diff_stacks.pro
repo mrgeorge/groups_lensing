@@ -243,7 +243,7 @@ for ii=0,nCen-1 do begin
    ; Sum of terms
    if(str.msun_lens GT 0.) then tot=ps_term + nfw_off $
    else tot=nfw_off
-   oplot,x_mpc,tot,color=!blue,thick=3
+   oplot,x_mpc,tot,color=!magenta,thick=3
 
    ; Offset NFW term
    oplot,x_mpc,nfw_off,color=!orange,linestyle=3,thick=8
