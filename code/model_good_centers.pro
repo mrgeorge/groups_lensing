@@ -59,6 +59,11 @@ covPlotFile=plotDir+"good_centers_rhotis_3dM.cov.eps"
 
 run_ds_mcmc, lensOutFile, fitType, rob_p_mean, rob_p_sigma, /slow, chainFile=chainFile,burnin=burnin,/rhotis,/off3dMax
 
+; make covar plot
 ds_cov_plots,chainFile,fitType,covPlotFile,burnin=burnin
+
+; plot lensing signal with model
+singlePlotFile=plotDir+"good_centers_rhotis_3dM.eps"
+plot_lensing_results,lensOutFile,singlePlotFile,rob_p_mean,fitType,/use_m200,/models,cen_type='rhotis',off_type='max3d'
 
 end
