@@ -131,7 +131,7 @@ for i=0,ncenters-1 do begin
 endfor
 
 xyouts,pleft/2.+0.005,pbott+ncenters*pheight/2.,textoidl('Fraction of groups'),/normal,alignment=0.5,orientation=90
-xyouts,pleft+ncenters*pwidth/2.,pbott/2.-0.005,textoidl('Physical transverse separation (Mpc)'),/normal,alignment=0.5
+xyouts,pleft+ncenters*pwidth/2.,pbott/2.-0.005,textoidl('Physical transverse separation (h_{72}^{-1} Mpc)'),/normal,alignment=0.5
 xyouts,pleft+ncenters*pwidth/2.,1-ptop/2.,textoidl('Angular separation (arcsec)'),/normal,alignment=0.5
 
 device,/close
