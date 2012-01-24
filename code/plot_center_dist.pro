@@ -5,16 +5,22 @@ pro pad_hist,x=x,y=y
 
 ; note, this connects the histogram with the y-axis on the upper left side
 ; of the plot and the x-axis on the bottom right
+; unless the left-most point is still >0, then it connects it down to
+; the x-axis.
 
 xstep=x[1]-x[0]
 x=[x[0]-0.5*xstep,x,replicate(x[n_elements(x)-1]+0.5*xstep,2)]
 y=[y[0],y,y[n_elements(y)-1],0]
+if(min(x) GT 0) then begin
+   x=[x[0],x]
+   y=[0,y]
+endif
 
 end
 
 pro plot_center_dist, groupInFile, outPathName
 
-if(n_elements(groupInFile) EQ 0) then groupInFile="~/data/cosmos/code/group4_20110914.fits"
+if(n_elements(groupInFile) EQ 0) then groupInFile="~/data/cosmos/code/group5_cenunc_20110914.fits"
 if(n_elements(outPathName) EQ 0) then outPathName="~/data/cosmos/groups_lensing/plots/"
 
 ; add trailing slash to output path if missing
@@ -73,9 +79,21 @@ for i=0,ncenters-1 do begin
    for j=i,ncenters-1 do begin
 
       if(j EQ i) then begin
-         ; plot a solid line crossing through blank panels
-;         plot,[0,1],[1,0],xstyle=4,ystyle=4,position=[pleft+i*pwidth,pbott+(ncenters-1-i)*pheight,pleft+(i+1)*pwidth,pbott+(ncenters-i)*pheight],thick=5
-         continue
+         ; plot uncertainty distribution for centroids, else blank
+         if(centers[i] EQ 'xray') then begin
+            plothist,group.pos_err_ellipse*3600.*group.lensing_r200_mpc/group.lensing_r200_as,x_mpc,y_mpc,bin=0.05,/noplot
+            plothist,group.pos_err_ellipse*3600.*group.lensing_r200_mpc/group.lensing_r200_as,x_mpc,y_mpc,bin=0.05,peak=max(y_mpc)/float(ngroups),xrange=xrange_mpc,yrange=yrange,position=[pleft+i*pwidth,pbott+(ncenters-1-j)*pheight,pleft+(i+1)*pwidth,pbott+(ncenters-j)*pheight],xtickname=xtickname_mpc,xtickv=xtickv_mpc,xticks=xticks_mpc,xminor=xminor_mpc,ytickname=nolabel,yticks=yticks,ytickv=ytickv,yminor=yminor,xstyle=1,ystyle=1,charsize=axischarsize,/fill,color=!purple,fcolor=!purple
+            axis,yaxis=1,yrange=yrange,ystyle=1,ytickname=ytickname_frac,ytickv=ytickv,yticks=yticks,yminor=yminor,charsize=axischarsize
+         endif else if(centers[i] EQ 'cn') then begin
+            plothist,group.pos_err_cn*3600.*group.lensing_r200_mpc/group.lensing_r200_as,x_mpc,y_mpc,bin=0.05,/noplot
+            plothist,group.pos_err_cn*3600.*group.lensing_r200_mpc/group.lensing_r200_as,x_mpc,y_mpc,bin=0.05,peak=max(y_mpc)/float(ngroups),xrange=xrange_mpc,yrange=yrange,position=[pleft+i*pwidth,pbott+(ncenters-1-j)*pheight,pleft+(i+1)*pwidth,pbott+(ncenters-j)*pheight],xtickname=nolabel,xtickv=xtickv_mpc,xticks=xticks_mpc,xminor=xminor_mpc,ytickname=nolabel,yticks=yticks,ytickv=ytickv,yminor=yminor,xstyle=1,ystyle=1,charsize=axischarsize,/fill,color=!purple,fcolor=!purple
+         endif else if(centers[i] EQ 'cl' OR centers[i] EQ 'cf') then begin
+            plothist,group.pos_err_cl*3600.*group.lensing_r200_mpc/group.lensing_r200_as,x_mpc,y_mpc,bin=0.05,/noplot
+            plothist,group.pos_err_cl*3600.*group.lensing_r200_mpc/group.lensing_r200_as,x_mpc,y_mpc,bin=0.05,peak=max(y_mpc)/float(ngroups),xrange=xrange_mpc,yrange=yrange,position=[pleft+i*pwidth,pbott+(ncenters-1-j)*pheight,pleft+(i+1)*pwidth,pbott+(ncenters-j)*pheight],xtickname=nolabel,xtickv=xtickv_mpc,xticks=xticks_mpc,xminor=xminor_mpc,ytickname=nolabel,yticks=yticks,ytickv=ytickv,yminor=yminor,xstyle=1,ystyle=1,charsize=axischarsize,/fill,color=!purple,fcolor=!purple
+         endif else if(centers[i] EQ 'cm') then begin
+            plothist,group.pos_err_cm*3600.*group.lensing_r200_mpc/group.lensing_r200_as,x_mpc,y_mpc,bin=0.05,/noplot
+            plothist,group.pos_err_cm*3600.*group.lensing_r200_mpc/group.lensing_r200_as,x_mpc,y_mpc,bin=0.05,peak=max(y_mpc)/float(ngroups),xrange=xrange_mpc,yrange=yrange,position=[pleft+i*pwidth,pbott+(ncenters-1-j)*pheight,pleft+(i+1)*pwidth,pbott+(ncenters-j)*pheight],xtickname=nolabel,xtickv=xtickv_mpc,xticks=xticks_mpc,xminor=xminor_mpc,ytickname=nolabel,yticks=yticks,ytickv=ytickv,yminor=yminor,xstyle=1,ystyle=1,charsize=axischarsize,/fill,color=!purple,fcolor=!purple
+         endif else continue
       endif else begin
 ;         compare_ctr,centers[i],centers[j],x_as,y_as,x_mpc,y_mpc
          get_center_coords, group, centers[j],ra2,dec2,sel2
@@ -113,8 +131,8 @@ for i=0,ncenters-1 do begin
 endfor
 
 xyouts,pleft/2.+0.005,pbott+ncenters*pheight/2.,textoidl('Fraction of groups'),/normal,alignment=0.5,orientation=90
-xyouts,pleft+ncenters*pwidth/2.,pbott/2.-0.005,textoidl('Radial offset (Mpc)'),/normal,alignment=0.5
-xyouts,pleft+ncenters*pwidth/2.,1-ptop/2.,textoidl('Radial offset (arcsec)'),/normal,alignment=0.5
+xyouts,pleft+ncenters*pwidth/2.,pbott/2.-0.005,textoidl('Physical transverse separation (Mpc)'),/normal,alignment=0.5
+xyouts,pleft+ncenters*pwidth/2.,1-ptop/2.,textoidl('Angular separation (arcsec)'),/normal,alignment=0.5
 
 device,/close
 
