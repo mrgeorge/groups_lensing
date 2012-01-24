@@ -75,7 +75,7 @@ endif else if(title EQ textoidl('c_{200c}')) then begin
    yarr=exp(-(xarr-conc)^2/(2.*sigma_conc^2))
    sel=where(xarr LE 1 OR xarr GE 10, nSel)
    if(nSel GT 0) then yarr[sel]=0.
-endif else if(title EQ textoidl('R_{off} (kpc)')) then begin
+endif else if(title EQ textoidl('\sigma_{off} (kpc)')) then begin
    yarr=exp(-(xarr-offset)^2/(2.*sigma_offset^2))
    sel=where(xarr LE 0 OR xarr GE 1000, nSel)
    if(nSel GT 0) then yarr[sel]=0.
@@ -160,7 +160,7 @@ if (fit_type[5] eq 1) then begin
 endif
 ; Offset radius
 if (fit_type[6] eq 1) then begin 
-    titles[k] = 'R_{off} (kpc)'
+    titles[k] = '\sigma_{off} (kpc)'
     ranges[*,k]=[-10,150]
     tickv[*,k]=[0.,75.,150.]
     minor[k]=3
