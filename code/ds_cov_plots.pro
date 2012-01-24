@@ -63,7 +63,7 @@ sigma_bias    = 0.3
 sigma_m_sigma = 0.1
 sigma_offset  = 0.2*1000 ; kpc
 
-if(title EQ textoidl('log(M_{cen}/M'+sun+')')) then begin
+if(title EQ textoidl('log(M_{sub}/M'+sun+')')) then begin
    yarr=exp(-(xarr-M0)^2/(2.*sigma_M0^2))
    sel=where(xarr LE 10 OR xarr GE 13, nSel)
    if(nSel GT 0) then yarr[sel]=0.
@@ -119,9 +119,9 @@ nticks=n_elements(tickv[*,0])-1
 minor=intarr(npars)
 
 k = 0
-; Baryonic term
+; Central baryonic/subhalo term
 if (fit_type[0] eq 1) then begin
-    titles[k] = 'log(M_{cen}/M'+sun+')'
+    titles[k] = 'log(M_{sub}/M'+sun+')'
     ranges[*,k]=[9.8,11.8]
     tickv[*,k]=[10.0,10.8,11.6]
     minor[k]=8
