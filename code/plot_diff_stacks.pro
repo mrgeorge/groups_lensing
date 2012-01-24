@@ -12,12 +12,12 @@ pro plot_diff_stacks,cenNames,refNames,cenText,refText,lensFileArrCen,lensFileAr
 
 if(keyword_set(test)) then begin
    ; Set paths for output files
-   dirName='bin_50_1500_7_emp'
+   dirName='bin_20_70_1000_7_emp_20110914'
    fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'/'
    plotDir='~/data/cosmos/groups_lensing/plots/'+dirName+'/'
 
-   cenNames=['mmgg_r200','mlgg_r200','mlgg_scale','cm','cl','cn','xray']
-   cenText=textoidl(['MMGG_{R200}','MLGG_{R200}','MLGG_{scale}','CM','CL','CN','X-ray'])
+   cenNames=['mmgg_r200','bgg_r200','bgg_scale','cm','cf','cn','xray']
+   cenText=textoidl(['MMGG_{R200}','BGG_{R200}','BGG_{scale}','CM','CF','CN','X-ray'])
    refNames=replicate('mmgg_scale',n_elements(cenNames)) ; the "good center" to compare with the ones above
    refText=textoidl(replicate('MMGG_{scale}',n_elements(cenNames)))
 
@@ -313,13 +313,13 @@ for ii=0,nCen-1 do begin
    xmax=10.^(logx[n_elements(logx)-1]+bin)
    xpad=[xmin,xmin,x,xmax,xmax]
    ypad=[yrhist[0],hist[0],hist,hist[n_elements(hist)-1],yrhist[0]]
-   oplot,xpad,ypad,ps=10,color=!orange
+   oplot,xpad,ypad,ps=10,color=!orange,thick=5
 
    nMatch=n_elements(where(offset_mpc LT min_offset_mpc))
    xarr=[xr[0],xr[0],min_offset_mpc,min_offset_mpc]
    yarr=[yrhist[0],nMatch,nMatch,yrhist[0]]
-   oplot,xarr,yarr,color=!gray,thick=5
-   polyfill,xarr,yarr,/line_fill,orientation=30,color=!gray
+   oplot,xarr,yarr,color=!gray,thick=3
+   polyfill,xarr,yarr,/line_fill,thick=3,orientation=30,color=!gray
 
    ; LEGEND
    nstr=textoidl('N_{Lens}:')
