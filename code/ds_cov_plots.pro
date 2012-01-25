@@ -1,19 +1,23 @@
 function find_contour_levels,res
 ; get contour levels that enclose 68%, 95%, 99% of mock data points
 
+sel30=where(total(res[reverse(sort(res))],/cumulative) GT 0.30*total(res),n30)
 sel68=where(total(res[reverse(sort(res))],/cumulative) GT 0.68*total(res),n68)
 sel95=where(total(res[reverse(sort(res))],/cumulative) GT 0.95*total(res),n95)
 sel99=where(total(res[reverse(sort(res))],/cumulative) GT 0.99*total(res),n99)
 
+if(n30 GT 0) then level0=res[(reverse(sort(res)))[min(sel30)]]
 if(n68 GT 0) then level1=res[(reverse(sort(res)))[min(sel68)]]
 if(n95 GT 0) then level2=res[(reverse(sort(res)))[min(sel95)]]
 if(n99 GT 0) then level3=res[(reverse(sort(res)))[min(sel99)]]
 
-if(n_elements(level1) GT 0 $
+
+if(n_elements(level0) GT 0 $
+   AND n_elements(level1) GT 0 $
    AND n_elements(level2) GT 0 $
    AND n_elements(level3) GT 0) then begin
-      if(level1 GT level2 AND level2 GT level3) then $
-         return,[level3,level2,level1] $
+      if(level0 GT level1 AND level1 GT level2 AND level2 GT level3) then $
+         return,[level3,level2,level1,level0] $
       else return,-1
 endif else return,-1
 
@@ -34,7 +38,7 @@ xs=findgen(dims[0])*xBin+min(xRange)
 ys=findgen(dims[1])*yBin+min(yRange)
 levels=find_contour_levels(res)
 if(n_elements(levels) GT 1) then $ 
-   contour,res,xs,ys,color=color,/over,levels=levels[1:2],/fill,c_color=[!medblue,!darkblue]
+   contour,res,xs,ys,color=color,/over,levels=levels[1:3],/fill,c_color=[!medblue,!darkblue,!red]
 ; else plot no contours
 end
 
