@@ -4,7 +4,7 @@ pro plot_good_centers
 ; while the MCMC chain is still running
 
 plotDir="~/data/cosmos/groups_lensing/plots/bin_20_70_1000_7_emp_conc_cen/"
-singlePlotFile=plotDir+"good_centers_rhotis_3dM" ;.eps is added
+singlePlotFile=plotDir+"good_centers_rhotis_3dM.eps"
 
 outDir="~/data/cosmos/groups_lensing/outfiles/bin_20_70_1000_7_emp_conc_cen/"
 chainFile=outDir+"good_centers.chain"
