@@ -108,20 +108,21 @@ for ii=0,nCen-1 do begin
       x_mpc=10.^(findgen(nxMpc)/(nxMpc-1)*alog10((xr[1]*xbuffer)/(xr[0]/xbuffer)))*xr[0]/xbuffer
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
 
-   get_ds_model, fitType, pMean, str.z_lens, str.msun_lens, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
-                  use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw,$
+   get_ds_model, fitType, pMean, str.z_lens, str.msun_lens, x_mpc, $
+                 cen_term=cen_term, nfw_term=nfw_term,$
+                 use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw,$
                  cen_type=cen_type,off_type=off_type
    
    ; Sum of terms
-   if(fitType[0] NE 0) then tot=ps_term + nfw_term $
+   if(fitType[0] NE 0) then tot=cen_term + nfw_term $
    else tot=nfw_term
    oplot,x_mpc,tot,color=!blue,thick=12
 
    ; NFW term
    if(cenText[ii] EQ textoidl('MMGG_{scale}')) then oplot,x_mpc,nfw_term,color=!darkgreen,linestyle=2,thick=18
 
-   ; Baryonic point source term
-   if(cenText[ii] EQ textoidl('MMGG_{scale}')) then if(fitType[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=5
+   ; Central term (stars + subhalo if any)
+   if(cenText[ii] EQ textoidl('MMGG_{scale}')) then if(fitType[0] NE 0) then oplot,x_mpc,cen_term,color=!red,linestyle=1,thick=5
 
    ; CALCULATE CHI^2
    chisq=get_ds_chisq(fitType,pMean,str.z_lens,str.msun_lens,x,y,yerr,dof=dof,use_m200=use_m200,cen_type=cen_type,off_type=off_type)
@@ -136,20 +137,21 @@ for ii=0,nCen-1 do begin
       if(fitType2[0] GT 0) then cen_type2=str.cen_type2
       if(fitType2[6] GT 0) then off_type2=str.off_type2
 
-      get_ds_model,fitType2,pMean2,str.z_lens,str.msun_lens,x_mpc,ps_term=ps_term,nfw_term=nfw_term,$
+      get_ds_model,fitType2,pMean2,str.z_lens,str.msun_lens,x_mpc, $
+                   cen_term=cen_term,nfw_term=nfw_term,$
                    use_m200=use_m200,mnfw=mnfw2,conc=conc2,rnfw=rnfw2,$
                    cen_type=cen_type2,off_type=off_type2
 
       ; Sum of terms
-      if(fitType2[0] NE 0) then tot = ps_term + nfw_term $
+      if(fitType2[0] NE 0) then tot = cen_term + nfw_term $
       else tot=nfw_term
       oplot,x_mpc,tot,color=!magenta,thick=3
 
       ; NFW term
       if(cenText[ii] EQ textoidl('MMGG_{scale}')) then oplot,x_mpc,nfw_term,color=!orange,linestyle=3,thick=8
 
-      ; Baryonic point source term
-      if(cenText[ii] EQ textoidl('MMGG_{scale}')) then if(fitType2[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=4
+      ; Central term (stars + subhalo if any)
+      if(cenText[ii] EQ textoidl('MMGG_{scale}')) then if(fitType2[0] NE 0) then oplot,x_mpc,cen_term,color=!red,linestyle=1,thick=4
 
       ; Calculate chi^2
       chisq2=get_ds_chisq(fitType2,pMean2,str.z_lens,str.msun_lens,x,y,yerr,dof=dof2,use_m200=use_m200,cen_type=cen_type2,off_type=off_type2)
