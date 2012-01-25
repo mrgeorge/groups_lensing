@@ -2,7 +2,8 @@ pro get_ds_model, fit_type, p_mean, zl, msun, x_mpc, $                          
                   use_m200=use_m200,$                                              ; switch
                   cen_type=cen_type,off_type=off_type, $                           ; model options
                   center=center,refcen=refcen,groupFile=groupFile,nfw_off=nfw_off,$; options for diff_stack
-                  ps_term=ps_term, nfw_term=nfw_term, nfw_ws_term=nfw_ws_term, tot=tot,$                    ; output profiles
+                  cen_term=cen_term, star_term=star_term, sub_term=sub_term,$ ; output profiles (cen=star+sub)
+                  nfw_term=nfw_term, nfw_ws_term=nfw_ws_term, tot=tot,$ ; output profiles (tot=nfw+cen)
                   mnfw=mnfw,conc=conc,rnfw=rnfw                                    ; output NFW params
 
 ; determine model components for a given set of parameters
@@ -12,7 +13,7 @@ pro get_ds_model, fit_type, p_mean, zl, msun, x_mpc, $                          
 ; fit_type is array telling which parameters are included in fit
 ; p_mean gives mean fit parameters
 ; zl and msun are the lens redshift and central stellar mass
-; ps_term, nfw_term return model values at radii x_mpc
+; *_term return model values at radii x_mpc
 ; if center, refcen, and groupFile are set, nfw_off will contain the
 ;   model NFW (assumed to be fit around refcen) convolved with the offset distribution between center
 ;   and refcen, to give the predicted signal around center
@@ -147,6 +148,8 @@ rnfw     = 10.0^(r_log)
 nfw_term=nfw_ds_offset(x_mpc,[rnfw,conc],zl,r200=keyword_set(use_m200),roff=offset,off_type=off_type)
 
 if(fit_type[0] GT 0) then begin
+   star_term=10.^(msun)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
+
    ; normalization radius and mass for SIS and TIS
    r_eff=0.005                  ; 5 kpc in Mpc
    meff_smeff_ratio=2. ; ratio of stellar mass within effective radius to total mass (DM+SM) within effective radius
@@ -156,7 +159,7 @@ if(fit_type[0] GT 0) then begin
    m_eff=10.^(M0) * smeff_smtot_ratio * meff_smeff_ratio ; Msun
 
    if(cen_type EQ 'sis') then begin         ; replace point source with SIS
-      ps_term=m_eff/(4.*r_eff) / x_mpc / 1.e12 ; Msun/pc^2
+      sub_term=m_eff/(4.*r_eff) / x_mpc / 1.e12 ; Msun/pc^2
 
    endif else if(cen_type EQ 'tis') then begin ; truncated isothermal PIEMD - see Kassiola & Kovner 1993 and Mira 2011
       ; core and truncation params
@@ -165,13 +168,11 @@ if(fit_type[0] GT 0) then begin
       r_cut=0.02                ; 20 kpc
       rho0=10.^(M0) * (r_core^2-r_cut^2) / (4.*!pi*r_core^2*r_cut^2 * (r_core*atan(r_eff/r_core)-r_cut*atan(r_eff/r_cut)))
 
-      ps_sigma_R=(rho0 * r_core^2 * r_cut^2 * !pi)/(r_cut^2-r_core^2) * (1./sqrt(r_core^2 + x_mpc^2) - 1./sqrt(r_cut^2 + x_mpc^2)) ; Msun/Mpc^2 , Mira eq. 23.
-      ps_sigmabar_R=(2.*rho0*r_core^2*r_cut^2*!pi)/(x_mpc^2*(r_cut+r_core)) * (1.-(sqrt(r_cut^2+x_mpc^2)-sqrt(r_core^2+x_mpc^2))/(r_cut-r_core)) ; Msun/Mpc^2 , Mira eq. 24.
-      ps_term=(ps_sigmabar_R - ps_sigma_R) / 1.e12 ; Msun/pc^2
+      sis_sigma_R=(rho0 * r_core^2 * r_cut^2 * !pi)/(r_cut^2-r_core^2) * (1./sqrt(r_core^2 + x_mpc^2) - 1./sqrt(r_cut^2 + x_mpc^2)) ; Msun/Mpc^2 , Mira eq. 23.
+      sis_sigmabar_R=(2.*rho0*r_core^2*r_cut^2*!pi)/(x_mpc^2*(r_cut+r_core)) * (1.-(sqrt(r_cut^2+x_mpc^2)-sqrt(r_core^2+x_mpc^2))/(r_cut-r_core)) ; Msun/Mpc^2 , Mira eq. 24.
+      sub_term=(sis_sigmabar_R - sis_sigma_R) / 1.e12 ; Msun/pc^2
    
    endif else if(cen_type EQ 'rhotis') then begin ; truncated isothermal PIEMD + stellar mass point source
-      stellar_term=10.^(msun)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
-
       ; M0 will be the mass within r_eff for an untruncated pseudo-SIS (PIS)
       ; the truncation radius will be set where the subhalo density equals
       ;  the halo density, along a line connecting their centers
@@ -210,19 +211,24 @@ if(fit_type[0] GT 0) then begin
       ; define sigma and delta sigma at x_mpc
       tis_sigma_R=(rho0 * r_core^2 * r_cut^2 * !pi)/(r_cut^2-r_core^2) * (1./sqrt(r_core^2 + x_mpc^2) - 1./sqrt(r_cut^2 + x_mpc^2)) ; Msun/Mpc^2 , Mira eq. 23.
       tis_sigmabar_R=(2.*rho0*r_core^2*r_cut^2*!pi)/(x_mpc^2*(r_cut+r_core)) * (1.-(sqrt(r_cut^2+x_mpc^2)-sqrt(r_core^2+x_mpc^2))/(r_cut-r_core)) ; Msun/Mpc^2 , Mira eq. 24.
-      tis_term=(tis_sigmabar_R - tis_sigma_R) / 1.e12 ; Msun/pc^2
-
-      ps_term=stellar_term+tis_term
-
+      sub_term=(tis_sigmabar_R - tis_sigma_R) / 1.e12 ; Msun/pc^2
    endif else if(cen_type EQ 'ps') then begin ; point source
-      ps_term=10^(M0)/1.e12/(!pi*x_mpc^2)     ; h^-1 Msun, factor of 1e12 to convert to pc^2
+      sub_term=replicate(0.,n_elements(x_mpc))
+      ; if fitting for stellar mass point source, set star_term here using M0
+      if(fit_type[0] EQ 1) then star_term=10.^(M0)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
    endif else begin
       print,'GET_DS_MODEL: cen_type not recognized'
       stop
    endelse
+
+   ; if M0=0, the subhalo profile should be zeroed out,
+   ; but since it's a log quantity I do it here by hand
+   if(M0 EQ 0) then sub_term=replicate(0.,n_elements(x_mpc))
+
+   ; add the stellar mass with the subhalo to get DS_cen
+   cen_term=star_term + sub_term
    
-   if(M0 EQ 0.) then ps_term[*]=0.
-endif else ps_term=0.
+endif else cen_term=replicate(0.,n_elements(x_mpc))
 
 
 ;ws_corr=1
@@ -244,7 +250,7 @@ if (ws_corr eq 1) then begin
 endif
 
 ; TOTAL
-tot=nfw_term + ps_term
+tot=nfw_term + cen_term
 
 if(keyword_set(center) AND keyword_set(refcen) AND keyword_set(groupFile)) then $
    nfw_off=nfw_ds_offset(x_mpc,[rnfw,conc],zl,groupFile,r200=keyword_set(use_m200),center=center,refcen=refcen)
