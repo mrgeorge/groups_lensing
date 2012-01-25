@@ -141,19 +141,20 @@ for ii=0,nCen-1 do begin
       x_mpc=10.^(findgen(nxMpc)/(nxMpc-1)*alog10((xr[1]*xbuffer)/(xr[0]/xbuffer)))*xr[0]/xbuffer
    endif else x_mpc = findgen(nxMpc)/(nxMpc-1) * (xr[1]-xr[0]) + xr[0]
    
-   get_ds_model, fitTypeRef, pMeanRef, str.z_lens, str.msun_lens, x_mpc, ps_term=ps_term, nfw_term=nfw_term,$
+   get_ds_model, fitTypeRef, pMeanRef, str.z_lens, str.msun_lens, x_mpc, $
+                 cen_term=cen_term, star_term=star_term, sub_term=sub_term, nfw_term=nfw_term,$
                  cen_type='ps',use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw  
 
    ; Sum of terms
-   if(fitTypeRef[0] NE 0) then tot=ps_term + nfw_term $
+   if(fitTypeRef[0] NE 0) then tot=cen_term + nfw_term $
    else tot=nfw_term
    oplot,x_mpc,tot,color=!blue,thick=3
 
    ; NFW term
    oplot,x_mpc,nfw_term,color=!darkgreen,linestyle=2,thick=8
 
-   ; Baryonic point source term
-   if(fitTypeRef[0] NE 0) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=6
+   ; Central term (stars + subhalo if any)
+   if(fitTypeRef[0] NE 0) then oplot,x_mpc,cen_term,color=!red,linestyle=1,thick=6
 
 
    ; PLOT DATA POINTS
@@ -236,20 +237,20 @@ for ii=0,nCen-1 do begin
                                 ; groupFile. PS term comes from
                                 ; stellar mass saved in str.
 
-   get_ds_model, fitTypeRef, pMeanRef, str.z_lens, str.msun_lens, x_mpc, ps_term=ps_term,$
+   get_ds_model, fitTypeRef, pMeanRef, str.z_lens, str.msun_lens, x_mpc, cen_term=cen_term,$
                  center=cenNames[ii],refcen=refNames[ii],groupFile=groupFile,nfw_off=nfw_off, $
                  cen_type='ps',use_m200=use_m200,mnfw=mnfw,conc=conc,rnfw=rnfw
    
    ; Sum of terms
-   if(str.msun_lens GT 0.) then tot=ps_term + nfw_off $
+   if(str.msun_lens GT 0.) then tot=cen_term + nfw_off $
    else tot=nfw_off
    oplot,x_mpc,tot,color=!magenta,thick=3
 
    ; Offset NFW term
    oplot,x_mpc,nfw_off,color=!orange,linestyle=3,thick=8
 
-   ; Baryonic point source term
-   if(str.msun_lens GT 0.) then oplot,x_mpc,ps_term,color=!red,linestyle=1,thick=6
+   ; Central term (stars + subhalo if any)
+   if(str.msun_lens GT 0.) then oplot,x_mpc,cen_term,color=!red,linestyle=1,thick=6
 
 
    ; PLOT DATA POINTS
