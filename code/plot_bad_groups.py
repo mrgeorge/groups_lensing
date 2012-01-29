@@ -14,9 +14,12 @@ group=group[group['FLAG_INCLUDE']==1]
 msmr=group['ID_MMGG_SCALE'] != group['ID_MMGG_R200']
 msbs=group['ID_MMGG_SCALE'] != group['ID_MLGG_SCALE']
 
-
-plt.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica'],'size':18})
+# use helvetica and latex
+plt.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica'],'size':20})
 plt.rc('text', usetex=True)
+plt.rc('axes',linewidth=1.5)
+
+# start the plot with axes
 plt.figure(1)
 plt.xlim((0,1.03))
 plt.ylim((41.2,44))
@@ -27,11 +30,11 @@ plt.ylabel(r'log(L$_{\mathrm{X}}$) (erg/s)',fontsize='medium')
 label1=r'$\mathrm{MMGG_{scale} \ne MMGG_{R200}}$'
 label2=r'$\mathrm{MMGG_{scale} \ne BGG_{scale}}$'
 
-plt.scatter(group['ZPHOT'],group['LX_APP'],c='gray',marker='o',s=15,edgecolors='none')
-plt.scatter(group['ZPHOT'][msmr],group['LX_APP'][msmr],edgecolors='red',marker='d',s=100,facecolors='none',label=label1)
-plt.scatter(group['ZPHOT'][msbs],group['LX_APP'][msbs],edgecolors='blue',marker='s',s=80,facecolors='none',label=label2)
+plt.scatter(group['ZPHOT'],group['LX_APP'],c='gray',edgecolors='none',marker='o',s=20)
+plt.scatter(group['ZPHOT'][msmr],group['LX_APP'][msmr],c='r',edgecolors='maroon',facecolors='r',marker='d',s=140,label=label1)
+plt.scatter(group['ZPHOT'][msbs],group['LX_APP'][msbs],c='b',edgecolors='navy',facecolors='b',marker='s',s=70,label=label2)
 
-plt.legend((label1, label2), loc='lower right', scatterpoints=1, markerscale=1, prop={'size':16},handletextpad=0).draw_frame(False)
+plt.legend((label1, label2), loc='lower right', scatterpoints=1, markerscale=1, prop={'size':18},handletextpad=0).draw_frame(False)
 ltext=plt.gca().get_legend().get_texts()
 plt.setp(ltext[0],color='red')
 plt.setp(ltext[1],color='blue')
