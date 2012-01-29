@@ -32,6 +32,10 @@ plt.scatter(group['ZPHOT'][msmr],group['LX_APP'][msmr],edgecolors='red',marker='
 plt.scatter(group['ZPHOT'][msbs],group['LX_APP'][msbs],edgecolors='blue',marker='s',s=80,facecolors='none',label=label2)
 
 plt.legend((label1, label2), loc='lower right', scatterpoints=1, markerscale=1, prop={'size':16},handletextpad=0).draw_frame(False)
+ltext=plt.gca().get_legend().get_texts()
+plt.setp(ltext[0],color='red')
+plt.setp(ltext[1],color='blue')
+
 
 plotDir="/Users/mgeorge/data/cosmos/groups_lensing/plots/"
 plotFile=plotDir+"bad_groups.eps"
