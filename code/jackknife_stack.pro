@@ -1,14 +1,23 @@
-pro jackknife_stack
+pro jackknife_stack, refName, cenName
 
 ; stack random subsamples of groups to determine the distribution of
 ; masses obtained. This is a test to see whether groups with
 ; MMGG_scale != MMGG_r200 have anomalously low masses.
 
-group=mrdfits("~alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits",1)
+;group=mrdfits("~alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits",1)
+group=mrdfits("~/data/cosmos/code/group5_20110914.fits",1)
 sel=where(group.flag_include EQ 1)
 group=group[sel]
 
-bad=where(group.id_mmgg_scale NE group.id_mmgg_r200)
+minSep=50. ; kpc
+if(refName EQ 'mmgg_scale' AND (cenName EQ 'mlgg_scale' OR cenName EQ 'bgg_scale')) then begin
+   bad=where(distance(group.alpha_mmgg_scale,group.delta_mmgg_scale,group.alpha_mlgg_scale,group.delta_mlgg_scale)*3600.*group.lensing_r200_mpc*1000./group.lensing_r200_as GT minSep)
+endif else if(refName EQ 'mmgg_scale' AND cenName EQ 'mmgg_r200') then begin
+   bad=where(distance(group.alpha_mmgg_scale,group.delta_mmgg_scale,group.alpha_mmgg_r200,group.delta_mmgg_r200)*3600.*group.lensing_r200_mpc*1000./group.lensing_r200_as GT minSep)
+endif else if(refName EQ 'mmgg_scale' AND (cenName EQ 'mlgg_r200' OR cenName EQ 'bgg_r200')) then begin
+   bad=where(distance(group.alpha_mmgg_scale,group.delta_mmgg_scale,group.alpha_mlgg_r200,group.delta_mlgg_r200)*3600.*group.lensing_r200_mpc*1000./group.lensing_r200_as GT minSep)
+endif
+
 LXBad=median(group[bad].lx_scale)
 mLXBad=median(group[bad].lensing_m200)
 zBad=median(group[bad].zphot)
@@ -24,18 +33,18 @@ massErrSamp=fltarr(nSamples)
 zSamp=fltarr(nSamples)
 nDiffSamp=intarr(nSamples) ; number of groups where centers disagree
 
-minRadiusKpc=50.
-maxRadiusKpc=2000.
-nRadiusBins=8
+innerRadiusKpc=20.
+secondRadiusKpc=70.
+maxRadiusKpc=1000.
+nRadiusBins=7
 stackx=0
-emp_var=0
-cenName='mmgg_scale'
-dirName='bin_'+string(minRadiusKpc,format='(I0)')+'_'+string(maxRadiusKpc,format='(I0)')+'_'+string(nRadiusBins,format='(I0)')
+emp_var=1
+dirName='bin_'+string(innerRadiusKpc,format='(I0)')+'_'+string(secondRadiusKpc,format='(I0)')+'_'+string(maxRadiusKpc,format='(I0)')+'_'+string(nRadiusBins,format='(I0)')
 if(keyword_set(stackx)) then dirName += '_sx'
 if(keyword_set(emp_var)) then dirName += '_emp'
-fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'/'
-lensOutFile=strcompress(fileDir+'center_'+cenName+'+_jackknife.fits',/remove_all)
-sampGroupFile=fileDir+'group_jackknife.fits'
+fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'_20110914/'
+lensOutFile=strcompress(fileDir+'center_'+refName+'_'+cenName+'_jackknife.fits',/remove_all)
+sampGroupFile=fileDir+'group_'+refName+'_'+cenName+'_jackknife.fits'
 infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7.fits' ; Using the new catalog (photoz version 1.7)
 
 zscheme=2 ; from ALs code
@@ -48,33 +57,44 @@ fitType = [$
 2,$             ; 0  M0    : baryonic mass
 1,$             ; 1  R_vir : NFW virial mass
 2,$             ; 2  C     : NFW concentration
-0,$             ; 5  alpha : fraction
-0,$             ; 6  bias
-0 ]             ; 6  m_sigma
+0,$             ; 3  alpha : fraction
+0,$             ; 4  bias
+0,$             ; 5  m_sigma
+0 ]             ; 6  offset
 
-openw,u,fileDir+'jackknife_results.txt',/get_lun,width=1000
+openw,u,fileDir+'jackknife_results_20110914_'+refName+'_'+cenName+'.txt',/get_lun,width=1000
 printf,u,'# Jackknife sample size',sampleSize
 printf,u,'# Run  nDiff  z  LX  mLX  mWL  sig_mWL'
-
 for ii=0,nSamples-1 do begin
    print,'==========================='
    print,'Sample ',ii,' of ',nSamples
    print,'==========================='
 
-   ; choose N random indices from Ngroups without replacement 
-   rand=randomu(seed,n_elements(group))
-   sel=(sort(rand))[0:sampleSize-1]
+   if(ii EQ 0) then sel=bad $ ; list the "bad" sample first for comparison
+   else begin
+      ; choose N random indices from Ngroups without replacement 
+      rand=randomu(seed,n_elements(group))
+      sel=(sort(rand))[0:sampleSize-1]
+   endelse
+
    mwrfits,group[sel],sampGroupFile,/create 
 
    LXSamp[ii]=median(group[sel].lx_scale)
    mLXSamp[ii]=median(group[sel].lensing_m200)
    zSamp[ii]=median(group[sel].zphot)
-   nDiffSamp[ii]=n_elements(where(group[sel].id_mmgg_scale NE group[sel].id_mmgg_r200))
+   
+   if(refName EQ 'mmgg_scale' AND (cenName EQ 'mlgg_scale' OR cenName EQ 'bgg_scale')) then begin
+      nDiffSamp[ii]=n_elements(where(group[sel].id_mmgg_scale NE group[sel].id_mlgg_scale))
+   endif else if(refName EQ 'mmgg_scale' AND cenName EQ 'mmgg_r200') then begin
+      nDiffSamp[ii]=n_elements(where(group[sel].id_mmgg_scale NE group[sel].id_mmgg_r200))
+   endif else if(refName EQ 'mmgg_scale' AND (cenName EQ 'mlgg_r200' OR cenName EQ 'bgg_r200')) then begin
+      nDiffSamp[ii]=n_elements(where(group[sel].id_mmgg_scale NE group[sel].id_mlgg_r200))
+   endif
 
-   run_gg_offset, infile_source, sampGroupFile, lensOutFile, minRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=cenName,stackx=keyword_set(stackx),emp_var=keyword_set(emp_var)
+   run_gg_offset, infile_source, sampGroupFile, lensOutFile, innerRadiusKpc, secondRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor, zscheme, /xgroups,/usespecz,center=refName,stackx=keyword_set(stackx),emp_var=keyword_set(emp_var)
 
    ; Fit model to the lensing signal
-   run_ds_mcmc, lensOutFile, fitType, rob_p_mean, rob_p_sigma
+   run_ds_mcmc, lensOutFile, fitType, rob_p_mean, rob_p_sigma, /fast, stackx=keyword_set(stackx), /noSave, /ps
    massSamp[ii]=rob_p_mean
    massErrSamp[ii]=rob_p_sigma
 
