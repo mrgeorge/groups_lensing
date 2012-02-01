@@ -1,4 +1,4 @@
-pro jackknife_stack, refName, cenName
+pro jackknife_stack, refName, cenName, hiZ=hiZ
 
 ; stack random subsamples of groups to determine the distribution of
 ; masses obtained. This is a test to see whether groups with
@@ -8,6 +8,11 @@ pro jackknife_stack, refName, cenName
 group=mrdfits("~/data/cosmos/code/group5_20110914.fits",1)
 sel=where(group.flag_include EQ 1)
 group=group[sel]
+
+if(keyword_set(hiZ)) then begin
+   sel=where(group.zphot GT 0.7)
+   group=group[sel]
+endif
 
 minSep=50. ; kpc
 if(refName EQ 'mmgg_scale' AND (cenName EQ 'mlgg_scale' OR cenName EQ 'bgg_scale')) then begin
@@ -43,8 +48,9 @@ dirName='bin_'+string(innerRadiusKpc,format='(I0)')+'_'+string(secondRadiusKpc,f
 if(keyword_set(stackx)) then dirName += '_sx'
 if(keyword_set(emp_var)) then dirName += '_emp'
 fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'_20110914/'
-lensOutFile=strcompress(fileDir+'center_'+refName+'_'+cenName+'_jackknife.fits',/remove_all)
-sampGroupFile=fileDir+'group_'+refName+'_'+cenName+'_jackknife.fits'
+if(keyword_set(hiZ)) then zExt='_hiz' else zExt=''
+lensOutFile=strcompress(fileDir+'center_'+refName+'_'+cenName+'_jackknife'+zExt+'.fits',/remove_all)
+sampGroupFile=fileDir+'group_'+refName+'_'+cenName+'_jackknife'+zExt+'.fits'
 infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7.fits' ; Using the new catalog (photoz version 1.7)
 
 zscheme=2 ; from ALs code
@@ -62,7 +68,7 @@ fitType = [$
 0,$             ; 5  m_sigma
 0 ]             ; 6  offset
 
-openw,u,fileDir+'jackknife_results_20110914_'+refName+'_'+cenName+'.txt',/get_lun,width=1000
+openw,u,fileDir+'jackknife_results_20110914_'+refName+'_'+cenName+zExt+'.txt',/get_lun,width=1000
 printf,u,'# Jackknife sample size',sampleSize
 printf,u,'# Run  nDiff  z  LX  mLX  mWL  sig_mWL'
 for ii=0,nSamples-1 do begin
