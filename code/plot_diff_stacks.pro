@@ -33,7 +33,7 @@ sel=where(group.flag_include EQ 1)
 group=group[sel]
 
 nCols=3
-nRows=7
+nRows=n_elements(cenNames)
 !p.multi=[0,nCols,nRows]
 !p.font=0
 !p.charsize=1.2
@@ -50,7 +50,7 @@ blank=replicate(' ',60)
 
 ;margins and plot dimensions
 xstart=0.09
-ystart=0.06
+ystart=0.54/(1.2*nRows+0.6)
 ddx=0.01 ; small gap between lensing plots and histogram
 dx=(1.-2.*xstart-ddx)/nCols
 dy=(1.-1.4*ystart)/nRows
@@ -85,7 +85,7 @@ lCharSize=0.7
 
 tickCharSize=1.3
 
-device,filename=plotFile,/encapsul,/helvetica,/color,xsize=7,ysize=9,/inches
+device,filename=plotFile,/encapsul,/helvetica,/color,xsize=7,ysize=1.2*nRows+0.6,/inches
 
 nCen=n_elements(cenText)
 for ii=0,nCen-1 do begin
