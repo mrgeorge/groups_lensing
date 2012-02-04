@@ -30,7 +30,7 @@ res=hist_2d(x,y,min1=min(xRange),min2=min(yRange),max1=max(xRange),max2=max(yRan
 if n_elements(g_smooth) gt 0 then begin	;make a gaussian and convolve with it
    make_gaussian,gauss,size=[2.0*g_smooth,2.0*g_smooth],$
                  fwhm=g_smooth,counts=1.0
-   res=convol(res,gauss,/edge_tr)
+   res=convol(float(res),gauss,/edge_tr)
 endif
 
 dims=size(res,/dim) ;get dimensions of the 2d histogram
@@ -38,7 +38,8 @@ xs=findgen(dims[0])*xBin+min(xRange)
 ys=findgen(dims[1])*yBin+min(yRange)
 levels=find_contour_levels(res)
 if(n_elements(levels) GT 1) then $ 
-   contour,res,xs,ys,color=color,/over,levels=levels[1:3],/fill,c_color=[!medblue,!darkblue,!red]
+;   contour,res,xs,ys,color=color,/over,levels=levels[1:3],/fill,c_color=[!medblue,!darkblue,!red]
+   contour,res,xs,ys,color=color,/over,levels=levels[1:2],/fill,c_color=[!medblue,!darkblue]
 ; else plot no contours
 end
 
@@ -249,7 +250,7 @@ for ii=0, npars-1 do begin            ; Go through params
          oplot,xarr,yarr,color=!darkgreen,thick=5,linestyle=2
       endif else begin
          plot,/nodata,xr,yr,xst=1+4,yst=1+4,position=[x1,y1,x2,y2]
-         oplot_contours,xp,yp,xbin,ybin,xr,yr,!black ;,g_smooth=sm
+         oplot_contours,xp,yp,xbin,ybin,xr,yr,!black, g_smooth=2
          axis,xaxis=0,xst=1,xtickn=xtickn,xtickv=tickv[*,ii],xticks=nticks,xminor=minor[ii],xtit=xtit
          axis,xaxis=1,xst=1,xtickn=blank,xtickv=tickv[*,ii],xticks=nticks,xminor=minor[ii]
          axis,yaxis=0,yst=1,ytickn=ytickn,ytickv=tickv[*,jj],yticks=nticks,yminor=minor[jj],ytit=ytit
