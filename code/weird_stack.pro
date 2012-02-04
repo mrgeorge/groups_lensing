@@ -12,8 +12,8 @@ pro do_weird_stack, groupSel, cenName, selType, compare_offset=compare_offset
 
 ; Set paths for output files
 dirName='weird_stack'
-fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'/bin_10_70_1000_7/'
-plotDir='~/data/cosmos/groups_lensing/plots/'+dirName+'/bin_10_70_1000_7/'
+fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'/bin_20_70_1000_7/'
+plotDir='~/data/cosmos/groups_lensing/plots/'+dirName+'/bin_20_70_1000_7/'
 if(NOT(file_test(fileDir))) then file_mkdir,fileDir
 if(NOT(file_test(plotDir))) then file_mkdir,plotDir
 
@@ -23,7 +23,7 @@ infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7
 
 mwrfits,groupSel,groupFile,/create
 
-innerRadiusKpc=10.
+innerRadiusKpc=20.
 secondRadiusKpc=70.
 maxRadiusKpc=1000.
 nRadiusBins=7
@@ -34,7 +34,7 @@ maxLensMass=15.
 box_factor=20.
 zscheme=2
 
-run_gg_offset, infile_source, groupFile, lensOutFile, innerRadiusKpc, secondRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor,zscheme,/xgroups,/usespecz,center=cenName ; no stackx or emp_var
+run_gg_offset, infile_source, groupFile, lensOutFile, innerRadiusKpc, secondRadiusKpc, maxRadiusKpc, nRadiusBins, minLensZ, maxLensZ, minLensMass, maxLensMass, box_factor,zscheme,/xgroups,/usespecz,center=cenName,/emp ; no stackx
 
 fitType = [$
 2,$             ; 0  M0    : baryonic mass
@@ -44,10 +44,10 @@ fitType = [$
 0,$             ; 4  bias
 0,$             ; 5  m_sigma
 0 ]             ; 6  offset
-run_ds_mcmc, lensOutFile, fitType, rob_p_mean, rob_p_sigma
+run_ds_mcmc, lensOutFile, fitType, rob_p_mean, rob_p_sigma,/fast,/ps
 
 if(NOT(keyword_set(compare_offset))) then $
-   plot_lensing_results,lensOutFile,plotDir+selType,rob_p_mean,fitType,/use_m200,/models $
+   plot_lensing_results,lensOutFile,plotDir+selType,rob_p_mean,fitType,'ps',/use_m200,/models $
 else begin
    fitTypeOff = [$
                 2,$             ; 0  M0    : baryonic mass
@@ -57,9 +57,9 @@ else begin
                 0,$             ; 4  bias
                 0,$             ; 5  m_sigma
                 1 ]             ; 6  offset
-   run_ds_mcmc, lensOutFile, fitTypeOff, rob_p_mean_off, rob_p_sigma_off,/fast
+   run_ds_mcmc, lensOutFile, fitTypeOff, rob_p_mean_off, rob_p_sigma_off,/fast,/ps,/off3dMax
 
-   plot_lensing_results,lensOutFile,plotDir+selType+'_comp',rob_p_mean,fitType,p_mean2=rob_p_mean_off,fit_type2=fitTypeOff,/use_m200,/models
+   plot_lensing_results,lensOutFile,plotDir+selType+'_comp',rob_p_mean,fitType,'ps',p_mean2=rob_p_mean_off,fit_type2=fitTypeOff,cen_type2='ps',off_type2='max3d',/use_m200,/models
 endelse 
 
 end
@@ -70,7 +70,8 @@ pro weird_stack
 ; e.g., blue centers, cases where mass gap is smaller than uncertainty,
 ;       different combinations of of centers where they disagree
 
-groupAll=mrdfits("~alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits",1)
+;groupAll=mrdfits("~alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits",1)
+groupAll=mrdfits("~/data/cosmos/code/group5_20110914.fits",1)
 sel=where(groupAll.flag_include EQ 1,nGroups)
 group=groupAll[sel]
 
@@ -263,8 +264,8 @@ d_x_ms_kpc=distance(group.alpha_ellipse,group.delta_ellipse,group.alpha_mmgg_sca
 xoff=where(group.flag1 EQ 1 $
            AND d_x_ms_kpc GT 50. $
            AND group.pos_err_ellipse*3600.*group.lensing_r200_mpc*1000./group.lensing_r200_as LT 50.)
-do_weird_stack,group[xoff],'mmgg_scale','xoff_mmgg_scale'
-do_weird_stack,group[xoff],'xray','xoff_xray'
+do_weird_stack,group[xoff],'mmgg_scale','xoff_mmgg_scale',/compare
+do_weird_stack,group[xoff],'xray','xoff_xray',/compare
 
 ; repeat using AF's centers (alpha_j2000) instead of ellipse
 d_xaf_ms_kpc=distance(group.alpha_j2000,group.delta_j2000,group.alpha_mmgg_scale,group.delta_mmgg_scale)*3600.*group.lensing_r200_mpc*1000./group.lensing_r200_as
