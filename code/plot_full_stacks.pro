@@ -23,8 +23,8 @@ if(keyword_set(test)) then begin
    plotFile=plotDir+'full_stacks_test.eps'
 endif
 
-nCols=2
-nRows=4
+nCols=4
+nRows=2
 !p.multi=[0,nCols,nRows]
 !p.font=0
 !p.charsize=1.2
@@ -41,9 +41,10 @@ blank=replicate(' ',60)
 
 ;margins and plot dimensions
 xstart=0.12
-ystart=0.07
+ystart=0.10
 dx=(1.-1.2*xstart)/nCols
 dy=(1.-1.4*ystart)/nRows
+ygap=0.02
 
 ; axes
 xst=1
@@ -58,14 +59,14 @@ xtitle=textoidl('Physical transverse distance,  R (h_{72}^{-1} Mpc)')
 bar='!S!A=!R!N'
 ytitle=textoidl('\Delta\Sigma = ')+bar+textoidl('\Sigma(<R) - \Sigma(R)  (h_{72} M')+sunsymbol()+textoidl(' pc^{-2})')
 
-device,filename=plotFile,/encapsul,/helvetica,/color,xsize=7,ysize=9,/inches
+device,filename=plotFile,/encapsul,/helvetica,/color,xsize=8,ysize=5,/inches
 
 nCen=n_elements(cenText)
 for ii=0,nCen-1 do begin
    ; positions for this plot
    x1=xstart+(ii MOD nCols)*dx
    x2=x1+dx
-   y1=ystart+(ii-(ii MOD nCols))/2*dy
+   y1=ystart+(ii/nCols)*(dy+ygap)
    y2=y1+dy
 
    ; read data file and get parameters
