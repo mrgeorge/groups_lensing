@@ -189,14 +189,14 @@ if(NOT(file_test(fileDir))) then file_mkdir,fileDir
 if(NOT(file_test(plotDir))) then file_mkdir,plotDir
 
 ; Centers ordered bottom left to top right on plot
-cenNames=['cf','xray','cn','cm','bgg_scale','bgg_r200','mmgg_scale','mmgg_r200']
-cenTitlesTex=['CF','X-ray','CN','CM','BGG_{scale}','BGG_{R200}','MMGG_{scale}','MMGG_{R200}']
+cenNames=['xray','cn','cm','cf','mmgg_scale','mmgg_r200','bgg_scale','bgg_r200']
+cenTitlesTex=['X-ray','CN','CM','CF','MMGG_{scale}','MMGG_{R200}','BGG_{scale}','BGG_{R200}']
 cenTitles=textoidl(cenTitlesTex)
 ptSrc=[0,0,0,0,2,2,2,2] ; for fit_t
 
 lensOutFileArr=strcompress(fileDir+'center_'+cenNames+'.fits',/remove_all)
 plotFileArr=strcompress(plotDir+'center_'+cenNames,/remove_all)
-fullPlotFile=plotDir+'full_stacks.eps'
+fullPlotFile=plotDir+'full_stacks_split.eps'
 tableFile=plotDir+'full_stack_fit_pars.tex'
 
 ; Measure and Model the lensing signal
