@@ -22,11 +22,13 @@ fitType = [$
 ; read chain file
 mcmc=obj_new('mcmc')
 pars=mcmc->read_trials(chainFile)
+if(n_elements(burnin) EQ 0) then burnin=500
+pars=pars[*,burnin:*]
 
 ; get rob_p_mean and rob_p_sigma from chain
-mcmc_stats,pars,p_mean,p_sigma,rob_p_mean,rob_p_sigma
+mcmc_stats,pars,p_mean,p_sigma,rob_p_mean,rob_p_sigma,ml,ml_lo,ml_hi
 
 ; plot signal and model
-plot_lensing_results,lensOutFile,singlePlotFile,rob_p_mean,fitType,'rhotis','max3d',/use_m200,/models
-
+plot_lensing_results,lensOutFile,singlePlotFile,ml,fitType,'rhotis','max3d',/use_m200,/models
+stop
 end
