@@ -98,7 +98,7 @@ for ii=0,nCen-1 do begin
    plot,/nodata,xr,yr,position=[x1,y1,x2,y2],xlog=xlog,ylog=ylog,xst=xst,yst=yst,xtitle='',ytitle='',xtickname=xtickname,ytickname=ytickname,xcharsize=1.5,ycharsize=1.5
 ;   plot,x,y,xr=xr,yr=yr,position=[x1,y1,x2,y2]
    if(ii EQ 0) then begin
-      xyouts,xstart+0.5*(nCols*dx),0.25*ystart,xtitle,alignment=0.5,/normal
+      xyouts,xstart+0.5*(nCols*dx),0.2*ystart,xtitle,alignment=0.5,/normal
       xyouts,0.3*xstart,ystart+0.5*(nRows*dy),ytitle,alignment=0.5,orientation=90,/normal
    endif
 
