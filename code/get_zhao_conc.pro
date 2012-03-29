@@ -7,9 +7,11 @@ function get_zhao_conc, mass, z
 common zhao_params, mc_mass_array, mc_conc_array
 
 if NOT (keyword_set(mc_mass_array)) then begin
-    file='/Users/alexie/idl/Jeremy/Zhao/mc_mass_array.sav'
+;    file='/Users/alexie/idl/Jeremy/Zhao/mc_mass_array.sav'
+    file='zhao_mc_mass_array.sav'
     restore,filename=file
-    file='/Users/alexie/idl/Jeremy/Zhao/mc_conc_array.sav'
+;    file='/Users/alexie/idl/Jeremy/Zhao/mc_conc_array.sav'
+    file='zhao_mc_conc_array.sav'
     restore,filename=file
 endif
 
