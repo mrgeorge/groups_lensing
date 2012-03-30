@@ -27,7 +27,7 @@ nCols=4
 nRows=2
 !p.multi=[0,nCols,nRows]
 !p.font=0
-!p.charsize=1.2
+!p.charsize=1.1
 !p.charthick=1.2
 !p.thick=3
 !x.thick=3
@@ -40,7 +40,7 @@ star=starsymbol()
 blank=replicate(' ',60)
 
 ;margins and plot dimensions
-xstart=0.12
+xstart=0.08
 ystart=0.10
 dx=(1.-1.2*xstart)/nCols
 dy=(1.-1.4*ystart)/nRows
@@ -59,7 +59,7 @@ xtitle=textoidl('Physical transverse distance,  R (h_{72}^{-1} Mpc)')
 bar='!S!A=!R!N'
 ytitle=textoidl('\Delta\Sigma = ')+bar+textoidl('\Sigma(<R) - \Sigma(R)  (h_{72} M')+sunsymbol()+textoidl(' pc^{-2})')
 
-device,filename=plotFile,/encapsul,/helvetica,/color,xsize=8,ysize=5,/inches
+device,filename=plotFile,/encapsul,/helvetica,/color,xsize=8,ysize=4,/inches
 
 nCen=n_elements(cenText)
 for ii=0,nCen-1 do begin
@@ -98,7 +98,7 @@ for ii=0,nCen-1 do begin
    plot,/nodata,xr,yr,position=[x1,y1,x2,y2],xlog=xlog,ylog=ylog,xst=xst,yst=yst,xtitle='',ytitle='',xtickname=xtickname,ytickname=ytickname,xcharsize=1.5,ycharsize=1.5
 ;   plot,x,y,xr=xr,yr=yr,position=[x1,y1,x2,y2]
    if(ii EQ 0) then begin
-      xyouts,xstart+0.5*(nCols*dx),0.2*ystart,xtitle,alignment=0.5,/normal
+      xyouts,xstart+0.5*(nCols*dx),0.15*ystart,xtitle,alignment=0.5,/normal
       xyouts,0.3*xstart,ystart+0.5*(nRows*dy),ytitle,alignment=0.5,orientation=90,/normal
    endif
 
