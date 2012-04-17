@@ -157,8 +157,9 @@ pro mcmc::run, step_func, like_func, nstep, parguess, pars, like=like, log=log, 
       self->_step, seed, oldpars, oldlike, step_func, like_func, newpars, newlike,$
         log=log
 
+      ; write step to file
       if n_elements(file) ne 0 then begin 
-          writeu, lun, float(newpars)
+          writeu, lun, float(newpars), float(newlike)
       endif else begin 
           pars[*,ii] = newpars
           like[ii] = newlike
@@ -236,7 +237,7 @@ end
 ;docend::mcmc::read_trials
 
 
-FUNCTION mcmc::read_trials, file
+FUNCTION mcmc::read_trials, file, like=like
   openr, lun, file, /get_lun
   ntrial=0L
   npar=0L
@@ -248,17 +249,21 @@ FUNCTION mcmc::read_trials, file
   fst=fstat(lun)
   longSize=4 ; bytes - not sure if this can be determined automatically
   floatSize=4 ; bytes
-  fullSize=npar*ntrial*floatSize + 2*longSize ; expected file size 
-                                       ; including npar x ntrial array 
-                                       ; + the first two lines with ntrial and npar
+  fullSize=(npar+1)*ntrial*floatSize + 2*longSize ; expected file size 
+                                       ; including (npar+1) x ntrial array 
+                                ; + the first two lines with ntrial and npar
+                                ; {we use npar+1 because of the stored likelihood}
   if(fullSize GT fst.size) then begin
-     ntrial=(fst.size - 2*longSize) / (npar * floatSize)
+     ntrial=(fst.size - 2*longSize) / ((npar+1) * floatSize)
      print,'MCMC::READ_TRIALS - file is incomplete, ntrials=',ntrial
   endif
 
-  pars = fltarr(npar, ntrial)
+  pars = fltarr(npar+1, ntrial)
   readu, lun, pars
   free_lun, lun
+
+  like=pars[npar,*]
+  pars=pars[0:npar-1,*]
 
   return, pars
 
