@@ -177,14 +177,15 @@ if(keyword_set(cenFree)) then cenExt='_cen' else cenExt=''
 if(keyword_set(subhalo)) then subExt='_sub'+string(subhalo,format='(F04.1)') else subExt=''
 
 ; Set paths for input files
-infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7.fits' ; Using the new catalog (photoz version 1.7)
+;infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7.fits' ; Using the new catalog (photoz version 1.7)
+infile_source='~/data/cosmos/catalogs/gglensing_source_v2.0.fits' ; (photoz version 2.0)
 ;infile_lens = '/Users/alexie/Work/GroupCatalogs/cosmos_xgroups_20110209.fits' ; group catalog with centers
 infile_lens = '~/data/cosmos/code/group5_20110914.fits' ; group catalog with centers
 
 ; Set paths for output files
 dirName='bin_'+string(innerRadiusKpc,format='(I0)')+'_'+string(secondRadiusKpc,format='(I0)')+'_'+string(maxRadiusKpc,format='(I0)')+'_'+string(nRadiusBins,format='(I0)')+sxExt+empExt+concExt+cenExt+subExt+zExt+mExt+"_20110914"
-fileDir='~/data/cosmos/groups_lensing/outfiles/'+dirName+'/'
-plotDir='~/data/cosmos/groups_lensing/plots/'+dirName+'/'
+fileDir='~/data/cosmos/groups_lensing/outfiles/src_v2.0/'+dirName+'/'
+plotDir='~/data/cosmos/groups_lensing/plots/src_v2.0/'+dirName+'/'
 if(NOT(file_test(fileDir))) then file_mkdir,fileDir
 if(NOT(file_test(plotDir))) then file_mkdir,plotDir
 
