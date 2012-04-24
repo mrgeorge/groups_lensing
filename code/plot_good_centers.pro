@@ -21,14 +21,18 @@ fitType = [$
 
 ; read chain file
 mcmc=obj_new('mcmc')
-pars=mcmc->read_trials(chainFile)
+pars=mcmc->read_trials(chainFile, like=lnl)
 if(n_elements(burnin) EQ 0) then burnin=500
 pars=pars[*,burnin:*]
+lnl=lnl[burnin:*]
 
-; get rob_p_mean and rob_p_sigma from chain
-mcmc_stats,pars,p_mean,p_sigma,rob_p_mean,rob_p_sigma,ml,ml_lo,ml_hi
+;; get rob_p_mean and rob_p_sigma from chain
+;mcmc_stats,pars,p_mean,p_sigma,rob_p_mean,rob_p_sigma,mpost,mpost_lo,mpost_hi
+
+; get point in chain with maximum likelihood
+mlpars=pars[*,(where(lnl EQ max(lnl)))[0]]
 
 ; plot signal and model
-plot_lensing_results,lensOutFile,singlePlotFile,ml,fitType,'rhotis','max3d',/use_m200,/models
+plot_lensing_results,lensOutFile,singlePlotFile,mlpars,fitType,'rhotis','max3d',/use_m200,/models
 stop
 end
