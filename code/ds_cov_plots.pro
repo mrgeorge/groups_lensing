@@ -103,6 +103,8 @@ mcmc=obj_new('mcmc')
 pars=mcmc->read_trials(chainFile,like=lnl)
 if(n_elements(burnin) EQ 0) then burnin=500
 pars=pars[*,burnin:*]
+lnl=lnl[burnin:*]
+mlpars=pars[*,(where(lnl EQ max(lnl)))[0]]
 
 sz=size(pars,/dim)   ; pars = chain
 npars=sz[0]              ; n=number of pars
@@ -170,6 +172,7 @@ if (fit_type[6] eq 1) then begin
     tickv[*,k]=[0.,75.,150.]
     minor[k]=3
     pars[k,*]*=1000. ; convert from Mpc to kpc
+    mlpars[k]*=1000. ; convert from Mpc to kpc
 endif
 
 titles=textoidl(titles)
@@ -250,7 +253,10 @@ for ii=0, npars-1 do begin            ; Go through params
          oplot,xarr,yarr,color=!darkgreen,thick=5,linestyle=2
       endif else begin
          plot,/nodata,xr,yr,xst=1+4,yst=1+4,position=[x1,y1,x2,y2]
+         ; plot contours
          oplot_contours,xp,yp,xbin,ybin,xr,yr,!black, g_smooth=2
+         ; oplot a cross at maximum likelihood
+         oplot,[mlpars[ii]],[mlpars[jj]],psym=1,symsize=1.2,color=!white
          axis,xaxis=0,xst=1,xtickn=xtickn,xtickv=tickv[*,ii],xticks=nticks,xminor=minor[ii],xtit=xtit
          axis,xaxis=1,xst=1,xtickn=blank,xtickv=tickv[*,ii],xticks=nticks,xminor=minor[ii]
          axis,yaxis=0,yst=1,ytickn=ytickn,ytickv=tickv[*,jj],yticks=nticks,yminor=minor[jj],ytit=ytit
