@@ -93,7 +93,7 @@ if(keyword_set(models)) then begin
          oplot,x_mpc,cen_term,color=!red,linestyle=1,thick=10
       endif else begin
          oplot,x_mpc,star_term,color=!red,linestyle=1,thick=10
-         oplot,x_mpc,sub_term,color=!purple,linestyle=4,thick=8
+         oplot,x_mpc,sub_term,color=!purple,linestyle=2,thick=8
       endelse
    endif
 
