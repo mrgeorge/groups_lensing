@@ -269,6 +269,35 @@ FUNCTION mcmc::read_trials, file, like=like
 
 END 
 
+FUNCTION mcmc::read_trials_old, file
+; this version reads the old format of the chain file (no likelihoods stored)
+  openr, lun, file, /get_lun
+  ntrial=0L
+  npar=0L
+
+  readu, lun, ntrial
+  readu, lun, npar
+
+  ; check that file is complete
+  fst=fstat(lun)
+  longSize=4 ; bytes - not sure if this can be determined automatically
+  floatSize=4 ; bytes
+  fullSize=(npar)*ntrial*floatSize + 2*longSize ; expected file size 
+                                       ; including (npar) x ntrial array 
+                                ; + the first two lines with ntrial and npar
+  if(fullSize GT fst.size) then begin
+     ntrial=(fst.size - 2*longSize) / ((npar) * floatSize)
+     print,'MCMC::READ_TRIALS - file is incomplete, ntrials=',ntrial
+  endif
+
+  pars = fltarr(npar, ntrial)
+  readu, lun, pars
+  free_lun, lun
+
+  return, pars
+
+END 
+
 
 ;docstart::mcmc::extract_stats
 ; NAME:
