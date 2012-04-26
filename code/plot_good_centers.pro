@@ -1,14 +1,14 @@
-pro plot_good_centers
+pro plot_good_centers, runStr
 
 ; this code is to plot the lensing signal calculated and used in model_good_centers
 ; while the MCMC chain is still running
 
 plotDir="~/data/cosmos/groups_lensing/plots/bin_20_70_1000_7_emp_conc_cen/"
-singlePlotFile=plotDir+"good_centers_lnl_rhotis_3dM.eps"
+singlePlotFile=plotDir+"good_centers_lnl_rhotis_3dM"+runStr+".eps"
 
 outDir="~/data/cosmos/groups_lensing/outfiles/bin_20_70_1000_7_emp_conc_cen/"
-chainFile=outDir+"good_centers_lnl.chain"
-lensOutFile=outDir+"good_centers_lnl.fits"
+chainFile=outDir+"good_centers_lnl"+runStr+".chain"
+lensOutFile=outDir+"good_centers_lnl"+runStr+".fits"
 
 fitType = [$
           1,$                   ; 0  M0    : baryonic mass
@@ -22,7 +22,7 @@ fitType = [$
 ; read chain file
 mcmc=obj_new('mcmc')
 pars=mcmc->read_trials(chainFile, like=lnl)
-if(n_elements(burnin) EQ 0) then burnin=500
+if(n_elements(burnin) EQ 0) then burnin=0.01 * n_elements(pars[0,*])
 pars=pars[*,burnin:*]
 lnl=lnl[burnin:*]
 

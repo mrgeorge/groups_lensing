@@ -101,7 +101,7 @@ pro ds_cov_plots, chainFile, fit_type, plotFile, hist=hist, burnin=burnin
 
 mcmc=obj_new('mcmc')
 pars=mcmc->read_trials(chainFile,like=lnl)
-if(n_elements(burnin) EQ 0) then burnin=500
+if(n_elements(burnin) EQ 0) then burnin=0.01*n_elements(pars[0,*])
 pars=pars[*,burnin:*]
 lnl=lnl[burnin:*]
 mlpars=pars[*,(where(lnl EQ max(lnl)))[0]]
