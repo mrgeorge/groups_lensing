@@ -20,7 +20,8 @@ end
 
 pro plot_center_dist, groupInFile, outPathName
 
-if(n_elements(groupInFile) EQ 0) then groupInFile="~/data/cosmos/code/group5_cenunc_20110914.fits"
+
+if(n_elements(groupInFile) EQ 0) then groupInFile="~/data/cosmos/code/group5_cenunc_20110914_run20120518.fits"
 if(n_elements(outPathName) EQ 0) then outPathName="~/data/cosmos/groups_lensing/plots/"
 
 ; add trailing slash to output path if missing
