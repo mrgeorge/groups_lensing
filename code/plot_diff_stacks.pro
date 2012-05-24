@@ -275,11 +275,13 @@ for ii=0,nCen-1 do begin
    dof_str='d.o.f.:'
    if(str.msun_lens GT 0.) then begin
       smstr=textoidl('log(M')+star+'/M'+sun+'):'
-   endif else sm=textoidl('log(M')+star+'/M'+sun+'):'+string(0.0,format="(f6.2)")
+      xyouts,xStrRight,yr[1]-1.*yLine,smstr,alignment=0.88,charsize=lCharSize
+      xyouts,xRight,yr[1]-1.*yLine,string(str.msun_lens,format=fmt),alignment=1,charsize=lCharSize
+   endif 
+      ; don't bother printing M* if =0 (since log(M*) = -inf)
+            ;else sm=textoidl('log(M')+star+'/M'+sun+'):'+string(0.0,format="(f6.2)")
 
-   xyouts,xStrRight,yr[1]-1.*yLine,smstr,alignment=0.88,charsize=lCharSize
 ;   xyouts,xStrRight,yr[1]-2.*yLine,chisqstr,alignment=1.0,charsize=lCharSize
-   xyouts,xRight,yr[1]-1.*yLine,string(str.msun_lens,format=fmt),alignment=1,charsize=lCharSize
 ;   xyouts,xRight,yr[1]-2.*yLine,string(chisq,format=fmt),alignment=1,charsize=lCharSize
 
    xyouts,xRight,yr[0]+0.5*yLine,cenText[ii],alignment=1,charsize=1.2*lCharSize
