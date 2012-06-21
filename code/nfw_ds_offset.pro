@@ -248,7 +248,7 @@ endif else begin ; USE OFFSETS BETWEEN CENTERS FROM GROUP CATALOG
    groupsel=group[where(group.flag_include EQ 1)]
    get_center_coords,groupsel,center,ra1,dec1,sel1
    get_center_coords,groupsel,refcen,ra2,dec2,sel2
-   roff=distance(ra1,dec1,ra2,dec2)*3600.*groupsel.lensing_r200_mpc/groupsel.lensing_r200_as ; Mpc
+   roff=as2kpc(distance(ra1,dec1,ra2,dec2)*3600.,groupsel.zphot)/1000. ; Mpc
    offset_kpc=roff*1000.
    min_offset_kpc=50.
    sel=where(ra1 GT 0 $
