@@ -16,6 +16,7 @@ case center of
    'bgg_r200': mass=group.mlgg_r200_mstar
    'bcg1': mass=group.bcg_sm ; AL's old center
    'visual': mass=group.visual_mstar ; see mrg_center_notes_20110808_distilled.txt and weird_stack.pro
+   'galaxy': mass=group.kevin_mstar
    else: mass[*]=0.              ; center is not a galaxy
 endcase
 
