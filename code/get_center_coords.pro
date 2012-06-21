@@ -41,6 +41,10 @@ case name of
       ra=group.alpha_mmgg_scale
       dec=group.delta_mmgg_scale
    end
+   'mmgg_scale_specz': begin
+      ra=group.alpha_mmgg_scale_specz
+      dec=group.delta_mmgg_scale_specz
+   end
    'mlgg_scale': begin
       ra=group.alpha_mlgg_scale
       dec=group.delta_mlgg_scale
@@ -118,6 +122,10 @@ case name of
       dec=group.delta_j2000
    end
    'af': begin
+      ra=group.alpha_j2000
+      dec=group.delta_j2000
+   end
+   'galaxy': begin
       ra=group.alpha_j2000
       dec=group.delta_j2000
    end
