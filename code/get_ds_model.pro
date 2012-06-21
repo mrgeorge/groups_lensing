@@ -129,6 +129,7 @@ endif else begin
    offset=0.
 endelse
 
+; Calculate model curves
 
 ; Calculate r200
 if (keyword_set(use_m200) eq 1) then begin
@@ -136,16 +137,15 @@ if (keyword_set(use_m200) eq 1) then begin
 endif else begin
    overdensity = density_contrast(zl) ; virial
 endelse
-rho_crit = critical_density(zl)
-factor   = alog10(double((4.0/3.0)*!Pi*overdensity*rho_crit))
-r_log    = (1.0/3.0)*(Mnfw-factor)
-rnfw     = 10.0^(r_log)
+if(fit_type[1] GT 0) then begin
+   rho_crit = critical_density(zl)
+   factor   = alog10(double((4.0/3.0)*!Pi*overdensity*rho_crit))
+   r_log    = (1.0/3.0)*(Mnfw-factor)
+   rnfw     = 10.0^(r_log)
 
-
-; Calculate model curves
-
-; NFW
-nfw_term=nfw_ds_offset(x_mpc,[rnfw,conc],zl,r200=keyword_set(use_m200),roff=offset,off_type=off_type)
+   ; NFW
+   nfw_term=nfw_ds_offset(x_mpc,[rnfw,conc],zl,r200=keyword_set(use_m200),roff=offset,off_type=off_type)
+endif else nfw_term=replicate(0,n_elements(x_mpc))
 
 if(fit_type[0] GT 0) then begin
    star_term=10.^(msun)/1.e12/(!pi*x_mpc^2) ; h^-1 Msun, factor of 1e12 to convert to pc^2
