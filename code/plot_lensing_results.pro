@@ -44,7 +44,7 @@ yst=1
 xlog=1
 ylog=0
 if(keyword_set(xlog)) then xr = [0.03,1] else xr=[0,1.5]
-if(keyword_set(ylog)) then yr = [0.5,3000] else yr = [-30,250]
+if(keyword_set(ylog)) then yr = [0.5,3000] else yr = [-30,100]
 if(keyword_set(ylog)) then ytickf='loglabels' else ytickf=''
 if(keyword_set(xlog)) then xtickf='loglabels' else xtickf=''
 
@@ -167,41 +167,41 @@ if(keyword_set(models)) then begin
 
 endif
 
-;-------------------------------------------------------------------------
-; Legend
-;-------------------------------------------------------------------------
-nlens    = textoidl('N_{Lens}:')+string(full_str.lens,format="(I)")
-z        = '<z>:'+string(full_str.z_lens,format="(f10.2)")
-if(keyword_set(models)) then begin
-   if(NOT(keyword_set(fit_type2) AND keyword_set(p_mean2))) then begin
-      chisq_str = textoidl('\chi^2:')+string(chisq,format='(f10.2)')
-      dof_str = 'd.o.f.:'+string(dof,format='(I)')
-      if keyword_set(use_m200) then begin
-         m        = textoidl('log(M_{200c}/M')+sunsymbol()+'):'+string(mnfw,format="(f10.2)")
-         r        = textoidl('R_{200}:')+string(rnfw,format="(f10.2)")
-         c        = textoidl('c_{200c}:')+string(Conc,format="(f10.2)")
-      endif else begin
-         m        = textoidl('log(M_{vir}):')+string(mnfw,format="(f10.2)")
-         r        = textoidl('R_{vir}:')+string(rnfw,format="(f10.2)")
-         c        = textoidl('c_{vir}:')+string(Conc,format="(f10.2)")
-      endelse
-      items=[nlens,z,m,c,chisq_str,dof_str]
-   endif else begin
-      chisq_str = textoidl('\chi^2:')+string(chisq,format='(f6.2)')+','+string(chisq2,format='(f6.2)')
-      dof_str = 'd.o.f.:'+string(dof,format='(I)')+','+string(dof2,format='(I)')
-      if keyword_set(use_m200) then begin
-         m        = textoidl('log_{10}(M_{200}):')+string(mnfw,format="(f6.2)")+','+string(mnfw2,format='(f6.2)')
-         r        = textoidl('R_{200}:')+string(rnfw,format="(f6.2)")+','+string(rnfw2,format='(f6.2)')
-      endif else begin
-         m        = textoidl('log(M_{vir}):')+string(mnfw,format="(f6.2)")+','+string(mnfw2,format='(f6.2)')
-         r        = textoidl('R_{vir}:')+string(rnfw,format="(f6.2)")+','+string(rnfw2,format='(f6.2)')
-      endelse
-      c        = 'Concentration:'+string(Conc,format="(f6.2)")+','+string(conc2,format='(f6.2)')
-      roff_str='Offset: 0,'+string(p_mean2[1],format='(F6.2)')
-      items=[nlens,z,m,roff_str,chisq_str,dof_str]
-   endelse
-endif else items=[nlens,z]
-;legend,items,/right,linestyle=-99,box=0,spacing=1.5
+;;-------------------------------------------------------------------------
+;; Legend
+;;-------------------------------------------------------------------------
+;nlens    = textoidl('N_{Lens}:')+string(full_str.lens,format="(I)")
+;z        = '<z>:'+string(full_str.z_lens,format="(f10.2)")
+;if(keyword_set(models)) then begin
+;   if(NOT(keyword_set(fit_type2) AND keyword_set(p_mean2))) then begin
+;      chisq_str = textoidl('\chi^2:')+string(chisq,format='(f10.2)')
+;      dof_str = 'd.o.f.:'+string(dof,format='(I)')
+;      if keyword_set(use_m200) then begin
+;         m        = textoidl('log(M_{200c}/M')+sunsymbol()+'):'+string(mnfw,format="(f10.2)")
+;         r        = textoidl('R_{200}:')+string(rnfw,format="(f10.2)")
+;         c        = textoidl('c_{200c}:')+string(Conc,format="(f10.2)")
+;      endif else begin
+;         m        = textoidl('log(M_{vir}):')+string(mnfw,format="(f10.2)")
+;         r        = textoidl('R_{vir}:')+string(rnfw,format="(f10.2)")
+;         c        = textoidl('c_{vir}:')+string(Conc,format="(f10.2)")
+;      endelse
+;      items=[nlens,z,m,c,chisq_str,dof_str]
+;   endif else begin
+;      chisq_str = textoidl('\chi^2:')+string(chisq,format='(f6.2)')+','+string(chisq2,format='(f6.2)')
+;      dof_str = 'd.o.f.:'+string(dof,format='(I)')+','+string(dof2,format='(I)')
+;      if keyword_set(use_m200) then begin
+;         m        = textoidl('log_{10}(M_{200}):')+string(mnfw,format="(f6.2)")+','+string(mnfw2,format='(f6.2)')
+;         r        = textoidl('R_{200}:')+string(rnfw,format="(f6.2)")+','+string(rnfw2,format='(f6.2)')
+;      endif else begin
+;         m        = textoidl('log(M_{vir}):')+string(mnfw,format="(f6.2)")+','+string(mnfw2,format='(f6.2)')
+;         r        = textoidl('R_{vir}:')+string(rnfw,format="(f6.2)")+','+string(rnfw2,format='(f6.2)')
+;      endelse
+;      c        = 'Concentration:'+string(Conc,format="(f6.2)")+','+string(conc2,format='(f6.2)')
+;      roff_str='Offset: 0,'+string(p_mean2[1],format='(F6.2)')
+;      items=[nlens,z,m,roff_str,chisq_str,dof_str]
+;   endelse
+;endif else items=[nlens,z]
+;;legend,items,/right,linestyle=-99,box=0,spacing=1.5
 
 device,/close
 
