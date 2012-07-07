@@ -257,8 +257,8 @@ for ii=0,nCen-1 do begin
    oploterror,x,y,yerr,psym=8,color=!black
 
    ; CALCULATE CHI^2
-;   chisq=get_ds_chisq(fitTypeAllCen[*,ii],massMeanRef[ii],str,x,y,yerr,dof=dof,$
-;                      center=cenNames[ii],refcen=refNames[ii],groupFile=groupFile,use_m200=use_m200)
+   chisq=get_ds_chisq(fitTypeRef,pMeanRef,str.z_lens,str.msun_lens,x,y,yerr,dof=dof,center=cenNames[ii],refcen=refNames[ii],groupFile=groupFile,use_m200=use_m200,cen_type='ps')
+
 
    ; LEGEND
    nlens=textoidl('N_{Lens}:')
@@ -273,16 +273,18 @@ for ii=0,nCen-1 do begin
    cstr='Concentration:'
    chisqstr=textoidl('\chi^2:')
    dof_str='d.o.f.:'
+   linenum=1.
    if(str.msun_lens GT 0.) then begin
       smstr=textoidl('log(M')+star+'/M'+sun+'):'
-      xyouts,xStrRight,yr[1]-1.*yLine,smstr,alignment=0.88,charsize=lCharSize
-      xyouts,xRight,yr[1]-1.*yLine,string(str.msun_lens,format=fmt),alignment=1,charsize=lCharSize
+      xyouts,xStrRight,yr[1]-linenum*yLine,smstr,alignment=0.88,charsize=lCharSize
+      xyouts,xRight,yr[1]-linenum*yLine,string(str.msun_lens,format=fmt),alignment=1,charsize=lCharSize
+      linenum+=1
    endif 
       ; don't bother printing M* if =0 (since log(M*) = -inf)
             ;else sm=textoidl('log(M')+star+'/M'+sun+'):'+string(0.0,format="(f6.2)")
 
-;   xyouts,xStrRight,yr[1]-2.*yLine,chisqstr,alignment=1.0,charsize=lCharSize
-;   xyouts,xRight,yr[1]-2.*yLine,string(chisq,format=fmt),alignment=1,charsize=lCharSize
+   xyouts,xStrRight,yr[1]-linenum*yLine,chisqstr,alignment=1.0,charsize=lCharSize
+   xyouts,xRight,yr[1]-linenum*yLine,string(chisq,format=fmt),alignment=1,charsize=lCharSize
 
    xyouts,xRight,yr[0]+0.5*yLine,cenText[ii],alignment=1,charsize=1.2*lCharSize
 
