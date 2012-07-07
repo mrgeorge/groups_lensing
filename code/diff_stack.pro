@@ -1,4 +1,4 @@
-pro diff_stack,innerRadiusKpc,secondRadiusKpc,maxRadiusKpc,nRadiusBins,stackx=stackx,emp_var=emp_var,loz=loz,hiz=hiz,loM=loM,hiM=hiM
+pro diff_stack,innerRadiusKpc,secondRadiusKpc,maxRadiusKpc,nRadiusBins,stackx=stackx,emp_var=emp_var,loz=loz,hiz=hiz,loM=loM,hiM=hiM, galaxies=galaxies, centroids=centroids
 
 ; measure lensing signal for two stacks of groups where centers disagree
 ; plot results in one big figure for paper
@@ -77,9 +77,24 @@ zscheme=2 ; from ALs code
 box_factor=20 ; from ALs code
 
 ; ordered bottom to top on plot
-cenNames=['xray','cf','cm','cn','bgg_r200','bgg_scale','mmgg_r200']
-cenText=textoidl(['X-ray','CF','CM','CN','BGG_{R200}','BGG_{scale}','MMGG_{R200}'])
-ptSrcCen=[0,0,0,0,1,1,1] ; for fit_t
+
+if(keyword_set(galaxies)) then begin
+   cenNames=['bgg_r200','bgg_scale','mmgg_r200']
+   cenText=textoidl(['BGG_{R200}','BGG_{scale}','MMGG_{R200}'])
+   ptSrcCen=[1,1,1]     ; for fit_t
+   diffPlotExt="_galaxies"
+endif else if(keyword_set(centroids)) then begin
+   cenNames=['xray','cf','cm','cn']
+   cenText=textoidl(['X-ray','CF','CM','CN'])
+   ptSrcCen=[0,0,0,0]     ; for fit_t
+   diffPlotExt="_centroids"
+endif else begin
+   cenNames=['xray','cf','cm','cn','bgg_r200','bgg_scale','mmgg_r200']
+   cenText=textoidl(['X-ray','CF','CM','CN','BGG_{R200}','BGG_{scale}','MMGG_{R200}'])
+   ptSrcCen=[0,0,0,0,1,1,1]     ; for fit_t
+   diffPlotExt=""
+endelse
+
 refNames=replicate('mmgg_scale',n_elements(cenNames)) ; the "good center" to compare with the ones above
 refText=replicate(textoidl('MMGG_{scale}'),n_elements(cenNames))
 ptSrcRef=replicate(2,n_elements(cenNames))
@@ -97,7 +112,7 @@ lensOutFileArrCen=strcompress(fileDir+'center_'+cenNames+'_'+refNames+'.fits',/r
 plotFileArrCen=strcompress(plotDir+'center_'+cenNames+'_'+refNames,/remove_all)
 lensOutFileArrRef=strcompress(fileDir+'center_'+refNames+'_'+cenNames+'.fits',/remove_all)
 plotFileArrRef=strcompress(plotDir+'center_'+refNames+'_'+cenNames,/remove_all)
-diffPlotFile=plotDir+'diff_stacks_'+refNames[0]+'.eps'
+diffPlotFile=plotDir+'diff_stacks_'+refNames[0]+diffPlotExt+'.eps'
 
 ; create 2d array to save fit types, 1 row for each center
 fitTypeAllRef=rebin(fit_t,n_elements(fit_t),n_elements(refNames))
