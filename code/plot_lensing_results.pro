@@ -42,9 +42,9 @@ ytitle=textoidl('\Delta\Sigma = ')+bar+textoidl('\Sigma(<R) - \Sigma(R)  (h_{72}
 xst=1
 yst=1
 xlog=1
-ylog=0
+ylog=1
 if(keyword_set(xlog)) then xr = [0.03,1] else xr=[0,1.5]
-if(keyword_set(ylog)) then yr = [0.5,3000] else yr = [-30,100]
+if(keyword_set(ylog)) then yr = [1,1000] else yr = [-30,700]
 if(keyword_set(ylog)) then ytickf='loglabels' else ytickf=''
 if(keyword_set(xlog)) then xtickf='loglabels' else xtickf=''
 
