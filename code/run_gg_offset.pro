@@ -127,14 +127,13 @@ print,'Number of  Lenses :', n_elements(struct_lens)
 ; LENS MASS SELECTION
 ;------------------------------------------------------------------------
 
-zphot=struct_lens.zphot
-lx=struct_lens.lx_scale
+if(keyword_set(xgroups)) then begin
+   select_lens=where(struct_lens.lensing_m200 GE minLensMass $
+                     AND struct_lens.lensing_m200 LE maxLensMass)
+   print,'After lens mass cut: ',minLensMass,maxLensMass
 
-select_lens=where(struct_lens.lensing_m200 GE minLensMass $
-                  AND struct_lens.lensing_m200 LE maxLensMass)
-print,'After lens mass cut: ',minLensMass,maxLensMass
-
-struct_lens = struct_lens(select_lens)
+   struct_lens = struct_lens(select_lens)
+endif
 
 print,'Number of lenses :',n_elements(struct_lens)
 
