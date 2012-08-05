@@ -4,10 +4,11 @@ pro radio_stack
 ; from FRII sources and galaxy overdensities.
 
 fileDir="../radiogroups/"
-inputFile=fileDir+"candidates.txt"
-groupFile=fileDir+'group_radio.fits'
-lensOutFile=fileDir+'center_radio.fits'
-plotFile=fileDir+"center_radio.eps"
+idstr='123'
+inputFile=fileDir+"candidates"+idstr+".txt"
+groupFile=fileDir+"group_radio"+idstr+".fits"
+lensOutFile=fileDir+"center_radio"+idstr+".fits"
+plotFile=fileDir+"center_radio"+idstr+".eps"
 infile_source='/Users/alexie/Work/Weak_lensing/GG_cat_2006/gglensing_source_v1.7.fits' ; Using the new catalog (photoz version 1.7)
 
 ; convert input text file to groupFile
