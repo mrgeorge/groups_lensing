@@ -43,7 +43,7 @@ ra=0                          ; ignored based on ANIS=0
 fmtI="(I3)"
 fmtF="(F12.8)"
 
-contraDir="~/sshfs/riemann/home/mgeorge/flow/code/contra/"
+contraDir="contra/"
 
 args=string(MAC,format=fmtI)+string(DM,format=fmtI)+string(BAR,format=fmtI)+string(TRACE,format=fmtI)+string(ANIS,format=fmtI)+string(conc,format=fmtF)+string(n_dm,format=fmtI)+string(fb,format=fmtF)+string(rb,format=fmtF)+string(n_b,format=fmtI)+string(ra,format=fmtI)
 
@@ -55,8 +55,8 @@ pro test_rho_to_sigma
 
 ; define some halo properties
 zl=0.
-conc=3.66868
-logMh=13. ; log M200
+logMh=12. ; log M200
+conc=get_zhao_conc(logMh,zl)
 logSM=11.
 reff=5. ; kpc
 
@@ -75,7 +75,6 @@ filename="contra.out"
 run_contra,filename,conc,logSM,logMh,reff,rnfw_kpc
 readcol,filename,r_i,r_f,m_i,m_f,rho_i,rho_f,gam_i,gam_f,v_circ,sigma_los,comment='#'
 
-
 ; convert densities to Msun / kpc^3
 rho_i *= mnfw/rnfw_kpc^3
 rho_f *= mnfw/rnfw_kpc^3
@@ -93,39 +92,71 @@ rho_f=append_rho_nfw(rkpc,rho_f,rnfw_mpc,conc,zl,extFactor)
 
 ; uncontracted
 sigma1=rho_to_sigma(rho_i, rkpc, rkpc)/1.e6 ; Msun / pc^2
+ds1=sigma_to_ds(rkpc,sigma1)/1.e6 ; Msun / pc^2
 
 ; contracted
 sigma2=rho_to_sigma(rho_f, rkpc, rkpc)/1.e6 ; Msun / pc^2 - note, using same radii as the non-contracted profile
+ds2=sigma_to_ds(rkpc,sigma2)/1.e6 ; Msun / pc^2
 
 ; NFW (uncontracted, calculated a different way to check for consistency)
+rho3=nfw_rho(rkpc/1000.,[rnfw_mpc,conc],zl) / 1.e9 ; Msun/kpc^3
 sigma3=nfw_sigma(rkpc/1000.,[rnfw_mpc,conc],zl,/r200)
-
+ds3=sigma_to_ds(rkpc,sigma3)/1.e6 ; Msun / pc^2
+ds4=nfw_ds(rkpc/1000.,[rnfw_mpc,conc],zl,/r200)
 
 simpctable
 !p.charsize=1.5
 
 ; compare contracted and uncontracted 3d density profiles
-plot,rkpc,(rho_f-rho_i)/rho_i,/xl,ps=-4,xtit='r (kpc)',ytit=textoidl("(\rho_{AC} - \rho_{NFW}) / \rho_{NFW}")
-
-; NFW (uncontracted, calculated a different way)
-rho3=nfw_rho(rkpc/1000.,[rnfw_mpc,conc],zl) / 1.e9 ; Msun/kpc^3
+plot,rkpc,(rho_f-rho_i)/rho_i,/xl,xr=[1,1000],ps=-4,xtit='r (kpc)',ytit=textoidl("(\rho_{AC} - \rho_{NFW}) / \rho_{NFW}")
 oplot,rkpc,(rho_i - rho3)/rho3,color=!green
-oplot,replicate(rnfw_kpc,2),!y.crange,linestyle=1
+oplot,replicate(reff,2),!y.crange,color=!red,linestyle=1
+oplot,replicate(rnfw_kpc,2),!y.crange,color=!blue,linestyle=2
 
 stop
 
 ; compare contracted and uncontracted 2d density profiles
-plot,rkpc,(sigma2-sigma1)/sigma1,/xl,ps=-4,xtit='R (kpc)',ytit=textoidl("(\Sigma_{AC} - \Sigma_{NFW}) / \Sigma_{NFW}")
+plot,rkpc,(sigma2-sigma1)/sigma1,/xl,xr=[1,1000],ps=-4,xtit='R (kpc)',ytit=textoidl("(\Sigma_{AC} - \Sigma_{NFW}) / \Sigma_{NFW}")
 oplot,rkpc,(sigma3-sigma1)/sigma1,ps=-4,color=!green
-oplot,replicate(rnfw_kpc,2),!y.crange,linestyle=1
+oplot,replicate(reff,2),!y.crange,color=!red,linestyle=1
+oplot,replicate(rnfw_kpc,2),!y.crange,color=!blue,linestyle=2
+
+stop
+
+; compare contracted and uncontracted 2d DS lensing profiles
+plot,rkpc,(ds2-ds1)/ds1,/xl,xr=[1,1000],ps=-4,xtit='R (kpc)',ytit=textoidl("(\Delta\Sigma_{AC} - \Delta\Sigma_{NFW}) / \Delta\Sigma_{NFW}")
+oplot,rkpc,(ds3-ds1)/ds1,ps=-4,color=!green
+oplot,rkpc,(ds4-ds1)/ds1,ps=-4,color=!orange
+oplot,replicate(reff,2),!y.crange,color=!red,linestyle=1
+oplot,replicate(rnfw_kpc,2),!y.crange,color=!blue,linestyle=2
 
 stop
 
 
-
-
-
+plot,rkpc,rho_f,/xl,/yl,xr=[1,1000],ps=-4,xtit='r (kpc)',ytit=textoidl("\rho")
+oplot,rkpc,rho_i,ps=-4,color=!blue
+oplot,rkpc,rho3,ps=-4,color=!green
+oplot,replicate(reff,2),!y.crange,color=!red,linestyle=1
+oplot,replicate(rnfw_kpc,2),!y.crange,color=!blue,linestyle=2
 
 stop
+
+plot,rkpc,sigma2,/xl,/yl,xr=[1,1000],ps=-4,xtit='R (kpc)',ytit=textoidl("\Sigma")
+oplot,rkpc,sigma1,ps=-4,color=!blue
+oplot,rkpc,sigma3,ps=-4,color=!green
+oplot,replicate(reff,2),!y.crange,color=!red,linestyle=1
+oplot,replicate(rnfw_kpc,2),!y.crange,color=!blue,linestyle=2
+
+stop
+
+plot,rkpc,ds2,/xl,/yl,xr=[1,1000],ps=-4,xtit='R (kpc)',ytit=textoidl("\Delta\Sigma")
+oplot,rkpc,ds1,ps=-4,color=!blue
+oplot,rkpc,ds3,ps=-4,color=!green
+oplot,rkpc,ds4,ps=-4,color=!orange
+oplot,replicate(reff,2),!y.crange,color=!red,linestyle=1
+oplot,replicate(rnfw_kpc,2),!y.crange,color=!blue,linestyle=2
+
+stop
+
 end
 
