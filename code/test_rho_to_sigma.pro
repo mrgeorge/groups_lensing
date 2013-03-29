@@ -150,7 +150,7 @@ simpctable
 !p.multi=[0,3,2]
 
 set_plot,'ps'
-device,filename="lensing_ac_"+string(reff,format='(I0)')+"_"+string(logSM,format='(F4.1)')+"_"+string(logMh,format='(F4.1)')+".eps",/encapsul,/helvetica,/color, xsize=8,ysize=5,/inches
+device,filename="../plots/lensing_ac/lensing_ac_"+string(reff,format='(I0)')+"_"+string(logSM,format='(F4.1)')+"_"+string(logMh,format='(F4.1)')+".eps",/encapsul,/helvetica,/color, xsize=8,ysize=5,/inches
 
 xr=[1,1000]
 
