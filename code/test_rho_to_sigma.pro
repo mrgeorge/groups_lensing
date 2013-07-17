@@ -132,7 +132,7 @@ pro test_rho_to_sigma
 ; define some halo properties
 zl=0.
 logSM=11.
-reff=10. ; kpc
+reff=5. ; kpc
 logMh=12. ; log M200
 get_halo_properties,logMh,zl,conc,rnfw_kpc ; fill in conc,rnfw_kpc
 
@@ -144,8 +144,8 @@ simpctable
 !p.thick=3
 !x.thick=3
 !y.thick=3
-!p.charsize=1.2
-!p.charthick=1.2
+!p.charsize=1.5
+!p.charthick=1.5
 !p.font=0
 !p.multi=[0,3,2]
 
@@ -154,43 +154,45 @@ device,filename="../plots/lensing_ac/lensing_ac_"+string(reff,format='(I0)')+"_"
 
 xr=[1,1000]
 
+thick=5
+
 ; plot all profiles
-plot,rkpc,rho1,/xl,/yl,xr=xr,xtit='r (kpc)',ytit=textoidl("\rho [M_{sun} / kpc^3]")
-oplot,rkpc,rho2,color=!blue
-oplot,rkpc,rho3,color=!green
-oplot,rkpc,rho0,color=!orange,linestyle=2
+plot,rkpc,rho1,/xl,/yl,xr=xr,xtit='r (kpc)',ytit=textoidl("\rho [M_{sun} / kpc^3]"),thick=thick
+oplot,rkpc,rho2,color=!blue,thick=thick
+oplot,rkpc,rho3,color=!green,thick=thick
+oplot,rkpc,rho0,color=!orange,linestyle=2,thick=thick
 
-plot,rkpc,sigma1,/xl,/yl,xr=xr,xtit='R (kpc)',ytit=textoidl("\Sigma [M_{sun} / pc^2]")
-oplot,rkpc,sigma2,color=!blue
-oplot,rkpc,sigma3,color=!green
-oplot,rkpc,sigma0,color=!orange,linestyle=2
+plot,rkpc,sigma1,/xl,/yl,xr=xr,xtit='R (kpc)',ytit=textoidl("\Sigma [M_{sun} / pc^2]"),thick=thick
+oplot,rkpc,sigma2,color=!blue,thick=thick
+oplot,rkpc,sigma3,color=!green,thick=thick
+oplot,rkpc,sigma0,color=!orange,linestyle=2,thick=thick
 
-plot,rkpc,ds1,/xl,/yl,xr=xr,xtit='R (kpc)',ytit=textoidl("\Delta\Sigma [M_{sun} / pc^2]")
-oplot,rkpc,ds2,color=!blue
-oplot,rkpc,ds3,color=!green
-oplot,rkpc,ds0,color=!orange,linestyle=2
+plot,rkpc,ds1,/xl,/yl,xr=xr,xtit='R (kpc)',ytit=textoidl("\Delta\Sigma [M_{sun} / pc^2]"),thick=thick,yr=[.1,1000],yst=1
+oplot,rkpc,ds2,color=!blue,thick=thick
+oplot,rkpc,ds3,color=!green,thick=thick
+oplot,rkpc,ds0,color=!orange,linestyle=2,thick=thick
 fit_type=[2,0,0,0,0,0,0]
 get_ds_model,fit_type,[0],0,logSM,rkpc/1000,cen_type="ps",cen_term=cen_term
-oplot,rkpc,cen_term,color=!magenta,linestyle=1
+;oplot,rkpc,cen_term,color=!magenta,linestyle=1,thick=thick
 
 ; plot diff between contracted profiles to uncontracted
-plot,rkpc,(rho2-rho1)/rho1,/xl,xr=xr,xtit='r (kpc)',ytit=textoidl("(\rho_{AC} - \rho_{NFW}) / \rho_{NFW}")
-oplot,rkpc,(rho2-rho1)/rho1,color=!blue
-oplot,rkpc,(rho3-rho1)/rho1,color=!green
-oplot,replicate(reff,2),!y.crange,color=!red,linestyle=1
-oplot,replicate(rnfw_kpc,2),!y.crange,color=!red,linestyle=2
+plot,rkpc,(rho2-rho1)/rho1,/xl,xr=xr,xtit='r (kpc)',ytit=textoidl("(\rho_{AC} - \rho_{NFW}) / \rho_{NFW}"),thick=thick
+oplot,rkpc,(rho2-rho1)/rho1,color=!blue,thick=thick
+oplot,rkpc,(rho3-rho1)/rho1,color=!green,thick=thick
+oplot,replicate(reff,2),!y.crange,color=!red,linestyle=1,thick=thick
+oplot,replicate(rnfw_kpc,2),!y.crange,color=!red,linestyle=2,thick=thick
 
-plot,rkpc,(sigma2-sigma1)/sigma1,/xl,xr=xr,xtit='R (kpc)',ytit=textoidl("(\Sigma_{AC} - \Sigma_{NFW}) / \Sigma_{NFW}")
-oplot,rkpc,(sigma2-sigma1)/sigma1,color=!blue
-oplot,rkpc,(sigma3-sigma1)/sigma1,color=!green
-oplot,replicate(reff,2),!y.crange,color=!red,linestyle=1
-oplot,replicate(rnfw_kpc,2),!y.crange,color=!red,linestyle=2
+plot,rkpc,(sigma2-sigma1)/sigma1,/xl,xr=xr,xtit='R (kpc)',ytit=textoidl("(\Sigma_{AC} - \Sigma_{NFW}) / \Sigma_{NFW}"),thick=thick
+oplot,rkpc,(sigma2-sigma1)/sigma1,color=!blue,thick=thick
+oplot,rkpc,(sigma3-sigma1)/sigma1,color=!green,thick=thick
+oplot,replicate(reff,2),!y.crange,color=!red,linestyle=1,thick=thick
+oplot,replicate(rnfw_kpc,2),!y.crange,color=!red,linestyle=2,thick=thick
 
-plot,rkpc,(ds2-ds1)/ds1,/xl,xr=[1,1000],xtit='R (kpc)',ytit=textoidl("(\Delta\Sigma_{AC} - \Delta\Sigma_{NFW}) / \Delta\Sigma_{NFW}")
-oplot,rkpc,(ds2-ds1)/ds1,color=!blue
-oplot,rkpc,(ds3-ds1)/ds1,color=!green
-oplot,replicate(reff,2),!y.crange,color=!red,linestyle=1
-oplot,replicate(rnfw_kpc,2),!y.crange,color=!red,linestyle=2
+plot,rkpc,(ds2-ds1)/ds1,/xl,xr=[1,1000],xtit='R (kpc)',ytit=textoidl("(\Delta\Sigma_{AC} - \Delta\Sigma_{NFW}) / \Delta\Sigma_{NFW}"),thick=thick
+oplot,rkpc,(ds2-ds1)/ds1,color=!blue,thick=thick
+oplot,rkpc,(ds3-ds1)/ds1,color=!green,thick=thick
+oplot,replicate(reff,2),!y.crange,color=!red,linestyle=1,thick=thick
+oplot,replicate(rnfw_kpc,2),!y.crange,color=!red,linestyle=2,thick=thick
 
 device,/close
 
